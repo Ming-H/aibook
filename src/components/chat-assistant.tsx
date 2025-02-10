@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Send, MessageCircle, X } from "lucide-react"
 
 interface Message {
@@ -14,6 +14,11 @@ export default function ChatAssistant() {
     const [input, setInput] = useState("")
     const [isLoading, setIsLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
+
+    useEffect(() => {
+        // 这里可以安全地使用 location
+        console.log(location.href);
+    }, []);
 
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault()
@@ -41,12 +46,12 @@ export default function ChatAssistant() {
                 throw new Error(data.error)
             }
 
-            setMessages(prev => [...prev, { role: "assistant", content: data.message }])
-        } catch (error) {
-            setError(error instanceof Error ? error.message : "发生错误，请稍后重试")
-            console.error("Error:", error)
+            const assistantMessage: Message = { role: "assistant", content: data.message }
+            setMessages(prev => [...prev, assistantMessage])
+        } catch (err) {
+            setError((err as Error).message);
         } finally {
-            setIsLoading(false)
+            setIsLoading(false);
         }
     }
 
@@ -87,8 +92,8 @@ export default function ChatAssistant() {
                     >
                         <div
                             className={`max-w-[80%] rounded-2xl p-3 shadow-sm ${message.role === "user"
-                                    ? "bg-purple-600 text-white"
-                                    : "bg-white dark:bg-gray-700 border border-purple-100 dark:border-purple-800"
+                                ? "bg-purple-600 text-white"
+                                : "bg-white dark:bg-gray-700 border border-purple-100 dark:border-purple-800"
                                 }`}
                         >
                             {message.content}
