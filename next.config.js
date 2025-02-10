@@ -6,7 +6,7 @@ const nextConfig = {
     images: {
         deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
         formats: ['image/avif', 'image/webp'],
-        domains: ['www.aibook.website']
+        domains: ['aibook.website', 'www.aibook.website']
     },
     output: 'standalone',
     generateEtags: false,
@@ -19,7 +19,7 @@ const nextConfig = {
                 headers: [
                     {
                         key: 'Cache-Control',
-                        value: 'no-store, must-revalidate'
+                        value: 'public, max-age=0, must-revalidate'
                     }
                 ]
             }
