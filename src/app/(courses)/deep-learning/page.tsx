@@ -11,7 +11,7 @@ export default async function DeepLearning() {
     )
 
     return (
-        <article className="prose prose-purple dark:prose-invert max-w-none">
+        <article className="prose prose-purple dark:prose-invert max-w-none border-t border-gray-200 dark:border-gray-700">
             <ClientWrapper />
             <MDXRemote source={content} components={components} />
         </article>

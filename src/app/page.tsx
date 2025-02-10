@@ -23,37 +23,20 @@ export default function Home() {
   return (
     <div>
       {/* Hero Section */}
-      <div className="relative overflow-hidden bg-gradient-to-b from-purple-50 to-white dark:from-purple-950 dark:to-gray-950">
+      <div className="relative overflow-hidden border-t border-gray-200 dark:border-gray-800 bg-gradient-to-b from-purple-50 to-white dark:from-purple-950 dark:to-gray-950">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="py-24 lg:py-32">
-            <h1 className="text-5xl md:text-6xl font-bold text-center mb-8 bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-pink-600 dark:from-purple-400 dark:to-pink-400">
+          <div className="py-6 lg:py-8">
+            <h1 className="text-4xl md:text-5xl font-bold text-center bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-pink-600 dark:from-purple-400 dark:to-pink-400">
               AI 学习从未如此简单
             </h1>
-            <p className="text-xl text-center text-gray-600 dark:text-gray-300 mb-12 max-w-3xl mx-auto">
-              通过交互式学习和实践案例，掌握深度学习和大语言模型的核心技术
-            </p>
-            <div className="flex justify-center gap-4">
-              <Link
-                href="/deep-learning"
-                className="px-8 py-3 bg-purple-600 text-white rounded-full hover:bg-purple-700 transition-colors shadow-lg hover:shadow-xl"
-              >
-                开始学习
-              </Link>
-              <Link
-                href="#courses"
-                className="px-8 py-3 bg-white dark:bg-gray-800 text-purple-600 dark:text-purple-400 rounded-full hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors shadow-lg hover:shadow-xl"
-              >
-                浏览课程
-              </Link>
-            </div>
           </div>
         </div>
       </div>
 
       {/* Courses Section */}
-      <div id="courses" className="py-24 bg-white dark:bg-gray-900">
+      <div id="courses" className="py-12 bg-white dark:bg-gray-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-center mb-16 text-gray-900 dark:text-white">
+          <h2 className="text-3xl font-bold text-center mb-8 text-gray-900 dark:text-white">
             精心设计的课程体系
           </h2>
           <div className="grid md:grid-cols-2 gap-12">
@@ -89,9 +72,9 @@ export default function Home() {
       </div>
 
       {/* Features Section */}
-      <div className="py-24 bg-gradient-to-b from-white to-purple-50 dark:from-gray-900 dark:to-purple-950">
+      <div className="py-12 bg-gradient-to-b from-white to-purple-50 dark:from-gray-900 dark:to-purple-950">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-center mb-16 text-gray-900 dark:text-white">
+          <h2 className="text-3xl font-bold text-center mb-12 text-gray-900 dark:text-white">
             为什么选择 AIBook
           </h2>
           <div className="grid md:grid-cols-3 gap-12">

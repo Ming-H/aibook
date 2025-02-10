@@ -26,21 +26,21 @@ export function Sidebar() {
     }, [])
 
     return (
-        <aside className="w-64 border-r border-gray-200 dark:border-gray-700 min-h-screen bg-white dark:bg-gray-900">
-            <nav className="p-4">
+        <aside className="w-full h-full">
+            <nav className="p-3">
                 {menu.map((section) => (
-                    <div key={section.title} className="mb-6">
-                        <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-2">
+                    <div key={section.title} className="mb-4">
+                        <h3 className="text-sm font-bold text-gray-900 dark:text-gray-100 mb-2 px-2 py-1 rounded">
                             {section.title}
                         </h3>
-                        <ul className="space-y-1">
+                        <ul className="space-y-1 pl-2">
                             {section.items.map((item) => (
                                 <li key={item.href}>
                                     <Link
                                         href={item.href}
-                                        className={`block px-4 py-2 text-sm rounded-lg ${pathname + currentHash === item.href
-                                            ? "bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300"
-                                            : "hover:bg-gray-100 dark:hover:bg-gray-800"
+                                        className={`block px-3 py-1 text-sm rounded-lg transition-colors duration-150 ${pathname + currentHash === item.href
+                                            ? "bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300 font-medium"
+                                            : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
                                             }`}
                                     >
                                         {item.title}
