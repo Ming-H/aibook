@@ -1,36 +1,62 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# AIBook - AI教程网站
 
-## Getting Started
+AIBook 是一个基于 Next.js 的在线学习平台，专注于深度学习和大语言模型的教程。通过交互式学习和实践案例，帮助用户掌握核心技术。
 
-First, run the development server:
+## 功能
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- **深度学习教程**：从基础概念到高级应用的完整深度学习教程。
+- **大语言模型教程**：探索大语言模型的原理与应用。
+- **AI 助手**：提供实时的聊天助手，解答用户的问题。
+- **响应式设计**：支持桌面和移动设备的良好体验。
+- **深色模式**：提供深色和浅色主题切换。
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 技术栈
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- **前端**：Next.js, React, TypeScript, Tailwind CSS
+- **后端**：OpenAI API
+- **状态管理**：React Hooks
+- **样式**：Tailwind CSS
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 安装步骤
 
-## Learn More
+1. 克隆项目：
+   ```bash
+   git clone https://github.com/Ming-H/aibook.git
+   cd aibook
+   ```
 
-To learn more about Next.js, take a look at the following resources:
+2. 安装依赖：
+   ```bash
+   npm install
+   ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+3. 创建 `.env.local` 文件并添加你的 OpenAI API 密钥：
+   ```plaintext
+   DEEPSEEK_API_KEY=your_api_key_here
+   DEEPSEEK_BASE_URL=https://api.deepseek.com
+   ```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+4. 运行开发服务器：
+   ```bash
+   npm run dev
+   ```
 
-## Deploy on Vercel
+5. 打开浏览器访问 [http://localhost:3000](http://localhost:3000) 查看项目。
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 使用方法
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- 在主页上，你可以选择不同的课程进行学习。
+- 使用聊天助手获取实时帮助和解答。
+- 课程内容包括文本、图像和代码示例，帮助你更好地理解概念。
+
+## 贡献
+
+欢迎任何形式的贡献！如果你有建议或发现了问题，请提交 issue 或 pull request。
+
+## 许可证
+
+本项目使用 MIT 许可证，详细信息请查看 [LICENSE](LICENSE) 文件。
+
+## 联系
+
+如有任何问题，请联系 [AIBook Team](mailto:team@aibook.website)。
