@@ -1,20 +1,27 @@
 import Image from 'next/image'
 import Link from 'next/link'
+import type { MDXComponents } from 'mdx/types'
 
-const components = {
-    img: (props: any) => (
-        <div className="relative w-full h-64 my-8">
-            <Image
-                {...props}
-                fill
-                className="object-contain"
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            />
-        </div>
+export const components: MDXComponents = {
+    img: (props) => (
+        <Image
+            {...props}
+            alt={props.alt || ''}
+            width={800}
+            height={400}
+            className="rounded-lg"
+        />
     ),
-    a: (props: any) => (
-        <Link {...props} className="text-purple-600 hover:text-purple-800 dark:text-purple-400 dark:hover:text-purple-300" />
-    ),
+    a: ({ href, children }) => {
+        if (!href) return <>{children}</>
+        return href.startsWith('http') ? (
+            <a href={href} target="_blank" rel="noopener noreferrer">
+                {children}
+            </a>
+        ) : (
+            <Link href={href}>{children}</Link>
+        )
+    },
     h1: (props: any) => (
         <h1 {...props} className="text-4xl font-bold mt-8 mb-4" />
     ),
@@ -39,6 +46,4 @@ const components = {
     pre: (props: any) => (
         <pre {...props} className="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 my-4 overflow-x-auto" />
     ),
-}
-
-export { components } 
+} 

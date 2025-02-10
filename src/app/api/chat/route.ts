@@ -1,5 +1,6 @@
 import { OpenAI } from "openai"
 import { NextResponse } from "next/server"
+import { ChatMessage, ChatResponse } from "@/types/chat"
 
 if (!process.env.DEEPSEEK_API_KEY) {
     throw new Error("Missing DEEPSEEK_API_KEY environment variable")
@@ -12,11 +13,11 @@ const client = new OpenAI({
 
 export async function POST(request: Request) {
     try {
-        const { messages } = await request.json()
+        const { messages }: { messages: ChatMessage[] } = await request.json()
 
         const response = await client.chat.completions.create({
             model: "deepseek-chat",
-            messages: messages.map((msg: any) => ({
+            messages: messages.map((msg: ChatMessage) => ({
                 role: msg.role,
                 content: msg.content
             })),
@@ -27,14 +28,17 @@ export async function POST(request: Request) {
             throw new Error("No response from API")
         }
 
-        return NextResponse.json({
+        const chatResponse: ChatResponse = {
             message: response.choices[0].message.content
-        })
+        }
+
+        return NextResponse.json(chatResponse)
     } catch (error) {
         console.error("Error:", error)
-        return NextResponse.json(
-            { error: "Failed to process chat request" },
-            { status: 500 }
-        )
+        const errorResponse: ChatResponse = {
+            message: "",
+            error: "Failed to process chat request"
+        }
+        return NextResponse.json(errorResponse, { status: 500 })
     }
 } 
