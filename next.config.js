@@ -10,6 +10,12 @@ const nextConfig = {
     output: 'standalone',
     generateEtags: false,
     poweredByHeader: false,
+    swcMinify: true,
+    reactStrictMode: true,
+    experimental: {
+        optimizeCss: true,
+        turbo: true
+    }
 }
 
 module.exports = withMDX(nextConfig) 
