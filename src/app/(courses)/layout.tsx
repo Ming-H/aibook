@@ -8,7 +8,7 @@ export default function CoursesLayout({
     return (
         <div className="flex min-h-screen">
             {/* 左侧固定侧边栏 */}
-            <div className="fixed left-0 top-16 w-64 h-[calc(100vh-4rem)] overflow-y-auto border-r border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900">
+            <div className="fixed left-0 top-16 w-64 h-[calc(100vh-4rem)] overflow-y-auto border-r border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900">
                 <Sidebar />
             </div>
 

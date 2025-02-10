@@ -1,44 +1,41 @@
-import { OpenAI } from "openai"
-import { NextResponse } from "next/server"
-import { ChatMessage, ChatResponse } from "@/types/chat"
+import { NextResponse } from 'next/server'
 
-if (!process.env.DEEPSEEK_API_KEY) {
-    throw new Error("Missing DEEPSEEK_API_KEY environment variable")
-}
-
-const client = new OpenAI({
-    apiKey: process.env.DEEPSEEK_API_KEY,
-    baseURL: process.env.DEEPSEEK_BASE_URL
-})
-
-export async function POST(request: Request) {
+export async function POST(req: Request) {
     try {
-        const { messages }: { messages: ChatMessage[] } = await request.json()
+        const { messages } = await req.json()
 
-        const response = await client.chat.completions.create({
-            model: "deepseek-chat",
-            messages: messages.map((msg: ChatMessage) => ({
-                role: msg.role,
-                content: msg.content
-            })),
-            temperature: 0.7,
+        console.log('Sending request to Deepseek API:', {
+            url: process.env.DEEPSEEK_BASE_URL,
+            messages
         })
 
-        if (!response.choices[0].message?.content) {
-            throw new Error("No response from API")
+        const response = await fetch(`${process.env.DEEPSEEK_BASE_URL}/v1/chat/completions`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${process.env.DEEPSEEK_API_KEY}`
+            },
+            body: JSON.stringify({
+                model: 'deepseek-chat',
+                messages,
+                temperature: 0.7,
+                max_tokens: 1000
+            })
+        })
+
+        if (!response.ok) {
+            const errorData = await response.text()
+            console.error('Deepseek API error:', errorData)
+            throw new Error(`API request failed: ${response.statusText}`)
         }
 
-        const chatResponse: ChatResponse = {
-            message: response.choices[0].message.content
-        }
-
-        return NextResponse.json(chatResponse)
+        const data = await response.json()
+        return NextResponse.json(data)
     } catch (error) {
-        console.error("Error:", error)
-        const errorResponse: ChatResponse = {
-            message: "",
-            error: "Failed to process chat request"
-        }
-        return NextResponse.json(errorResponse, { status: 500 })
+        console.error('Chat API Error:', error)
+        return NextResponse.json(
+            { error: 'Failed to process chat request' },
+            { status: 500 }
+        )
     }
 } 

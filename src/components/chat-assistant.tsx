@@ -46,12 +46,16 @@ export default function ChatAssistant() {
                 throw new Error(data.error)
             }
 
-            const assistantMessage: Message = { role: "assistant", content: data.message }
+            const assistantMessage: Message = {
+                role: "assistant",
+                content: data.choices[0].message.content
+            }
             setMessages(prev => [...prev, assistantMessage])
         } catch (err) {
-            setError((err as Error).message);
+            console.error('Chat error:', err)
+            setError((err as Error).message)
         } finally {
-            setIsLoading(false);
+            setIsLoading(false)
         }
     }
 
