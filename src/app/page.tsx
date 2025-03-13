@@ -17,6 +17,12 @@ export default function Home() {
       description: "探索大语言模型的原理与应用",
       href: "/large-language-model",
       image: "/images/llm-cover.jpg"
+    },
+    {
+      title: "大模型导航",
+      description: "了解当前流行的AI大模型及其特点",
+      href: "/ai-models",
+      image: "/images/ai-models-cover.jpg"
     }
   ];
 

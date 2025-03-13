@@ -115,4 +115,40 @@ export const llmMenu = [
             { title: "推理加速", href: "/large-language-model#推理加速" },
         ],
     },
+];
+
+export const aiModelsMenu = [
+    {
+        title: "OpenAI模型",
+        items: [
+            { title: "GPT-4o", href: "/ai-models#gpt-4o" },
+            { title: "GPT-4", href: "/ai-models#gpt-4" },
+            { title: "GPT-3.5", href: "/ai-models#gpt-3-5" },
+        ],
+    },
+    {
+        title: "Anthropic模型",
+        items: [
+            { title: "Claude 3.5 Sonnet", href: "/ai-models#claude-3-5-sonnet" },
+            { title: "Claude 3 Opus", href: "/ai-models#claude-3-opus" },
+            { title: "Claude 3 Haiku", href: "/ai-models#claude-3-haiku" },
+        ],
+    },
+    {
+        title: "国产模型",
+        items: [
+            { title: "文心一言", href: "/ai-models#文心一言" },
+            { title: "智谱 GLM-4", href: "/ai-models#glm-4" },
+            { title: "讯飞星火", href: "/ai-models#讯飞星火" },
+            { title: "MiniMax", href: "/ai-models#minimax" },
+        ],
+    },
+    {
+        title: "开源模型",
+        items: [
+            { title: "Llama 3", href: "/ai-models#llama-3" },
+            { title: "Mistral AI", href: "/ai-models#mistral-ai" },
+            { title: "Falcon", href: "/ai-models#falcon" },
+        ],
+    },
 ]; 

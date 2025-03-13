@@ -42,6 +42,12 @@ export default function Navbar() {
                         >
                             大语言模型
                         </Link>
+                        <Link
+                            href="/ai-models"
+                            className="text-gray-700 dark:text-gray-200 hover:text-purple-600 dark:hover:text-purple-400 font-medium transition-colors"
+                        >
+                            大模型导航
+                        </Link>
                         <button
                             onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
                             className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"

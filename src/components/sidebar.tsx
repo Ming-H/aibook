@@ -2,14 +2,27 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { deepLearningMenu, llmMenu } from "@/docs/config"
+import { deepLearningMenu, llmMenu, aiModelsMenu } from "@/docs/config"
 import { useEffect, useState } from "react"
 
 export function Sidebar() {
     const pathname = usePathname()
     const [currentHash, setCurrentHash] = useState("")
-    const isDeepLearning = pathname.startsWith("/deep-learning")
-    const menu = isDeepLearning ? deepLearningMenu : llmMenu
+
+    // 确定当前路径对应的菜单
+    let menu
+    if (pathname.startsWith("/deep-learning")) {
+        menu = deepLearningMenu
+    } else if (pathname.startsWith("/large-language-model")) {
+        menu = llmMenu
+    } else if (pathname.startsWith("/ai-models")) {
+        menu = aiModelsMenu
+    } else {
+        // 默认菜单，可以根据需要设置
+        menu = pathname.includes("deep-learning") ? deepLearningMenu :
+            pathname.includes("large-language-model") ? llmMenu :
+                pathname.includes("ai-models") ? aiModelsMenu : deepLearningMenu
+    }
 
     // 在客户端监听 hash 变化
     useEffect(() => {
