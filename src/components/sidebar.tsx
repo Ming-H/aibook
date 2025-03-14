@@ -18,7 +18,6 @@ export function Sidebar() {
     } else if (pathname.startsWith("/ai-models")) {
         menu = aiModelsMenu
     } else {
-        // 默认菜单，可以根据需要设置
         menu = pathname.includes("deep-learning") ? deepLearningMenu :
             pathname.includes("large-language-model") ? llmMenu :
                 pathname.includes("ai-models") ? aiModelsMenu : deepLearningMenu
@@ -26,44 +25,54 @@ export function Sidebar() {
 
     // 在客户端监听 hash 变化
     useEffect(() => {
-        // 初始化当前 hash
         setCurrentHash(window.location.hash)
-
-        // 监听 hash 变化
         const handleHashChange = () => {
             setCurrentHash(window.location.hash)
         }
-
         window.addEventListener('hashchange', handleHashChange)
         return () => window.removeEventListener('hashchange', handleHashChange)
     }, [])
 
+    // 获取当前页面的标题
+    const getPageTitle = () => {
+        if (pathname.startsWith("/deep-learning")) {
+            return "深度学习"
+        } else if (pathname.startsWith("/large-language-model")) {
+            return "大语言模型"
+        } else if (pathname.startsWith("/ai-models")) {
+            return "AI大模型导航"
+        }
+        return "课程目录"
+    }
+
     return (
-        <aside className="w-full h-full">
-            <nav className="p-3">
+        <nav className="p-4">
+            <h2 className="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100">
+                {getPageTitle()}
+            </h2>
+            <div className="space-y-4">
                 {menu.map((section) => (
-                    <div key={section.title} className="mb-4">
-                        <h3 className="text-sm font-bold text-gray-900 dark:text-gray-100 mb-2 px-2 py-1 rounded">
+                    <div key={section.title} className="space-y-1">
+                        <h3 className="text-sm font-medium text-gray-900 dark:text-gray-100 px-4 mb-2">
                             {section.title}
                         </h3>
-                        <ul className="space-y-1 pl-2">
+                        <div className="space-y-1">
                             {section.items.map((item) => (
-                                <li key={item.href}>
-                                    <Link
-                                        href={item.href}
-                                        className={`block px-3 py-1 text-sm rounded-lg transition-colors duration-150 ${pathname + currentHash === item.href
-                                            ? "bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300 font-medium"
-                                            : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
-                                            }`}
-                                    >
-                                        {item.title}
-                                    </Link>
-                                </li>
+                                <Link
+                                    key={item.href}
+                                    href={item.href}
+                                    className={`flex items-center px-4 py-2 text-sm rounded-lg transition-colors ${pathname + currentHash === item.href
+                                            ? "bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-300 font-medium"
+                                            : "text-gray-700 dark:text-gray-300 hover:bg-purple-50 dark:hover:bg-purple-900/20"
+                                        }`}
+                                >
+                                    <span className="flex-1">{item.title}</span>
+                                </Link>
                             ))}
-                        </ul>
+                        </div>
                     </div>
                 ))}
-            </nav>
-        </aside>
+            </div>
+        </nav>
     )
 } 

@@ -38,18 +38,18 @@ export default function RootLayout({
 }) {
   return (
     <html lang="zh" suppressHydrationWarning>
-      <body className={`${inter.className} bg-[#fafafa] dark:bg-gray-950`}>
+      <body className={`${inter.className} bg-white dark:bg-gray-950`}>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
           enableSystem
           disableTransitionOnChange
         >
-          <div className="min-h-screen flex flex-col">
+          <div className="min-h-screen">
             <Navbar />
-            <main className="flex-1 flex flex-col items-center justify-center">
+            <div className="pt-16">
               {children}
-            </main>
+            </div>
             <ChatAssistant />
           </div>
         </ThemeProvider>
