@@ -2,7 +2,13 @@ import { aiModels } from '@/config/ai-models'
 import { notFound } from 'next/navigation'
 import { ExternalLink } from 'lucide-react'
 
-export default function ModelPage({ params }: { params: { modelId: string } }) {
+type Props = {
+    params: {
+        modelId: string
+    }
+}
+
+export default function ModelPage({ params }: Props) {
     const model = aiModels.find((m) => m.id === params.modelId)
 
     if (!model) {
