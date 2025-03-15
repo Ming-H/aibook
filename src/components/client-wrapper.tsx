@@ -1,11 +1,13 @@
-"use client"
+"use client";
 
-import dynamic from 'next/dynamic'
+import dynamic from "next/dynamic";
 
-const LocationLogger = dynamic(() => import('@/components/LocationLogger'), {
-    ssr: false
-})
+const LocationLogger = dynamic(() => import("@/components/LocationLogger"), {
+  ssr: false,
+});
 
 export default function ClientWrapper() {
-    return process.env.NODE_ENV === 'development' ? <LocationLogger /> : null
-} 
+  return process.env.NODE_ENV === "development" ? (
+    <LocationLogger data-oid="7w:mdnd" />
+  ) : null;
+}

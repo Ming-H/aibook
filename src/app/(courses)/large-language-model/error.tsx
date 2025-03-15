@@ -1,5 +1,5 @@
-'use client'
+"use client";
 
-import Error from '@/components/error'
+import Error from "@/components/error";
 
-export default Error 
+export default Error;

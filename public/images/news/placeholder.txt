@@ -1,0 +1,2 @@
+This directory will contain news images.
+You can replace this with actual image files. 

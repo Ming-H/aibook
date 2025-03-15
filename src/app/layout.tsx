@@ -1,57 +1,50 @@
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import "./globals.css";
-import { ThemeProvider } from "@/components/theme-provider";
-import Navbar from "@/components/navbar";
-import ChatAssistant from "@/components/chat-assistant"
+import { Inter } from "next/font/google";
+import { ThemeProvider } from "next-themes";
+import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
+import { Toaster } from 'sonner';
+import type { Metadata } from "next";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://www.aibook.website'),
-  title: {
-    default: 'AIBook - AI教程网站',
-    template: '%s - AIBook'
-  },
-  description: '专业的深度学习与大语言模型教程',
-  keywords: ['AI', '深度学习', '大语言模型', '教程', '人工智能'],
-  authors: [{ name: 'AIBook Team' }],
-  openGraph: {
-    type: 'website',
-    locale: 'zh_CN',
-    url: 'https://www.aibook.website',
-    title: 'AIBook - AI教程网站',
-    description: '专业的深度学习与大语言模型教程',
-    siteName: 'AIBook'
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'AIBook - AI教程网站',
-    description: '专业的深度学习与大语言模型教程'
-  }
+  title: "AI Tools Hub - 一站式AI工具解决方案",
+  description:
+    "提供文本、图像、视频、音频处理的AI工具集合，提高工作效率，释放创造力",
 };
 
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
   return (
-    <html lang="zh" suppressHydrationWarning>
-      <body className={`${inter.className} bg-white dark:bg-gray-950`}>
+    <html lang="zh-CN" suppressHydrationWarning data-oid="dg-xgu7">
+      <body
+        className={`${inter.className} bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen`}
+        data-oid="3kgxio4"
+      >
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
           enableSystem
           disableTransitionOnChange
+          data-oid="9g4fa:_"
         >
-          <div className="min-h-screen">
-            <Navbar />
-            <div className="pt-16">
+          <div className="min-h-screen flex flex-col" data-oid="nkvnk.a">
+            {/* 导航栏 - 只保留一个导航组件 */}
+            <Navbar data-oid="_j.bs21" />
+
+            {/* 主内容区域 */}
+            <main className="flex-grow" data-oid="mg:5_b8">
               {children}
-            </div>
-            <ChatAssistant />
+            </main>
+
+            {/* 页脚 */}
+            <Footer data-oid="pwls2dt" />
           </div>
+          <Toaster position="top-center" />
         </ThemeProvider>
       </body>
     </html>
