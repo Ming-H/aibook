@@ -1,41 +1,30 @@
-const withMDX = require('@next/mdx')()
-
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'md', 'mdx'],
+    reactStrictMode: true,
+    swcMinify: true,
     images: {
-        deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
-        formats: ['image/avif', 'image/webp'],
-        domains: ['aibook.website', 'www.aibook.website', 'images.unsplash.com'],
+        domains: [
+            'ctvvnthsnbnrgbwvrgec.supabase.co', // Supabase存储域名
+            'avatars.githubusercontent.com', // GitHub头像
+            'localhost', // 本地开发
+            'res.cloudinary.com', // Cloudinary (如果使用)
+            'images.unsplash.com', // Unsplash示例图片
+            'via.placeholder.com', // 占位图片
+        ],
         remotePatterns: [
             {
                 protocol: 'https',
-                hostname: 'api.deepseek.com',
+                hostname: '**',
             },
-            {
-                protocol: 'https',
-                hostname: 'images.unsplash.com',
-                pathname: '/**',
-            },
-        ]
+        ],
     },
-    output: 'standalone',
-    generateEtags: false,
-    poweredByHeader: false,
-    reactStrictMode: true,
-    async headers() {
-        return [
-            {
-                source: '/:path*',
-                headers: [
-                    {
-                        key: 'Cache-Control',
-                        value: 'public, max-age=0, must-revalidate'
-                    }
-                ]
-            }
-        ]
-    }
+    experimental: {
+        // App Router 已经内置了服务器组件支持，不需要额外配置
+        // 编译时间优化
+        optimizeCss: false,
+        // 改进的类型检查
+        typedRoutes: true,
+    },
 }
 
-module.exports = withMDX(nextConfig) 
+module.exports = nextConfig 

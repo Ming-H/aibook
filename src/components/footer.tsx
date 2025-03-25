@@ -3,14 +3,11 @@ import Link from "next/link";
 export default function Footer() {
   return (
     <footer
-      className="bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800"
+      className="bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800"
       data-oid="u.zicwk"
     >
-      <div className="container mx-auto px-4 py-12" data-oid="ch5brbm">
-        <div
-          className="grid grid-cols-1 md:grid-cols-4 gap-8"
-          data-oid="ly.ripy"
-        >
+      <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8" data-oid="ch5brbm">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8" data-oid="ly.ripy">
           {/* Logo and Description */}
           <div className="col-span-1 md:col-span-1" data-oid=".-qegan">
             <Link href="/" className="inline-block" data-oid="9c888we">
@@ -25,7 +22,7 @@ export default function Footer() {
               className="mt-3 text-gray-600 dark:text-gray-400 text-sm"
               data-oid="accsjrj"
             >
-              全面的AI工具集合平台，助力创作与提升效率的得力助手
+              一站式AI工具平台，提供文本、图像、视频、音频处理的AI工具集合，提高工作效率，释放创造力。
             </p>
             <div className="mt-4 flex space-x-4" data-oid="rv69u4x">
               <a
@@ -77,43 +74,43 @@ export default function Footer() {
               className="text-sm font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-wider"
               data-oid="zokur6b"
             >
-              平台
+              导航
             </h3>
             <ul className="mt-4 space-y-3" data-oid="b3p_dzk">
               <li data-oid="_h7bdrp">
                 <Link
-                  href="/tools"
+                  href="/"
                   className="text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 text-sm"
                   data-oid="fr47k3a"
                 >
-                  工具导航
+                  首页
                 </Link>
               </li>
               <li data-oid="6m.fq4z">
                 <Link
-                  href="/news"
+                  href="/tools"
                   className="text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 text-sm"
                   data-oid="1yfio1g"
                 >
-                  新闻资讯
+                  工具导航
                 </Link>
               </li>
               <li data-oid="om.0ln2">
                 <Link
-                  href="/pricing"
+                  href="/auth/login"
                   className="text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 text-sm"
                   data-oid="w78:b:1"
                 >
-                  价格方案
+                  登录
                 </Link>
               </li>
               <li data-oid="y8q9mgx">
                 <Link
-                  href="/community"
+                  href="/auth/register"
                   className="text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 text-sm"
                   data-oid="ekegpf1"
                 >
-                  社区
+                  注册
                 </Link>
               </li>
             </ul>
@@ -125,43 +122,43 @@ export default function Footer() {
               className="text-sm font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-wider"
               data-oid="wmym16c"
             >
-              支持
+              联系我们
             </h3>
             <ul className="mt-4 space-y-3" data-oid="zb3.7i9">
               <li data-oid="3hzy960">
                 <Link
-                  href="/faq"
+                  href="mailto:support@aitoolshub.com"
                   className="text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 text-sm"
                   data-oid="gn5f0wj"
                 >
-                  常见问题
+                  邮箱：support@aitoolshub.com
                 </Link>
               </li>
               <li data-oid="19w3sv6">
                 <Link
-                  href="/support"
+                  href="/faq"
                   className="text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 text-sm"
                   data-oid="7rwbioc"
                 >
-                  联系客服
+                  常见问题
                 </Link>
               </li>
               <li data-oid="eq8rx8_">
                 <Link
-                  href="/guides"
+                  href="/support"
                   className="text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 text-sm"
                   data-oid="m7g8qgz"
                 >
-                  使用教程
+                  联系客服
                 </Link>
               </li>
               <li data-oid="k-zvu4_">
                 <Link
-                  href="/api-docs"
+                  href="/guides"
                   className="text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 text-sm"
                   data-oid="6ukd_b3"
                 >
-                  API文档
+                  使用教程
                 </Link>
               </li>
             </ul>
@@ -173,16 +170,16 @@ export default function Footer() {
               className="text-sm font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-wider"
               data-oid="pcbybmc"
             >
-              关于我们
+              客服时间
             </h3>
             <ul className="mt-4 space-y-3" data-oid="_8akly7">
               <li data-oid="mfx0zb.">
                 <Link
-                  href="/about"
+                  href="/"
                   className="text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 text-sm"
                   data-oid="5s-b4w5"
                 >
-                  公司介绍
+                  周一至周五 9:00-18:00
                 </Link>
               </li>
               <li data-oid="rnahofc">
