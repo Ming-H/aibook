@@ -1,17 +1,13 @@
 'use client';
 
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from '@/lib/supabase/client';
 import { STORAGE_KEYS } from '@/app/lib/constants';
-import { Session, User } from '@supabase/supabase-js';
+// 重命名导入的 User 类型以避免冲突
+import { Session, User as SupabaseUser } from '@supabase/supabase-js';
 import { useRouter } from 'next/navigation';
 
-// 创建Supabase客户端
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
-
-// 定义用户类型
+// 定义自定义用户类型
 export interface User {
     id: string;
     email: string;
@@ -28,8 +24,14 @@ export interface AuthContextType {
     loading: boolean;
     isLoading: boolean;
     error: string | null;
-    signIn: (email: string, password: string) => Promise<void>;
+    signIn: (email: string, password: string) => Promise<{ error?: string }>;
+    login: (email: string, password: string) => Promise<{ error?: string }>;
     signOut: () => Promise<void>;
+    signup: (email: string, password: string, name: string) => Promise<{ data?: any; error?: any }>;
+    signInWithGoogle: () => Promise<void>;
+    signInWithGithub: () => Promise<void>;
+    resetPassword: (email: string) => Promise<void>;
+    updateProfile: (data: Partial<User>) => Promise<void>;
 }
 
 // 创建 AuthContext
@@ -90,7 +92,7 @@ export function AuthProvider({
                         const userData: User = {
                             id: data.session.user.id,
                             email: data.session.user.email!,
-                            name: profileData.display_name,
+                            name: profileData.full_name,
                             avatar: profileData.avatar_url,
                         };
 
@@ -121,7 +123,7 @@ export function AuthProvider({
                     const userData: User = {
                         id: session.user.id,
                         email: session.user.email!,
-                        name: profileData.display_name,
+                        name: profileData.full_name,
                         avatar: profileData.avatar_url,
                     };
 
@@ -143,8 +145,28 @@ export function AuthProvider({
     // 登录方法
     const signIn = async (email: string, password: string) => {
         console.log('AuthContext: Attempting login with', { email, passwordLength: password.length });
+        setError(null);
 
         try {
+            // 检查输入是否含有非 ASCII 字符，这可能导致请求失败
+            if (/[^\x00-\x7F]/.test(email) || /[^\x00-\x7F]/.test(password)) {
+                return { error: '邮箱或密码包含不支持的特殊字符' };
+            }
+
+            // 检查环境变量是否配置
+            if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+                throw new Error('Supabase 环境变量未正确配置');
+            }
+
+            if (/[^\x00-\x7F]/.test(process.env.NEXT_PUBLIC_SUPABASE_URL) ||
+                /[^\x00-\x7F]/.test(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)) {
+                console.error('环境变量包含非 ASCII 字符，可能导致连接问题');
+                return { error: 'Supabase 配置错误：环境变量包含不支持的字符' };
+            }
+
+            console.log('使用 Supabase URL:', process.env.NEXT_PUBLIC_SUPABASE_URL.substring(0, 20) + '...');
+
+            // 尝试登录
             const { data, error } = await supabase.auth.signInWithPassword({
                 email,
                 password,
@@ -152,29 +174,78 @@ export function AuthProvider({
 
             if (error) {
                 console.error('Login error:', error.message);
-                setError(error.message);
-                return;
+                if (error.message === 'Failed to fetch') {
+                    return { error: 'Supabase 连接失败，请检查网络连接或服务器配置' };
+                }
+                return { error: error.message };
             }
 
             if (data.user) {
                 console.log('Login successful:', {
                     id: data.user.id,
                     email: data.user.email,
-                    emailConfirmed: data.user.email_confirmed_at ? true : false
                 });
-                setUser(data.user);
+
+                // 获取用户详细信息
+                const { data: profileData, error: profileError } = await supabase
+                    .from('profiles')
+                    .select('*')
+                    .eq('id', data.user.id)
+                    .single();
+
+                if (profileError) {
+                    console.error('Error fetching profile:', profileError);
+                    // 如果找不到配置文件，则创建一个
+                    if (profileError.code === 'PGRST116') {
+                        console.log('Profile not found, creating a new one');
+
+                        const { error: insertError } = await supabase
+                            .from('profiles')
+                            .insert([
+                                {
+                                    id: data.user.id,
+                                    email: data.user.email,
+                                    full_name: data.user.email?.split('@')[0] || 'User',
+                                    updated_at: new Date().toISOString(),
+                                }
+                            ]);
+
+                        if (insertError) {
+                            console.error('Failed to create profile:', insertError);
+                        }
+                    }
+                }
+
+                // 使用配置文件数据或回退到基本用户数据
+                const userData: User = {
+                    id: data.user.id,
+                    email: data.user.email!,
+                    name: profileData?.full_name || data.user.email!.split('@')[0],
+                    avatar: profileData?.avatar_url,
+                };
+
+                setUser(userData);
+                localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(userData));
+                return {};
             }
+
+            return { error: '登录失败：无效的用户数据' };
         } catch (error: any) {
             console.error('Unexpected login error:', error.message);
-            setError(error.message);
+            return { error: error.message };
         }
     };
+
+    // 添加 login 别名以保持兼容性
+    const login = signIn;
 
     // 注册方法
     const signup = async (email: string, password: string, name: string) => {
         console.log('AuthContext: Attempting signup with', { email, name, passwordLength: password.length });
+        setError(null);
 
         try {
+            // 1. 创建用户认证
             const { data, error } = await supabase.auth.signUp({
                 email,
                 password,
@@ -182,28 +253,45 @@ export function AuthProvider({
                     data: {
                         full_name: name,
                     },
-                    // 确保邮箱验证重定向到正确URL
-                    emailRedirectTo: `${window.location.origin}/auth/callback`,
                 },
             });
 
             if (error) {
                 console.error('Signup error:', error.message);
-                return { error };
+                return { error: error.message };
             }
 
             if (data.user) {
-                console.log('Signup successful:', {
-                    id: data.user.id,
-                    email: data.user.email,
-                    emailConfirmed: data.user.email_confirmed_at ? true : false
-                });
+                console.log('Signup successful. Creating profile for user:', data.user.id);
+
+                // 2. 手动创建用户配置文件
+                const { error: profileError } = await supabase
+                    .from('profiles')
+                    .insert([
+                        {
+                            id: data.user.id,
+                            email: email,
+                            full_name: name,
+                            avatar_url: null,
+                            updated_at: new Date().toISOString(),
+                        }
+                    ]);
+
+                if (profileError) {
+                    console.error('Failed to create user profile:', profileError);
+                    return { error: `用户创建成功，但个人资料设置失败: ${profileError.message}` };
+                }
+
+                console.log('User profile created successfully');
+
+                // 用户已创建，返回成功
+                return { data: data.user };
             }
 
-            return { data, error: null };
+            return { error: '注册过程中发生未知错误' };
         } catch (error: any) {
             console.error('Unexpected signup error:', error.message);
-            return { error: { message: error.message } };
+            return { error: error.message };
         }
     };
 
@@ -332,6 +420,7 @@ export function AuthProvider({
         isLoading: loading,
         error,
         signIn,
+        login,
         signup,
         signInWithGoogle: async () => {
             // Implementation needed

@@ -3,7 +3,7 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
-import { AuthProvider } from '../lib/context/AuthContext'
+// import { AuthProvider } from '../lib/context/AuthContext'
 // import { Toaster } from 'sonner'
 import Navbar from '../components/Navbar'
 import { Providers } from './providers'
@@ -17,19 +17,19 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
     children,
-}: Readonly<{
+}: {
     children: React.ReactNode;
-}>) {
+}) {
     return (
         <html lang="zh-CN" className="scroll-smooth">
             <body className={`${inter.className} bg-gray-100 min-h-screen flex flex-col`}>
-                <AuthProvider>
+                <Providers>
                     <Navbar />
                     <main className="flex-grow">{children}</main>
                     <Footer />
                     {/* 暂时注释掉 Toaster */}
                     {/* <Toaster /> */}
-                </AuthProvider>
+                </Providers>
             </body>
         </html>
     )

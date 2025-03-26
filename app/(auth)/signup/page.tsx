@@ -55,30 +55,51 @@ export default function SignUp() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
-
-        // 验证密码匹配
-        if (password !== confirmPassword) {
-            setError('两次输入的密码不匹配');
-            return;
-        }
-
-        // 验证密码强度
-        if (password.length < 8) {
-            setError('密码至少需要8个字符');
-            return;
-        }
-
-        // 检查邮箱是否已被注册
-        if (emailStatus === 'taken') {
-            setError('此邮箱已被注册，请尝试登录或找回密码');
-            return;
-        }
-
         setIsLoading(true);
 
         try {
-            // 调用Supabase注册函数
-            await signup(email, password, name);
+            // 基本验证
+            if (!email || !password || !name) {
+                setError('请填写所有必填字段');
+                setIsLoading(false);
+                return;
+            }
+
+            // 注册用户
+            const { data, error: signUpError } = await supabase.auth.signUp({
+                email,
+                password,
+                options: {
+                    data: { full_name: name }
+                }
+            });
+
+            if (signUpError) {
+                throw new Error(signUpError.message);
+            }
+
+            if (!data.user) {
+                throw new Error('注册过程中发生未知错误');
+            }
+
+            // 手动创建用户配置文件
+            const { error: profileError } = await supabase
+                .from('profiles')
+                .insert([
+                    {
+                        id: data.user.id,
+                        email: email,
+                        display_name: name,
+                        updated_at: new Date().toISOString()
+                    }
+                ]);
+
+            if (profileError) {
+                console.error('创建用户资料失败:', profileError);
+                // 继续导航，不阻止用户体验
+            }
+
+            // 注册成功，导航到仪表板
             router.push('/dashboard');
         } catch (err: any) {
             console.error('注册失败:', err);

@@ -2,6 +2,7 @@
 
 import type { User } from './userService';
 import { getUserByEmail } from './userService';
+import { createClient } from '../supabase/client';
 
 export type AuthSession = {
     user: User | null;
@@ -9,207 +10,134 @@ export type AuthSession = {
     error?: string | null;
 };
 
-// 模拟会话状态（实际中应该使用真实的会话管理）
-let mockSession: AuthSession = {
-    user: {
-        id: 'user1',
-        email: 'zhangsan@example.com',
-        username: 'zhangsan',
-        display_name: '张三',
-        avatar_url: 'https://via.placeholder.com/150?text=ZS',
-        bio: '热爱技术和编程的前端开发者，专注于React和Next.js生态。',
-        website: 'https://zhangsan.example.com',
-        created_at: new Date(Date.now() - 30 * 86400000).toISOString(),
-        role: 'admin',
-        last_login: new Date().toISOString()
-    },
-    isAuthenticated: true
-};
+const supabase = createClient();
 
-/**
- * 获取当前会话状态
- * @returns 当前会话信息
- */
 export async function getSession(): Promise<AuthSession> {
     try {
-        return mockSession;
-    } catch (error) {
-        console.error('Error in getSession:', error);
-        return { user: null, isAuthenticated: false, error: 'Failed to get session' };
-    }
-}
+        const { data, error } = await supabase.auth.getSession();
 
-/**
- * 用户登录
- * @param email 用户邮箱
- * @param password 用户密码
- * @returns 会话信息
- */
-export async function signIn(email: string, password: string): Promise<AuthSession> {
-    try {
-        console.log('Signing in with email:', email);
+        if (error || !data.session) {
+            return { user: null, isAuthenticated: false, error: error?.message };
+        }
 
-        // 模拟登录验证
-        if (email === 'zhangsan@example.com' && password === 'password123') {
-            const user = await getUserByEmail(email);
+        // 获取完整用户资料
+        const { data: userData } = await supabase
+            .from('profiles')
+            .select('id, email, username, display_name, role, created_at, updated_at')
+            .eq('id', data.session.user.id)
+            .single();
 
-            if (user) {
-                mockSession = {
-                    user,
-                    isAuthenticated: true
-                };
-                return mockSession;
-            }
+        if (!userData) {
+            return { user: null, isAuthenticated: false, error: '用户资料不存在' };
         }
 
         return {
-            user: null,
-            isAuthenticated: false,
-            error: '邮箱或密码不正确'
+            user: {
+                id: userData.id,
+                email: userData.email,
+                username: userData.username,
+                display_name: userData.display_name,
+                role: userData.role,
+                created_at: userData.created_at
+            },
+            isAuthenticated: true
         };
     } catch (error) {
-        console.error('Error in signIn:', error);
-        return {
-            user: null,
-            isAuthenticated: false,
-            error: '登录时出现错误'
-        };
+        console.error('Session error:', error);
+        return { user: null, isAuthenticated: false, error: '无法获取会话信息' };
     }
 }
 
-/**
- * 用户注册
- * @param email 用户邮箱
- * @param password 用户密码
- * @param username 用户名
- * @returns 会话信息
- */
+export async function login(email: string, password: string): Promise<AuthSession> {
+    try {
+        const { data, error } = await supabase.auth.signInWithPassword({
+            email,
+            password
+        });
+
+        if (error) {
+            return { user: null, isAuthenticated: false, error: error.message };
+        }
+
+        // 获取完整用户资料
+        const { data: userData } = await supabase
+            .from('profiles')
+            .select('id, email, username, display_name, role, created_at, updated_at')
+            .eq('id', data.user.id)
+            .single();
+
+        return {
+            user: userData as User,
+            isAuthenticated: true
+        };
+    } catch (error) {
+        console.error('Login error:', error);
+        return { user: null, isAuthenticated: false, error: '登录过程中发生错误' };
+    }
+}
+
 export async function signUp(
     email: string,
     password: string,
     username: string
 ): Promise<AuthSession> {
     try {
-        console.log('Signing up with email:', email);
+        // 邮箱唯一性检查
+        const { count } = await supabase
+            .from('profiles')
+            .select('*', { count: 'exact', head: true })
+            .eq('email', email);
 
-        // 模拟注册流程
-        const existingUser = await getUserByEmail(email);
-
-        if (existingUser) {
-            return {
-                user: null,
-                isAuthenticated: false,
-                error: '该邮箱已被注册'
-            };
+        if (count && count > 0) {
+            return { user: null, isAuthenticated: false, error: '该邮箱已被注册' };
         }
 
-        // 模拟创建新用户
-        const newUser: User = {
-            id: Math.random().toString(36).substring(2, 9),
+        // 创建新用户
+        const { data, error } = await supabase.auth.signUp({
             email,
-            username,
-            display_name: username,
-            created_at: new Date().toISOString(),
-            role: 'user',
-            last_login: new Date().toISOString()
-        };
+            password,
+            options: {
+                data: {
+                    username,
+                    display_name: username
+                }
+            }
+        });
 
-        // 更新模拟会话
-        mockSession = {
-            user: newUser,
+        if (error) {
+            return { user: null, isAuthenticated: false, error: error.message };
+        }
+
+        // 创建用户资料
+        const { data: userData } = await supabase
+            .from('profiles')
+            .insert({
+                id: data.user!.id,
+                email,
+                username,
+                display_name: username,
+                role: 'user',
+                created_at: new Date().toISOString()
+            })
+            .select()
+            .single();
+
+        return {
+            user: userData as User,
             isAuthenticated: true
         };
-
-        return mockSession;
     } catch (error) {
-        console.error('Error in signUp:', error);
-        return {
-            user: null,
-            isAuthenticated: false,
-            error: '注册时出现错误'
-        };
+        console.error('Registration error:', error);
+        return { user: null, isAuthenticated: false, error: '注册过程中发生错误' };
     }
 }
 
-/**
- * 用户登出
- * @returns 操作是否成功
- */
-export async function signOut(): Promise<boolean> {
+export async function signOut(): Promise<{ success: boolean; error?: string }> {
     try {
-        console.log('Signing out');
-
-        // 清除模拟会话
-        mockSession = {
-            user: null,
-            isAuthenticated: false
-        };
-
-        return true;
+        const { error } = await supabase.auth.signOut();
+        return error ? { success: false, error: error.message } : { success: true };
     } catch (error) {
-        console.error('Error in signOut:', error);
-        return false;
+        console.error('Logout error:', error);
+        return { success: false, error: '登出过程中发生错误' };
     }
 }
-
-/**
- * 发送密码重置链接
- * @param email 用户邮箱
- * @returns 操作是否成功
- */
-export async function sendPasswordResetEmail(email: string): Promise<boolean> {
-    try {
-        console.log('Sending password reset email to:', email);
-
-        // 模拟发送密码重置邮件
-        return true;
-    } catch (error) {
-        console.error('Error in sendPasswordResetEmail:', error);
-        return false;
-    }
-}
-
-/**
- * 重置用户密码
- * @param token 重置令牌
- * @param newPassword 新密码
- * @returns 操作是否成功
- */
-export async function resetPassword(token: string, newPassword: string): Promise<boolean> {
-    try {
-        console.log('Resetting password with token:', token);
-
-        // 模拟密码重置
-        return true;
-    } catch (error) {
-        console.error('Error in resetPassword:', error);
-        return false;
-    }
-}
-
-/**
- * 更新用户密码
- * @param userId 用户ID
- * @param currentPassword 当前密码
- * @param newPassword 新密码
- * @returns 操作是否成功
- */
-export async function updatePassword(
-    userId: string,
-    currentPassword: string,
-    newPassword: string
-): Promise<boolean> {
-    try {
-        console.log('Updating password for user:', userId);
-
-        // 模拟密码更新
-        if (currentPassword === 'password123') {
-            return true;
-        }
-
-        return false;
-    } catch (error) {
-        console.error('Error in updatePassword:', error);
-        return false;
-    }
-} 

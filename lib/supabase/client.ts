@@ -1,27 +1,27 @@
 'use client';
 
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { createClient as supabaseCreateClient } from '@supabase/supabase-js';
 import { Database } from '../database.types';
 
 // 这些值应该在环境变量中设置
 // 对于本地开发，可以在.env.local文件中设置
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://ctvvnthsnbnrgbwvrgec.supabase.co';
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 
 if (!supabaseAnonKey) {
     console.warn('Supabase Anonymous Key is not set. Please set NEXT_PUBLIC_SUPABASE_ANON_KEY environment variable.');
 }
 
-// 创建一个Supabase客户端实例，用于客户端组件
-export function createClient() {
-    return createClientComponentClient<Database>({
-        supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        supabaseKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    });
+// 创建 Supabase 客户端
+export const supabase = supabaseCreateClient(supabaseUrl, supabaseAnonKey);
+
+// 创建客户端的函数（用于服务器组件）
+export function createServerClient() {
+    return supabaseCreateClient(supabaseUrl, supabaseAnonKey);
 }
 
-// 导出一个单例实例，方便在客户端组件使用
-export const supabase = createClient()
+// 确保这个引用能够在客户端组件中正确获取
+export { supabase as default };
 
 // 辅助函数：从响应中提取数据或错误
 export const extractDataOrError = <T>(

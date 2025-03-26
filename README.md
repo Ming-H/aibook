@@ -110,3 +110,76 @@ aibook-blog/
 ## 许可证
 
 MIT
+
+# AIBook Studio
+
+创建、协作和发布您的AI驱动内容
+
+## 认证功能
+
+本项目使用 Supabase 提供认证服务，支持以下功能：
+
+- 邮箱/密码注册和登录
+- GitHub OAuth 登录
+- 密码重置
+- 用户个人资料管理
+
+### 设置认证
+
+1. 在 Supabase 创建项目
+2. 复制项目 URL 和匿名密钥到 `.env.local` 文件
+3. 确保 Supabase 中有 `profiles` 表，字段包括：
+   - `id` (uuid, primary key)
+   - `email` (text)
+   - `full_name` (text)
+   - `avatar_url` (text, optional)
+   - `updated_at` (timestamp)
+
+4. 在 Supabase SQL 编辑器中创建触发器：
+
+```sql
+CREATE OR REPLACE FUNCTION public.handle_new_user()
+RETURNS TRIGGER AS $$
+BEGIN
+  INSERT INTO public.profiles (id, email, full_name, updated_at)
+  VALUES (
+    new.id, 
+    new.email, 
+    COALESCE(new.raw_user_meta_data->>'full_name', SPLIT_PART(new.email, '@', 1)), 
+    NOW()
+  );
+  RETURN new;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+CREATE TRIGGER on_auth_user_created
+  AFTER INSERT ON auth.users
+  FOR EACH ROW EXECUTE PROCEDURE public.handle_new_user();
+```
+```
+
+## 5. 提交到 GitHub 的命令
+
+完成上述修改后，您可以使用以下命令将更改提交到 GitHub：
+
+```bash
+# 添加所有更改的文件
+git add .
+
+# 添加 .env.example 文件
+git add .env.example
+
+# 添加 README.md
+git add README.md
+
+# 提交更改
+git commit -m "实现 Supabase 认证功能：修复登录和注册问题"
+
+# 推送到 GitHub
+git push origin main
+```
+
+## 提交信息示例
+
+以下是一个详细的提交信息，如果您希望提供更多上下文：
