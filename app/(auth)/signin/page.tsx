@@ -56,7 +56,7 @@ export default function SignIn() {
 
             console.log('开始登录流程...');
 
-            // 直接使用 Supabase 客户端进行登录
+            // 增加错误处理明确性
             const { data, error: signInError } = await supabase.auth.signInWithPassword({
                 email,
                 password,
@@ -65,17 +65,24 @@ export default function SignIn() {
             if (signInError) {
                 console.error('登录失败:', signInError);
 
-                if (process.env.NODE_ENV === 'development') {
-                    // 开发环境提供更详细的错误信息
-                    setError(`登录失败: ${signInError.message} (错误代码: ${signInError.status})`);
+                // 根据错误类型提供更明确的错误信息
+                if (signInError.status === 400) {
+                    if (signInError.message.includes('Invalid login credentials')) {
+                        setError('邮箱或密码不正确，请重试');
+                    } else {
+                        setError(`登录请求无效: ${signInError.message}`);
+                    }
+                } else if (signInError.status === 422) {
+                    setError('邮箱格式不正确');
+                } else if (signInError.message.includes('fetch')) {
+                    setError('连接服务器失败，请检查网络连接');
                 } else {
-                    // 生产环境提供简单的错误信息
-                    setError('邮箱或密码不正确，请重试');
+                    setError(`登录失败: ${signInError.message}`);
                 }
             } else {
                 console.log('登录成功，准备重定向');
-                // 成功登录后，重定向到指定页面
-                router.push(redirectTo as any);
+                // 解决类型问题，使用明确的类型断言
+                router.push(redirectTo);
             }
         } catch (err: any) {
             console.error('登录过程发生异常:', err);
@@ -555,6 +562,45 @@ export default function SignIn() {
         }
     };
 
+    // 可以考虑将开发者工具部分提取为单独的组件
+    const DevTools = ({
+        email,
+        password,
+        redirectTo,
+        router,
+        setError
+    }: {
+        email: string;
+        password: string;
+        redirectTo: string;
+        router: any;
+        setError: (error: string | null) => void;
+    }) => {
+        // 开发者工具相关功能
+        return (
+            <div className="mt-6 pt-4 border-t border-gray-700">
+                <h3 className="text-sm font-medium text-gray-400 mb-2">开发者工具</h3>
+                <div className="grid grid-cols-1 gap-2">
+                    <button
+                        type="button"
+                        onClick={handleQuickLogin}
+                        className="px-3 py-2 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                    >
+                        快速登录
+                    </button>
+                    <button
+                        type="button"
+                        onClick={checkAuthStatus}
+                        className="px-3 py-2 text-sm bg-green-600 text-white rounded-md hover:bg-green-700"
+                    >
+                        修复 auth.users 记录
+                    </button>
+                    {/* 其他开发工具按钮 */}
+                </div>
+            </div>
+        );
+    };
+
     if (isLoading) {
         return (
             <div className="flex min-h-screen flex-col items-center justify-center py-12 sm:px-6 lg:px-8">
@@ -697,99 +743,8 @@ export default function SignIn() {
                 </div>
 
                 {/* 开发者工具 - 仅在开发环境显示 */}
-                {showDevTools && (
-                    <div className="mt-6 pt-4 border-t border-gray-600">
-                        <p className="text-xs text-muted-foreground mb-2">开发者工具</p>
-                        <div className="flex flex-col gap-2">
-                            <button
-                                type="button"
-                                onClick={handleQuickLogin}
-                                className="flex w-full justify-center rounded-md bg-green-700 px-3 py-2 text-sm font-semibold text-white hover:bg-green-800"
-                            >
-                                开发者快速登录
-                            </button>
-                            <button
-                                type="button"
-                                onClick={showEnvironmentInfo}
-                                className="flex w-full justify-center rounded-md bg-blue-700 px-3 py-2 text-sm font-semibold text-white hover:bg-blue-800"
-                            >
-                                检查环境变量
-                            </button>
-                            <button
-                                type="button"
-                                onClick={debugSupabase}
-                                className="flex w-full justify-center rounded-md bg-orange-700 px-3 py-2 text-sm font-semibold text-white hover:bg-orange-800"
-                            >
-                                测试 Supabase 连接
-                            </button>
-                            <button
-                                type="button"
-                                onClick={testSupabaseAuth}
-                                className="text-sm text-blue-500 hover:text-blue-600 mt-2"
-                            >
-                                测试 Supabase 连接和登录
-                            </button>
-                            <button
-                                type="button"
-                                onClick={testAuthConfig}
-                                className="text-sm text-blue-500 hover:text-blue-600 mt-2"
-                            >
-                                测试认证配置
-                            </button>
-                            <button
-                                type="button"
-                                onClick={advancedLoginTest}
-                                className="flex w-full justify-center rounded-md bg-indigo-700 px-3 py-2 text-sm font-semibold text-white hover:bg-indigo-800 mt-2"
-                            >
-                                高级登录诊断
-                            </button>
-                            <Link
-                                href="/env-check"
-                                className="flex w-full justify-center rounded-md bg-purple-700 px-3 py-2 text-sm font-semibold text-white hover:bg-purple-800"
-                            >
-                                Supabase环境检查
-                            </Link>
-                            <button
-                                type="button"
-                                onClick={checkAuthStatus}
-                                className="flex w-full justify-center rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white hover:bg-green-700 mt-2"
-                            >
-                                修复 auth.users 记录
-                            </button>
-                            <button
-                                type="button"
-                                onClick={async () => {
-                                    try {
-                                        const currentEmail = email || '1518246548@qq.com';
-                                        if (!currentEmail) {
-                                            alert('请输入邮箱地址');
-                                            return;
-                                        }
-
-                                        const { error } = await supabase.auth.resetPasswordForEmail(
-                                            currentEmail,
-                                            {
-                                                redirectTo: `${window.location.origin}/reset-password`,
-                                            }
-                                        );
-
-                                        if (error) {
-                                            console.error('发送重置密码邮件失败:', error);
-                                            alert(`发送重置密码邮件失败: ${error.message}`);
-                                        } else {
-                                            alert(`重置密码邮件已发送到 ${currentEmail}`);
-                                        }
-                                    } catch (err: any) {
-                                        console.error('重置密码过程中出错:', err);
-                                        alert(`重置密码过程中出错: ${err.message}`);
-                                    }
-                                }}
-                                className="flex w-full justify-center rounded-md bg-pink-700 px-3 py-2 text-sm font-semibold text-white hover:bg-pink-800 mt-2"
-                            >
-                                发送密码重置邮件
-                            </button>
-                        </div>
-                    </div>
+                {showDevTools && process.env.NODE_ENV === 'development' && (
+                    <DevTools email={email} password={password} redirectTo={redirectTo} router={router} setError={setError} />
                 )}
             </div>
         </div>

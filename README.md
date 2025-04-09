@@ -159,27 +159,6 @@ CREATE TRIGGER on_auth_user_created
 ```
 ```
 
-## 5. 提交到 GitHub 的命令
-
-完成上述修改后，您可以使用以下命令将更改提交到 GitHub：
-
-```bash
-# 添加所有更改的文件
-git add .
-
-# 添加 .env.example 文件
-git add .env.example
-
-# 添加 README.md
-git add README.md
-
-# 提交更改
-git commit -m "实现 Supabase 认证功能：修复登录和注册问题"
-
-# 推送到 GitHub
-git push origin main
-```
-
 ## 提交信息示例
 
 以下是一个详细的提交信息，如果您希望提供更多上下文：
