@@ -93,36 +93,79 @@ vercel domains add www.aibook.website
 vercel domains ls
 ```
 
-## DNS 配置
+## 常见域名注册商的配置方法
 
-在你的域名注册商处添加以下 DNS 记录：
+### 聚名网 (juming.com) - 详细步骤
 
-### 根域名 (aibook.website)
+1. **登录聚名网账户**
+   - 访问 https://www.juming.com/user/#/admin_ym
+   - 登录你的账户
 
-**选项 A: A 记录**
-```
-类型: A
-名称: @
-值: 76.76.21.21
-TTL: 3600
-```
+2. **进入域名管理**
+   - 在域名列表中找到 `aibook.website`
+   - 点击域名右侧的 **"解析"** 按钮
 
-**选项 B: CNAME 记录（如果支持）**
-```
-类型: CNAME
-名称: @
-值: cname.vercel-dns.com
-TTL: 3600
-```
+3. **配置 DNS 记录**
 
-### www 子域名 (www.aibook.website)
+   **步骤 A: 配置根域名 `aibook.website`**
+   - 点击 "添加记录" 或 "新增解析"
+   - 填写以下信息：
+     ```
+     记录类型: A
+     主机记录: @ 或 留空 或 aibook
+     记录值: 76.76.21.21
+     TTL: 600 或 3600（默认值即可）
+     ```
+   - 点击 "保存" 或 "确定"
 
-```
-类型: CNAME
-名称: www
-值: cname.vercel-dns.com
-TTL: 3600
-```
+   **步骤 B: 配置 www 子域名 `www.aibook.website`**
+   - 再次点击 "添加记录"
+   - 填写以下信息：
+     ```
+     记录类型: CNAME
+     主机记录: www
+     记录值: cname.vercel-dns.com
+     TTL: 600 或 3600（默认值即可）
+     ```
+   - 点击 "保存" 或 "确定"
+
+4. **删除冲突记录（重要）**
+   - 检查是否有其他 A 记录或 CNAME 记录指向不同的值
+   - 如果有，删除这些冲突的记录
+   - 确保只保留上面添加的两条记录
+
+5. **保存并等待生效**
+   - 保存所有更改
+   - 等待 5-30 分钟让 DNS 传播
+   - 返回 Vercel 域名设置页面，点击 "Refresh" 按钮
+
+### Namecheap
+
+1. 登录 Namecheap 账户
+2. 进入 "Domain List" → 选择 `aibook.website`
+3. 点击 "Advanced DNS"
+4. 添加记录：
+   - **A Record**: Host `@`, Value `76.76.21.21`, TTL `Automatic`
+   - **CNAME Record**: Host `www`, Value `cname.vercel-dns.com`, TTL `Automatic`
+
+### GoDaddy
+
+1. 登录 GoDaddy 账户
+2. 进入 "My Products" → 选择 `aibook.website` → "DNS"
+3. 添加记录：
+   - **A Record**: Name `@`, Value `76.76.21.21`, TTL `600`
+   - **CNAME Record**: Name `www`, Value `cname.vercel-dns.com`, TTL `600`
+
+### Cloudflare
+
+1. 登录 Cloudflare 账户
+2. 选择域名 `aibook.website`
+3. 进入 "DNS" → "Records"
+4. 添加记录：
+   - **A Record**: Name `@`, IPv4 address `76.76.21.21`, Proxy status `DNS only`（关闭代理）
+   - **CNAME Record**: Name `www`, Target `cname.vercel-dns.com`, Proxy status `DNS only`
+
+**注意**：如果使用 Cloudflare，确保代理状态设置为 "DNS only"（灰色云朵），而不是 "Proxied"（橙色云朵），否则 Vercel 无法正确验证域名。
 
 ## 验证 DNS 配置
 
@@ -132,18 +175,73 @@ TTL: 3600
 2. 在 Vercel 中查看域名状态（应该显示 "Valid Configuration"）
 3. 访问 https://aibook.website 测试
 
-## 常见问题
+## 常见问题排查
 
-### DNS_PROBE_FINISHED_NXDOMAIN
+### 1. "Invalid Configuration" 错误
+
+**可能原因：**
+- DNS 记录未正确配置
+- DNS 记录值错误
+- DNS 传播尚未完成
+- 域名注册商的 DNS 服务器响应慢
+
+**解决方法：**
+1. 使用 `dig` 或 `nslookup` 命令检查 DNS 记录：
+   ```bash
+   # macOS/Linux
+   dig aibook.website
+   dig www.aibook.website
+   
+   # Windows
+   nslookup aibook.website
+   nslookup www.aibook.website
+   ```
+
+2. 在 https://dnschecker.org 检查全球 DNS 传播状态
+
+3. 确保 DNS 记录值与 Vercel 要求的一致
+
+4. 清除本地 DNS 缓存：
+   ```bash
+   # macOS
+   sudo killall -HUP mDNSResponder
+   
+   # Windows
+   ipconfig /flushdns
+   
+   # Linux
+   sudo systemd-resolve --flush-caches
+   ```
+
+### 2. DNS_PROBE_FINISHED_NXDOMAIN
 
 这个错误表示：
 - 域名还没有配置 DNS 记录
 - DNS 记录配置错误
 - DNS 传播尚未完成（需要等待）
 
-### SSL 证书
+### 3. SSL 证书问题
 
 Vercel 会自动为你的域名生成 SSL 证书，通常需要几分钟时间。
+
+如果 SSL 证书生成失败：
+- 检查是否有 CAA 记录阻止证书颁发
+- 确保 DNS 配置完全正确
+- 等待更长时间（最多 24 小时）
+
+### 4. 域名一直显示 "Invalid Configuration"
+
+**检查清单：**
+- ✅ DNS 记录已正确添加
+- ✅ DNS 记录值与 Vercel 要求的一致
+- ✅ 已删除所有冲突的 DNS 记录
+- ✅ 等待了足够的时间（至少 30 分钟）
+- ✅ 在 Vercel 中点击了 "Refresh" 按钮
+- ✅ 使用 DNS 检查工具验证了全球传播状态
+
+如果以上都正确，但问题仍然存在：
+1. 联系域名注册商技术支持
+2. 联系 Vercel 支持：https://vercel.com/support
 
 ## 临时访问
 
