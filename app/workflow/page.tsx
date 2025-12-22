@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { FileUpload } from "@/components/ui/FileUpload";
+import { FeatureAnalysisPanel } from "@/components/ui/FeatureAnalysisPanel";
 import Link from "next/link";
 import { executeWorkflow, type WorkflowState as ExecWorkflowState } from "@/lib/workflow-executor";
 
@@ -1063,6 +1064,11 @@ export default function WorkflowPage() {
                       {node.config?.dataset_name ? `数据集: ${node.config.dataset_name}` : "右键点击上传文件"}
                     </div>
                   )}
+                  {node.type === "feature_analysis" && executionResult && typeof executionResult === "object" && "results" in executionResult && (executionResult as { results: Record<string, unknown> }).results[node.id] ? (
+                    <div className="mt-2 text-xs text-slate-400">
+                      ✅ 分析完成 - 右键查看结果
+                    </div>
+                  ) : null}
                   {node.type === "model_evaluation" && node.config && (
                     <div className="mt-2 text-xs text-slate-400">
                       已配置评估选项
@@ -1126,6 +1132,32 @@ export default function WorkflowPage() {
           const node = workflow.nodes.find((n) => n.id === rightPanelNode);
           const algorithmType = node?.type || rightPanelNode;
           const isAlgorithmType = ALGORITHM_TYPES.some(a => a.type === algorithmType);
+
+          // 检查是否是特征分析节点且有执行结果
+          if (node?.type === "feature_analysis" && executionResult && typeof executionResult === "object" && "results" in executionResult) {
+            const results = (executionResult as { results: Record<string, unknown> }).results;
+            const analysisResult = results[node.id];
+            if (analysisResult && typeof analysisResult === "object" && "n_features" in analysisResult) {
+              return (
+                <div className="w-96 border-l border-slate-800 bg-slate-900/50 flex flex-col overflow-y-auto">
+                  <div className="p-4 border-b border-slate-800">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-lg font-bold text-slate-100">特征分析结果</h3>
+                      <button
+                        onClick={() => setRightPanelNode(null)}
+                        className="text-slate-400 hover:text-slate-200"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  </div>
+                  <div className="flex-1 overflow-y-auto p-4">
+                    <FeatureAnalysisPanel data={analysisResult as Parameters<typeof FeatureAnalysisPanel>[0]["data"]} />
+                  </div>
+                </div>
+              );
+            }
+          }
 
           if (isAlgorithmType) {
             return (
@@ -1342,16 +1374,30 @@ export default function WorkflowPage() {
 
               {/* 特征分析节点 */}
               {node.type === "feature_analysis" && (
-                <button
-                  onClick={() => {
-                    // 打开特征分析设置
-                    setConfigDialog(contextMenu.nodeId);
-                    setContextMenu(null);
-                  }}
-                  className="w-full rounded px-4 py-2 text-left text-sm text-slate-200 hover:bg-slate-700"
-                >
-                  ⚙️ 设置
-                </button>
+                <>
+                  <button
+                    onClick={() => {
+                      // 打开特征分析设置
+                      setConfigDialog(contextMenu.nodeId);
+                      setContextMenu(null);
+                    }}
+                    className="w-full rounded px-4 py-2 text-left text-sm text-slate-200 hover:bg-slate-700"
+                  >
+                    ⚙️ 设置
+                  </button>
+                  {executionResult && typeof executionResult === "object" && "results" in executionResult && (executionResult as { results: Record<string, unknown> }).results[contextMenu.nodeId] && (
+                    <button
+                      onClick={() => {
+                        // 查看特征分析结果
+                        setRightPanelNode(contextMenu.nodeId);
+                        setContextMenu(null);
+                      }}
+                      className="w-full rounded px-4 py-2 text-left text-sm text-slate-200 hover:bg-slate-700"
+                    >
+                      📊 查看分析结果
+                    </button>
+                  )}
+                </>
               )}
 
               {/* 模型评估节点 */}
@@ -1648,8 +1694,13 @@ function NodeConfigDialog({
         {node.type === "feature_analysis" && (
           <div className="space-y-4">
             <p className="text-sm text-slate-400">
-              特征分析设置（功能开发中）
+              特征分析将自动分析数据集的统计信息，包括缺失值、分布、相关性等。
             </p>
+            <div className="rounded-lg bg-slate-800/50 p-3">
+              <p className="text-xs text-slate-300">
+                💡 提示：将特征分析节点连接到数据上传节点后运行工作流即可查看分析结果。
+              </p>
+            </div>
           </div>
         )}
         {node.type === "model_evaluation" && (
