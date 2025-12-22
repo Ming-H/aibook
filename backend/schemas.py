@@ -188,6 +188,37 @@ class ModelPredictResponse(BaseModel):
     probabilities: Optional[dict] = None  # 分类任务的类别概率
 
 
+# 协作功能相关模型
+class ExperimentShareRequest(BaseModel):
+    """分享实验请求"""
+    experiment_id: int
+    shared_with_user_email: str
+    permission: Literal["read", "write"] = "read"
+
+
+class ExperimentShareResponse(BaseModel):
+    """分享实验响应"""
+    message: str
+    share_id: int
+
+
+# 版本管理相关模型
+class ExperimentVersion(BaseModel):
+    """实验版本"""
+    id: int
+    version: int
+    name: Optional[str] = None
+    created_at: str
+    metrics: List[MetricItem]
+
+
+class ExperimentVersionCompare(BaseModel):
+    """实验版本对比"""
+    base_version: ExperimentVersion
+    compare_version: ExperimentVersion
+    metric_differences: List[dict]  # 指标差异
+
+
 # 特征工程相关模型
 class DataCleaningRequest(BaseModel):
     """数据清洗请求"""

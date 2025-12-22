@@ -32,6 +32,12 @@ export function Navbar() {
           >
             实验历史
           </Link>
+          <Link
+            href="/models"
+            className="text-sm font-medium text-slate-300 transition-colors hover:text-slate-100"
+          >
+            模型管理
+          </Link>
         </nav>
         <div className="flex items-center gap-3">
           {isAuthenticated ? (

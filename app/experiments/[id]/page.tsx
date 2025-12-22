@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
+import { EnhancedCharts } from "@/components/ui/EnhancedCharts";
 import { authFetch } from "@/lib/auth";
 
 const BACKEND_BASE = process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:8000";
@@ -310,21 +311,31 @@ export default function ExperimentDetailPage() {
               <div className="p-6">
                 <h2 className="mb-4 text-xl font-semibold text-slate-100">模型指标</h2>
                 {experiment.metrics && experiment.metrics.length > 0 ? (
-                  <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                    {experiment.metrics.map((metric) => (
-                      <div
-                        key={metric.name}
-                        className="rounded-lg border border-slate-700 bg-slate-800/50 p-4"
-                      >
-                        <div className="mb-1 text-xs font-medium uppercase tracking-wide text-slate-400">
-                          {metric.name}
+                  <>
+                    <div className="mb-6 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                      {experiment.metrics.map((metric) => (
+                        <div
+                          key={metric.name}
+                          className="rounded-lg border border-slate-700 bg-slate-800/50 p-4"
+                        >
+                          <div className="mb-1 text-xs font-medium uppercase tracking-wide text-slate-400">
+                            {metric.name}
+                          </div>
+                          <div className={`text-2xl font-bold ${getMetricColor(metric.name, metric.value)}`}>
+                            {metric.value.toFixed(4)}
+                          </div>
                         </div>
-                        <div className={`text-2xl font-bold ${getMetricColor(metric.name, metric.value)}`}>
-                          {metric.value.toFixed(4)}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+                      ))}
+                    </div>
+                    {/* 增强的可视化图表 */}
+                    <div className="mt-6 border-t border-slate-700 pt-6">
+                      <EnhancedCharts
+                        metrics={experiment.metrics}
+                        featureImportance={experiment.feature_importance}
+                        taskType={experiment.task_type}
+                      />
+                    </div>
+                  </>
                 ) : (
                   <p className="text-slate-400">暂无指标数据</p>
                 )}
@@ -404,6 +415,32 @@ export default function ExperimentDetailPage() {
                   <Button
                     variant="outline"
                     className="w-full"
+                    onClick={async () => {
+                      try {
+                        const res = await authFetch(`${BACKEND_BASE}/api/v1/models/save`, {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({
+                            experiment_id: experiment.id,
+                            model_name: experiment.name || `模型_${experiment.id}`,
+                          }),
+                        });
+                        if (res.ok) {
+                          alert("模型保存成功！");
+                        } else {
+                          const data = await res.json().catch(() => ({}));
+                          alert(`保存失败: ${data.detail || "未知错误"}`);
+                        }
+                      } catch (err) {
+                        alert(`保存失败: ${err instanceof Error ? err.message : "未知错误"}`);
+                      }
+                    }}
+                  >
+                    💾 保存模型
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="w-full"
                     onClick={() => {
                       const data = JSON.stringify(experiment, null, 2);
                       const blob = new Blob([data], { type: "application/json" });
@@ -417,13 +454,27 @@ export default function ExperimentDetailPage() {
                   >
                     📥 导出 JSON
                   </Button>
-                  <button
+                  <Button
+                    className="w-full"
                     onClick={handleRetrain}
-                    disabled={!experiment}
-                    className="w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-sm font-medium text-slate-200 transition-all hover:border-slate-600 hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     🔄 重新训练
-                  </button>
+                  </Button>
+                  <Link href="/models">
+                    <Button variant="outline" className="w-full">
+                      📦 查看所有模型
+                    </Button>
+                  </Link>
+                  <Link href={`/experiments/${experiment.id}/share`}>
+                    <Button variant="outline" className="w-full">
+                      👥 分享实验
+                    </Button>
+                  </Link>
+                  <Link href={`/experiments/${experiment.id}/compare`}>
+                    <Button variant="outline" className="w-full">
+                      📊 版本对比
+                    </Button>
+                  </Link>
                 </div>
               </div>
             </Card>

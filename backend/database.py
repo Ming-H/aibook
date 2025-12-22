@@ -157,6 +157,8 @@ def init_db() -> None:
                     hyperparams_json TEXT NOT NULL,
                     metrics_json TEXT NOT NULL,
                     feature_importance_json TEXT,
+                    parent_experiment_id INTEGER REFERENCES experiments(id),
+                    version INTEGER DEFAULT 1,
                     created_at TIMESTAMP NOT NULL DEFAULT NOW()
                 )
             """)
@@ -173,16 +175,49 @@ def init_db() -> None:
                     hyperparams_json TEXT NOT NULL,
                     metrics_json TEXT NOT NULL,
                     feature_importance_json TEXT,
+                    parent_experiment_id INTEGER,
+                    version INTEGER DEFAULT 1,
                     created_at TEXT NOT NULL,
                     FOREIGN KEY (user_id) REFERENCES users(id),
-                    FOREIGN KEY (dataset_id) REFERENCES datasets(id)
+                    FOREIGN KEY (dataset_id) REFERENCES datasets(id),
+                    FOREIGN KEY (parent_experiment_id) REFERENCES experiments(id)
                 )
             """)
-            # 添加name列（如果不存在，仅 SQLite）
-            try:
-                cursor.execute("ALTER TABLE experiments ADD COLUMN name TEXT")
-            except sqlite3.OperationalError:
-                pass  # 列已存在
+            # 添加新列（如果不存在，仅 SQLite）
+            for col in ["name", "parent_experiment_id", "version"]:
+                try:
+                    cursor.execute(f"ALTER TABLE experiments ADD COLUMN {col} {'TEXT' if col == 'name' else 'INTEGER'}")
+                except sqlite3.OperationalError:
+                    pass  # 列已存在
+
+        # 实验分享表（协作功能）
+        if is_postgres:
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS experiment_shares (
+                    id SERIAL PRIMARY KEY,
+                    experiment_id INTEGER REFERENCES experiments(id) ON DELETE CASCADE,
+                    shared_by_user_id INTEGER REFERENCES users(id),
+                    shared_with_user_id INTEGER REFERENCES users(id),
+                    permission TEXT DEFAULT 'read',  -- read, write
+                    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+                    UNIQUE(experiment_id, shared_with_user_id)
+                )
+            """)
+        else:
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS experiment_shares (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    experiment_id INTEGER,
+                    shared_by_user_id INTEGER,
+                    shared_with_user_id INTEGER,
+                    permission TEXT DEFAULT 'read',
+                    created_at TEXT NOT NULL,
+                    FOREIGN KEY (experiment_id) REFERENCES experiments(id) ON DELETE CASCADE,
+                    FOREIGN KEY (shared_by_user_id) REFERENCES users(id),
+                    FOREIGN KEY (shared_with_user_id) REFERENCES users(id),
+                    UNIQUE(experiment_id, shared_with_user_id)
+                )
+            """)
 
         # 订阅表
         if is_postgres:

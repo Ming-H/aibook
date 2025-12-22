@@ -24,6 +24,10 @@ from schemas import (
     EvaluationConfig,
     EvaluationResponse,
     ExperimentResult,
+    ExperimentShareRequest,
+    ExperimentShareResponse,
+    ExperimentVersion,
+    ExperimentVersionCompare,
     FeatureAnalysisResponse,
     FeatureStat,
     FeatureTransformRequest,
@@ -1403,6 +1407,275 @@ async def predict_model(
         if conn:
             conn.close()
         raise HTTPException(status_code=500, detail=f"预测失败: {e}") from e
+
+
+# ========== 协作功能 API ==========
+@app.post("/api/v1/experiments/{experiment_id}/share", response_model=ExperimentShareResponse)
+@app.post("/api/experiments/{experiment_id}/share", response_model=ExperimentShareResponse)  # 兼容旧路径
+async def share_experiment(
+    experiment_id: int,
+    req: ExperimentShareRequest,
+    current_user: Optional[dict] = Depends(get_current_user),
+) -> ExperimentShareResponse:
+    """分享实验给其他用户"""
+    if not current_user:
+        raise HTTPException(status_code=401, detail="需要登录")
+
+    conn = None
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        is_postgres = not isinstance(cursor, sqlite3.Cursor)
+
+        # 检查实验是否存在且属于当前用户
+        if is_postgres:
+            cursor.execute(
+                "SELECT id FROM experiments WHERE id = %s AND user_id = %s",
+                (experiment_id, current_user["user_id"]),
+            )
+        else:
+            cursor.execute(
+                "SELECT id FROM experiments WHERE id = ? AND user_id = ?",
+                (experiment_id, current_user["user_id"]),
+            )
+
+        if not cursor.fetchone():
+            raise HTTPException(status_code=404, detail="实验不存在或无权限")
+
+        # 查找被分享用户
+        if is_postgres:
+            cursor.execute("SELECT id FROM users WHERE email = %s", (req.shared_with_user_email,))
+        else:
+            cursor.execute("SELECT id FROM users WHERE email = ?", (req.shared_with_user_email,))
+
+        shared_with_user = cursor.fetchone()
+        if not shared_with_user:
+            raise HTTPException(status_code=404, detail="用户不存在")
+
+        def get_user_id(row):
+            if isinstance(row, dict):
+                return row.get("id")
+            else:
+                try:
+                    return row["id"] if "id" in row.keys() else None
+                except (KeyError, IndexError):
+                    return None
+
+        shared_with_user_id = get_user_id(shared_with_user)
+
+        # 创建分享记录
+        now = datetime.utcnow().isoformat()
+        if is_postgres:
+            cursor.execute(
+                """
+                INSERT INTO experiment_shares (
+                    experiment_id, shared_by_user_id, shared_with_user_id, permission, created_at
+                ) VALUES (%s, %s, %s, %s, %s) RETURNING id
+            """,
+                (experiment_id, current_user["user_id"], shared_with_user_id, req.permission, now),
+            )
+            share_id = cursor.fetchone()["id"]
+        else:
+            cursor.execute(
+                """
+                INSERT INTO experiment_shares (
+                    experiment_id, shared_by_user_id, shared_with_user_id, permission, created_at
+                ) VALUES (?, ?, ?, ?, ?)
+            """,
+                (experiment_id, current_user["user_id"], shared_with_user_id, req.permission, now),
+            )
+            share_id = cursor.lastrowid
+
+        conn.commit()
+        conn.close()
+
+        return ExperimentShareResponse(
+            message="实验分享成功",
+            share_id=int(share_id),
+        )
+    except HTTPException:
+        raise
+    except Exception as e:  # noqa: BLE001
+        if conn:
+            conn.close()
+        raise HTTPException(status_code=500, detail=f"分享实验失败: {e}") from e
+
+
+# ========== 版本管理 API ==========
+@app.get("/api/v1/experiments/{experiment_id}/versions")
+@app.get("/api/experiments/{experiment_id}/versions")  # 兼容旧路径
+async def get_experiment_versions(
+    experiment_id: int,
+    current_user: Optional[dict] = Depends(get_current_user),
+) -> dict:
+    """获取实验的所有版本"""
+    if not current_user:
+        raise HTTPException(status_code=401, detail="需要登录")
+
+    conn = None
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        is_postgres = not isinstance(cursor, sqlite3.Cursor)
+
+        # 获取实验的所有版本（包括父实验和子实验）
+        if is_postgres:
+            cursor.execute(
+                """
+                SELECT * FROM experiments
+                WHERE (id = %s OR parent_experiment_id = %s)
+                AND user_id = %s
+                ORDER BY version ASC, created_at ASC
+            """,
+                (experiment_id, experiment_id, current_user["user_id"]),
+            )
+        else:
+            cursor.execute(
+                """
+                SELECT * FROM experiments
+                WHERE (id = ? OR parent_experiment_id = ?)
+                AND user_id = ?
+                ORDER BY version ASC, created_at ASC
+            """,
+                (experiment_id, experiment_id, current_user["user_id"]),
+            )
+
+        rows = cursor.fetchall()
+        versions = []
+
+        for row in rows:
+            def get_field(field_name, default=None):
+                if isinstance(row, dict):
+                    return row.get(field_name, default)
+                else:
+                    try:
+                        return row[field_name] if field_name in row.keys() else default
+                    except (KeyError, IndexError):
+                        return default
+
+            metrics_json = get_field("metrics_json")
+            try:
+                metrics = [MetricItem(**m) for m in json.loads(metrics_json)] if metrics_json else []
+            except (json.JSONDecodeError, TypeError):
+                metrics = []
+
+            created_at = get_field("created_at")
+            if created_at and not isinstance(created_at, str):
+                created_at = str(created_at)
+
+            versions.append(
+                ExperimentVersion(
+                    id=get_field("id", 0),
+                    version=get_field("version", 1),
+                    name=get_field("name"),
+                    created_at=created_at or "",
+                    metrics=metrics,
+                )
+            )
+
+        conn.close()
+        return {"versions": versions}
+    except Exception as e:  # noqa: BLE001
+        if conn:
+            conn.close()
+        raise HTTPException(status_code=500, detail=f"获取版本列表失败: {e}") from e
+
+
+@app.get("/api/v1/experiments/{base_id}/compare/{compare_id}")
+@app.get("/api/experiments/{base_id}/compare/{compare_id}")  # 兼容旧路径
+async def compare_experiments(
+    base_id: int,
+    compare_id: int,
+    current_user: Optional[dict] = Depends(get_current_user),
+) -> ExperimentVersionCompare:
+    """对比两个实验版本"""
+    if not current_user:
+        raise HTTPException(status_code=401, detail="需要登录")
+
+    conn = None
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        is_postgres = not isinstance(cursor, sqlite3.Cursor)
+
+        # 获取两个实验
+        experiments = {}
+        for exp_id in [base_id, compare_id]:
+            if is_postgres:
+                cursor.execute(
+                    "SELECT * FROM experiments WHERE id = %s AND user_id = %s",
+                    (exp_id, current_user["user_id"]),
+                )
+            else:
+                cursor.execute(
+                    "SELECT * FROM experiments WHERE id = ? AND user_id = ?",
+                    (exp_id, current_user["user_id"]),
+                )
+
+            row = cursor.fetchone()
+            if not row:
+                raise HTTPException(status_code=404, detail=f"实验 {exp_id} 不存在")
+
+            def get_field(field_name, default=None):
+                if isinstance(row, dict):
+                    return row.get(field_name, default)
+                else:
+                    try:
+                        return row[field_name] if field_name in row.keys() else default
+                    except (KeyError, IndexError):
+                        return default
+
+            metrics_json = get_field("metrics_json")
+            try:
+                metrics = [MetricItem(**m) for m in json.loads(metrics_json)] if metrics_json else []
+            except (json.JSONDecodeError, TypeError):
+                metrics = []
+
+            created_at = get_field("created_at")
+            if created_at and not isinstance(created_at, str):
+                created_at = str(created_at)
+
+            experiments[exp_id] = ExperimentVersion(
+                id=get_field("id", 0),
+                version=get_field("version", 1),
+                name=get_field("name"),
+                created_at=created_at or "",
+                metrics=metrics,
+            )
+
+        # 计算指标差异
+        base_metrics = {m.name: m.value for m in experiments[base_id].metrics}
+        compare_metrics = {m.name: m.value for m in experiments[compare_id].metrics}
+        all_metric_names = set(base_metrics.keys()) | set(compare_metrics.keys())
+
+        metric_differences = []
+        for metric_name in all_metric_names:
+            base_value = base_metrics.get(metric_name, 0)
+            compare_value = compare_metrics.get(metric_name, 0)
+            difference = compare_value - base_value
+            percent_change = ((compare_value - base_value) / base_value * 100) if base_value != 0 else 0
+
+            metric_differences.append({
+                "name": metric_name,
+                "base_value": base_value,
+                "compare_value": compare_value,
+                "difference": difference,
+                "percent_change": percent_change,
+            })
+
+        conn.close()
+
+        return ExperimentVersionCompare(
+            base_version=experiments[base_id],
+            compare_version=experiments[compare_id],
+            metric_differences=metric_differences,
+        )
+    except HTTPException:
+        raise
+    except Exception as e:  # noqa: BLE001
+        if conn:
+            conn.close()
+        raise HTTPException(status_code=500, detail=f"对比实验失败: {e}") from e
 
 
 if __name__ == "__main__":
