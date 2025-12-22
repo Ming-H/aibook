@@ -240,6 +240,42 @@ def init_db() -> None:
                 )
             """)
 
+        # 模型表（存储模型文件信息）
+        if is_postgres:
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS saved_models (
+                    id SERIAL PRIMARY KEY,
+                    user_id INTEGER REFERENCES users(id),
+                    experiment_id INTEGER REFERENCES experiments(id),
+                    model_name TEXT NOT NULL,
+                    model_path TEXT NOT NULL,
+                    model_type TEXT NOT NULL,
+                    task_type TEXT NOT NULL,
+                    algorithm TEXT NOT NULL,
+                    metrics_json TEXT,
+                    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+                    updated_at TIMESTAMP NOT NULL DEFAULT NOW()
+                )
+            """)
+        else:
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS saved_models (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    user_id INTEGER,
+                    experiment_id INTEGER,
+                    model_name TEXT NOT NULL,
+                    model_path TEXT NOT NULL,
+                    model_type TEXT NOT NULL,
+                    task_type TEXT NOT NULL,
+                    algorithm TEXT NOT NULL,
+                    metrics_json TEXT,
+                    created_at TEXT NOT NULL,
+                    updated_at TEXT NOT NULL,
+                    FOREIGN KEY (user_id) REFERENCES users(id),
+                    FOREIGN KEY (experiment_id) REFERENCES experiments(id)
+                )
+            """)
+
         conn.commit()
     except Exception as e:
         if conn:

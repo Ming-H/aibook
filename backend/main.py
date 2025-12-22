@@ -6,6 +6,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Annotated, Optional
 
+import numpy as np
 import pandas as pd
 from fastapi import Depends, FastAPI, File, Form, HTTPException, Header, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
@@ -15,15 +16,25 @@ import sqlite3
 
 from auth import authenticate_user, create_access_token, create_user, verify_token
 from database import get_db_connection, init_db
-from ml_core import TrainConfig, train_simple_experiment
+from ml_core import TrainConfig, load_model, save_model, train_simple_experiment
 from schemas import (
     AlgorithmType,
+    DataCleaningRequest,
+    DataCleaningResponse,
     EvaluationConfig,
     EvaluationResponse,
     ExperimentResult,
     FeatureAnalysisResponse,
     FeatureStat,
+    FeatureTransformRequest,
+    FeatureTransformResponse,
     MetricItem,
+    ModelListResponse,
+    ModelPredictRequest,
+    ModelPredictResponse,
+    ModelSaveRequest,
+    ModelSaveResponse,
+    SavedModel,
     SummaryRequest,
     SummaryResponse,
     TaskType,
@@ -32,6 +43,13 @@ from schemas import (
     WorkflowResult,
     WorkflowSaveRequest,
 )
+from feature_engineering import (
+    DataCleaningConfig,
+    FeatureTransformConfig,
+    clean_data,
+    get_cleaning_stats,
+    transform_features,
+)
 
 # 确保数据库已初始化
 init_db()
@@ -39,6 +57,8 @@ init_db()
 BASE_DIR = Path(__file__).resolve().parent
 UPLOAD_DIR = BASE_DIR / "uploads"
 UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+MODELS_DIR = BASE_DIR / "models"
+MODELS_DIR.mkdir(parents=True, exist_ok=True)
 
 app = FastAPI(
     title="AI Book ML Backend",
@@ -362,7 +382,8 @@ async def upload_and_train(
     )
 
     try:
-        experiment = train_simple_experiment(df, cfg, dataset_name=file.filename)
+        # 训练模型（不返回模型对象，保持向后兼容）
+        experiment = train_simple_experiment(df, cfg, dataset_name=file.filename, return_model=False)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e)) from e
     except Exception as e:  # noqa: BLE001
@@ -622,6 +643,122 @@ async def analyze_features(
         correlation_matrix=correlation_matrix,
         correlation_features=correlation_features,
     )
+
+
+@app.post("/api/v1/experiments/data-cleaning", response_model=DataCleaningResponse)
+@app.post("/api/experiments/data-cleaning", response_model=DataCleaningResponse)  # 兼容旧路径
+async def data_cleaning(
+    file: Annotated[UploadFile, File(..., description="包含数据的 CSV 文件")],
+    config: Annotated[str, Form(..., description="清洗配置 JSON")],
+) -> DataCleaningResponse:
+    """
+    数据清洗：处理缺失值和异常值
+    """
+    if not file.filename or not file.filename.lower().endswith(".csv"):
+        raise HTTPException(status_code=400, detail="目前仅支持 CSV 文件")
+
+    content = await file.read()
+    try:
+        df_before = pd.read_csv(io.BytesIO(content))
+    except Exception as e:  # noqa: BLE001
+        raise HTTPException(status_code=400, detail=f"解析 CSV 失败: {e}") from e
+
+    if df_before.empty:
+        raise HTTPException(status_code=400, detail="上传的数据集为空")
+
+    # 解析配置
+    try:
+        config_dict = json.loads(config)
+        cleaning_config = DataCleaningConfig(
+            missing_value_strategy=config_dict.get("missing_value_strategy", "mean"),
+            handle_outliers=config_dict.get("handle_outliers", False),
+            outlier_method=config_dict.get("outlier_method", "iqr"),
+            outlier_threshold=config_dict.get("outlier_threshold", 3.0),
+        )
+    except Exception as e:  # noqa: BLE001
+        raise HTTPException(status_code=400, detail=f"配置解析失败: {e}") from e
+
+    # 执行数据清洗
+    try:
+        df_after = clean_data(df_before, cleaning_config)
+        stats = get_cleaning_stats(df_before, df_after)
+        
+        # 将清洗后的数据转换为 CSV（Base64）
+        output = io.StringIO()
+        df_after.to_csv(output, index=False)
+        import base64
+        cleaned_csv_b64 = base64.b64encode(output.getvalue().encode()).decode()
+        
+        return DataCleaningResponse(
+            n_samples_before=stats["rows_before"],
+            n_samples_after=stats["rows_after"],
+            n_features_before=stats["columns_before"],
+            n_features_after=stats["columns_after"],
+            missing_values_before=stats["missing_values_before"],
+            missing_values_after=stats["missing_values_after"],
+            dropped_rows=stats["dropped_rows"],
+            cleaned_data_csv=cleaned_csv_b64,
+        )
+    except Exception as e:  # noqa: BLE001
+        raise HTTPException(status_code=500, detail=f"数据清洗失败: {e}") from e
+
+
+@app.post("/api/v1/experiments/feature-transform", response_model=FeatureTransformResponse)
+@app.post("/api/experiments/feature-transform", response_model=FeatureTransformResponse)  # 兼容旧路径
+async def feature_transform(
+    file: Annotated[UploadFile, File(..., description="包含数据的 CSV 文件")],
+    config: Annotated[str, Form(..., description="变换配置 JSON")],
+) -> FeatureTransformResponse:
+    """
+    特征变换：标准化、归一化等
+    """
+    if not file.filename or not file.filename.lower().endswith(".csv"):
+        raise HTTPException(status_code=400, detail="目前仅支持 CSV 文件")
+
+    content = await file.read()
+    try:
+        df = pd.read_csv(io.BytesIO(content))
+    except Exception as e:  # noqa: BLE001
+        raise HTTPException(status_code=400, detail=f"解析 CSV 失败: {e}") from e
+
+    if df.empty:
+        raise HTTPException(status_code=400, detail="上传的数据集为空")
+
+    # 解析配置
+    try:
+        config_dict = json.loads(config)
+        transform_config = FeatureTransformConfig(
+            transform_type=config_dict.get("transform_type", "standardize"),
+            columns=config_dict.get("columns"),
+        )
+    except Exception as e:  # noqa: BLE001
+        raise HTTPException(status_code=400, detail=f"配置解析失败: {e}") from e
+
+    # 执行特征变换
+    try:
+        df_transformed = transform_features(df, transform_config)
+        
+        # 确定变换的列
+        if transform_config.columns:
+            transformed_cols = [col for col in transform_config.columns if col in df_transformed.columns]
+        else:
+            transformed_cols = df_transformed.select_dtypes(include=["number"]).columns.tolist()
+        
+        # 将变换后的数据转换为 CSV（Base64）
+        output = io.StringIO()
+        df_transformed.to_csv(output, index=False)
+        import base64
+        transformed_csv_b64 = base64.b64encode(output.getvalue().encode()).decode()
+        
+        return FeatureTransformResponse(
+            n_samples=len(df_transformed),
+            n_features=len(df_transformed.columns),
+            transformed_data_csv=transformed_csv_b64,
+            transform_type=transform_config.transform_type,
+            transformed_columns=transformed_cols,
+        )
+    except Exception as e:  # noqa: BLE001
+        raise HTTPException(status_code=500, detail=f"特征变换失败: {e}") from e
 
 
 @app.get("/api/v1/experiments/get-columns")
@@ -942,13 +1079,23 @@ async def update_experiment_name(
         cursor = conn.cursor()
 
         # 检查实验是否存在且属于当前用户
-        cursor.execute(
-            """
-            SELECT id FROM experiments
-            WHERE id = ? AND user_id = ?
-        """,
-            (experiment_id, current_user["user_id"]),
-        )
+        is_postgres = not isinstance(cursor, sqlite3.Cursor)
+        if is_postgres:
+            cursor.execute(
+                """
+                SELECT id FROM experiments
+                WHERE id = %s AND user_id = %s
+            """,
+                (experiment_id, current_user["user_id"]),
+            )
+        else:
+            cursor.execute(
+                """
+                SELECT id FROM experiments
+                WHERE id = ? AND user_id = ?
+            """,
+                (experiment_id, current_user["user_id"]),
+            )
 
         if not cursor.fetchone():
             if conn:
@@ -976,6 +1123,286 @@ async def update_experiment_name(
         if conn:
             conn.close()
         raise HTTPException(status_code=500, detail=f"更新实验名称失败: {e}") from e
+
+
+# ========== 模型导出和部署 API ==========
+@app.post("/api/v1/models/save", response_model=ModelSaveResponse)
+@app.post("/api/models/save", response_model=ModelSaveResponse)  # 兼容旧路径
+async def save_model_endpoint(
+    req: ModelSaveRequest,
+    current_user: Optional[dict] = Depends(get_current_user),
+) -> ModelSaveResponse:
+    """保存训练好的模型"""
+    if not current_user:
+        raise HTTPException(status_code=401, detail="需要登录才能保存模型")
+
+    conn = None
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        is_postgres = not isinstance(cursor, sqlite3.Cursor)
+
+        # 获取实验信息
+        if req.experiment_id:
+            if is_postgres:
+                cursor.execute("SELECT * FROM experiments WHERE id = %s AND user_id = %s", (req.experiment_id, current_user["user_id"]))
+            else:
+                cursor.execute("SELECT * FROM experiments WHERE id = ? AND user_id = ?", (req.experiment_id, current_user["user_id"]))
+            
+            experiment_row = cursor.fetchone()
+            if not experiment_row:
+                raise HTTPException(status_code=404, detail="实验不存在或无权限访问")
+            
+            # 获取字段值
+            def get_field(field_name, default=None):
+                if isinstance(experiment_row, dict):
+                    return experiment_row.get(field_name, default)
+                else:
+                    try:
+                        return experiment_row[field_name] if field_name in experiment_row.keys() else default
+                    except (KeyError, IndexError):
+                        return default
+            
+            task_type = get_field("task_type")
+            model_name = get_field("model_name")
+            hyperparams_json = get_field("hyperparams_json")
+            metrics_json = get_field("metrics_json")
+            
+            try:
+                hyperparams = json.loads(hyperparams_json) if hyperparams_json else {}
+                metrics = json.loads(metrics_json) if metrics_json else []
+            except json.JSONDecodeError:
+                hyperparams = {}
+                metrics = []
+            
+            algorithm = hyperparams.get("algorithm", "random_forest")
+        else:
+            raise HTTPException(status_code=400, detail="需要提供 experiment_id")
+
+        # 生成模型文件名
+        model_filename = f"model_{req.experiment_id}_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}.pkl"
+        model_path = MODELS_DIR / model_filename
+
+        # 保存模型信息到数据库
+        now = datetime.utcnow().isoformat()
+        if is_postgres:
+            cursor.execute(
+                """
+                INSERT INTO saved_models (
+                    user_id, experiment_id, model_name, model_path, model_type,
+                    task_type, algorithm, metrics_json, created_at, updated_at
+                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING id
+            """,
+                (
+                    current_user["user_id"],
+                    req.experiment_id,
+                    req.model_name,
+                    str(model_path),
+                    model_name,
+                    task_type,
+                    algorithm,
+                    json.dumps(metrics),
+                    now,
+                    now,
+                ),
+            )
+            model_id = cursor.fetchone()["id"]
+        else:
+            cursor.execute(
+                """
+                INSERT INTO saved_models (
+                    user_id, experiment_id, model_name, model_path, model_type,
+                    task_type, algorithm, metrics_json, created_at, updated_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+                (
+                    current_user["user_id"],
+                    req.experiment_id,
+                    req.model_name,
+                    str(model_path),
+                    model_name,
+                    task_type,
+                    algorithm,
+                    json.dumps(metrics),
+                    now,
+                    now,
+                ),
+            )
+            model_id = cursor.lastrowid
+
+        conn.commit()
+        conn.close()
+
+        return ModelSaveResponse(
+            model_id=int(model_id),
+            model_path=str(model_path),
+            message="模型信息已保存（注意：需要重新训练以生成模型文件）",
+        )
+    except HTTPException:
+        raise
+    except Exception as e:  # noqa: BLE001
+        if conn:
+            conn.close()
+        raise HTTPException(status_code=500, detail=f"保存模型失败: {e}") from e
+
+
+@app.get("/api/v1/models", response_model=ModelListResponse)
+@app.get("/api/models", response_model=ModelListResponse)  # 兼容旧路径
+async def list_models(
+    current_user: Optional[dict] = Depends(get_current_user),
+    limit: int = 50,
+) -> ModelListResponse:
+    """获取用户的模型列表"""
+    if not current_user:
+        raise HTTPException(status_code=401, detail="需要登录")
+
+    conn = None
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        is_postgres = not isinstance(cursor, sqlite3.Cursor)
+
+        if is_postgres:
+            cursor.execute(
+                "SELECT * FROM saved_models WHERE user_id = %s ORDER BY created_at DESC LIMIT %s",
+                (current_user["user_id"], limit),
+            )
+        else:
+            cursor.execute(
+                "SELECT * FROM saved_models WHERE user_id = ? ORDER BY created_at DESC LIMIT ?",
+                (current_user["user_id"], limit),
+            )
+
+        rows = cursor.fetchall()
+        models = []
+
+        for row in rows:
+            def get_field(field_name, default=None):
+                if isinstance(row, dict):
+                    return row.get(field_name, default)
+                else:
+                    try:
+                        return row[field_name] if field_name in row.keys() else default
+                    except (KeyError, IndexError):
+                        return default
+
+            metrics_json = get_field("metrics_json")
+            try:
+                metrics = [MetricItem(**m) for m in json.loads(metrics_json)] if metrics_json else None
+            except (json.JSONDecodeError, TypeError):
+                metrics = None
+
+            created_at = get_field("created_at")
+            if created_at and not isinstance(created_at, str):
+                created_at = str(created_at)
+
+            updated_at = get_field("updated_at")
+            if updated_at and not isinstance(updated_at, str):
+                updated_at = str(updated_at)
+
+            models.append(
+                SavedModel(
+                    id=get_field("id", 0),
+                    user_id=get_field("user_id", 0),
+                    experiment_id=get_field("experiment_id"),
+                    model_name=get_field("model_name", ""),
+                    model_path=get_field("model_path", ""),
+                    model_type=get_field("model_type", ""),
+                    task_type=get_field("task_type", "classification"),
+                    algorithm=get_field("algorithm", "random_forest"),
+                    metrics=metrics,
+                    created_at=created_at or "",
+                    updated_at=updated_at or "",
+                )
+            )
+
+        conn.close()
+        return ModelListResponse(models=models)
+    except Exception as e:  # noqa: BLE001
+        if conn:
+            conn.close()
+        raise HTTPException(status_code=500, detail=f"获取模型列表失败: {e}") from e
+
+
+@app.post("/api/v1/models/{model_id}/predict", response_model=ModelPredictResponse)
+@app.post("/api/models/{model_id}/predict", response_model=ModelPredictResponse)  # 兼容旧路径
+async def predict_model(
+    model_id: int,
+    req: ModelPredictRequest,
+    current_user: Optional[dict] = Depends(get_current_user),
+) -> ModelPredictResponse:
+    """使用保存的模型进行预测"""
+    if not current_user:
+        raise HTTPException(status_code=401, detail="需要登录")
+
+    conn = None
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        is_postgres = not isinstance(cursor, sqlite3.Cursor)
+
+        # 获取模型信息
+        if is_postgres:
+            cursor.execute(
+                "SELECT * FROM saved_models WHERE id = %s AND user_id = %s",
+                (model_id, current_user["user_id"]),
+            )
+        else:
+            cursor.execute(
+                "SELECT * FROM saved_models WHERE id = ? AND user_id = ?",
+                (model_id, current_user["user_id"]),
+            )
+
+        model_row = cursor.fetchone()
+        if not model_row:
+            raise HTTPException(status_code=404, detail="模型不存在或无权限访问")
+
+        def get_field(field_name, default=None):
+            if isinstance(model_row, dict):
+                return model_row.get(field_name, default)
+            else:
+                try:
+                    return model_row[field_name] if field_name in model_row.keys() else default
+                except (KeyError, IndexError):
+                    return default
+
+        model_path_str = get_field("model_path")
+        task_type = get_field("task_type", "classification")
+
+        if not model_path_str or not Path(model_path_str).exists():
+            raise HTTPException(status_code=404, detail="模型文件不存在")
+
+        # 加载模型
+        model = load_model(Path(model_path_str))
+
+        # 准备输入数据
+        input_df = pd.DataFrame([req.features])
+
+        # 进行预测
+        prediction = model.predict(input_df)[0]
+
+        # 如果是分类任务，获取概率
+        probabilities = None
+        if task_type == "classification" and hasattr(model, "predict_proba"):
+            proba = model.predict_proba(input_df)[0]
+            # 获取类别名称（如果有）
+            if hasattr(model, "classes_"):
+                probabilities = {str(cls): float(prob) for cls, prob in zip(model.classes_, proba)}
+            else:
+                probabilities = {f"class_{i}": float(prob) for i, prob in enumerate(proba)}
+
+        conn.close()
+
+        return ModelPredictResponse(
+            prediction=float(prediction) if isinstance(prediction, (int, float, np.number)) else str(prediction),
+            probabilities=probabilities,
+        )
+    except HTTPException:
+        raise
+    except Exception as e:  # noqa: BLE001
+        if conn:
+            conn.close()
+        raise HTTPException(status_code=500, detail=f"预测失败: {e}") from e
 
 
 if __name__ == "__main__":

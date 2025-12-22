@@ -139,3 +139,88 @@ class WorkflowListResponse(BaseModel):
     workflows: List[WorkflowResult]
 
 
+# 模型导出和部署相关模型
+class SavedModel(BaseModel):
+    """保存的模型信息"""
+    model_config = {"protected_namespaces": ()}
+    
+    id: int
+    user_id: int
+    experiment_id: Optional[int] = None
+    model_name: str
+    model_path: str
+    model_type: str
+    task_type: TaskType
+    algorithm: AlgorithmType
+    metrics: Optional[List[MetricItem]] = None
+    created_at: str
+    updated_at: str
+
+
+class ModelSaveRequest(BaseModel):
+    """保存模型请求"""
+    experiment_id: Optional[int] = None
+    model_name: str
+    description: Optional[str] = None
+
+
+class ModelSaveResponse(BaseModel):
+    """保存模型响应"""
+    model_id: int
+    model_path: str
+    message: str
+
+
+class ModelListResponse(BaseModel):
+    """模型列表响应"""
+    models: List[SavedModel]
+
+
+class ModelPredictRequest(BaseModel):
+    """模型预测请求"""
+    model_id: int
+    features: dict  # 特征字典，例如 {"feature1": 1.0, "feature2": 2.0}
+
+
+class ModelPredictResponse(BaseModel):
+    """模型预测响应"""
+    prediction: float | int | str
+    probabilities: Optional[dict] = None  # 分类任务的类别概率
+
+
+# 特征工程相关模型
+class DataCleaningRequest(BaseModel):
+    """数据清洗请求"""
+    missing_value_strategy: Literal["mean", "median", "mode", "drop", "fill_zero"] = "mean"
+    handle_outliers: bool = False
+    outlier_method: Literal["iqr", "zscore"] = "iqr"
+    outlier_threshold: float = 3.0
+
+
+class DataCleaningResponse(BaseModel):
+    """数据清洗响应"""
+    n_samples_before: int
+    n_samples_after: int
+    n_features_before: int
+    n_features_after: int
+    missing_values_before: int
+    missing_values_after: int
+    dropped_rows: int
+    cleaned_data_csv: str  # Base64 编码的 CSV 数据
+
+
+class FeatureTransformRequest(BaseModel):
+    """特征变换请求"""
+    transform_type: Literal["standardize", "normalize", "robust", "label_encode"] = "standardize"
+    columns: Optional[List[str]] = None  # None 表示所有数值列
+
+
+class FeatureTransformResponse(BaseModel):
+    """特征变换响应"""
+    n_samples: int
+    n_features: int
+    transformed_data_csv: str  # Base64 编码的 CSV 数据
+    transform_type: str
+    transformed_columns: List[str]
+
+

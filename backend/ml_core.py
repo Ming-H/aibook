@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+import pickle
 from dataclasses import dataclass
-from typing import Dict, List, Tuple
+from pathlib import Path
+from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
@@ -204,7 +206,8 @@ def train_simple_experiment(
     df: pd.DataFrame,
     cfg: TrainConfig,
     dataset_name: str = "uploaded_dataset",
-) -> ExperimentResult:
+    return_model: bool = False,
+) -> ExperimentResult | tuple[ExperimentResult, Pipeline]:
     """执行一次简单的端到端训练，并返回结构化实验结果。
 
     注意：对于分类任务，如果某个类别样本数过少（< 2），将自动关闭 stratify，
@@ -240,7 +243,7 @@ def train_simple_experiment(
     # 添加创建时间到超参数中（用于数据库记录）
     hyperparams["created_at"] = datetime.utcnow().isoformat()
 
-    return ExperimentResult(
+    result = ExperimentResult(
         dataset_name=dataset_name,
         n_samples=int(df.shape[0]),
         n_features=int(X.shape[1]),
@@ -251,5 +254,22 @@ def train_simple_experiment(
         metrics=metrics,
         feature_importance=fi,
     )
+
+    if return_model:
+        return result, pipe
+    return result
+
+
+def save_model(pipe: Pipeline, model_path: Path) -> None:
+    """保存训练好的模型到文件"""
+    model_path.parent.mkdir(parents=True, exist_ok=True)
+    with open(model_path, "wb") as f:
+        pickle.dump(pipe, f)
+
+
+def load_model(model_path: Path) -> Pipeline:
+    """从文件加载模型"""
+    with open(model_path, "rb") as f:
+        return pickle.load(f)
 
 

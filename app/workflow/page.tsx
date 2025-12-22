@@ -16,6 +16,8 @@ import { executeWorkflow, type WorkflowState as ExecWorkflowState } from "@/lib/
 type NodeType =
   | "data_upload"
   | "feature_analysis"
+  | "data_cleaning"
+  | "feature_transform"
   | "feature_selection"
   | "algorithm_selection"
   | "model_training"
@@ -68,6 +70,20 @@ const MODULE_TYPES: Array<{
       icon: "📊",
       description: "分析数据特征统计信息",
       color: "from-purple-500 to-pink-500",
+    },
+    {
+      type: "data_cleaning",
+      label: "数据清洗",
+      icon: "🧹",
+      description: "处理缺失值和异常值",
+      color: "from-teal-500 to-cyan-500",
+    },
+    {
+      type: "feature_transform",
+      label: "特征变换",
+      icon: "🔄",
+      description: "标准化、归一化等特征变换",
+      color: "from-cyan-500 to-blue-500",
     },
     {
       type: "feature_selection",
@@ -1069,6 +1085,16 @@ export default function WorkflowPage() {
                       ✅ 分析完成 - 右键查看结果
                     </div>
                   ) : null}
+                  {node.type === "data_cleaning" && node.config && (
+                    <div className="mt-2 text-xs text-slate-400">
+                      已配置清洗参数
+                    </div>
+                  )}
+                  {node.type === "feature_transform" && node.config && (
+                    <div className="mt-2 text-xs text-slate-400">
+                      已配置变换参数
+                    </div>
+                  )}
                   {node.type === "model_evaluation" && node.config && (
                     <div className="mt-2 text-xs text-slate-400">
                       已配置评估选项
@@ -1400,6 +1426,32 @@ export default function WorkflowPage() {
                 </>
               )}
 
+              {/* 数据清洗节点 */}
+              {node.type === "data_cleaning" && (
+                <button
+                  onClick={() => {
+                    setConfigDialog(contextMenu.nodeId);
+                    setContextMenu(null);
+                  }}
+                  className="w-full rounded px-4 py-2 text-left text-sm text-slate-200 hover:bg-slate-700"
+                >
+                  ⚙️ 配置清洗参数
+                </button>
+              )}
+
+              {/* 特征变换节点 */}
+              {node.type === "feature_transform" && (
+                <button
+                  onClick={() => {
+                    setConfigDialog(contextMenu.nodeId);
+                    setContextMenu(null);
+                  }}
+                  className="w-full rounded px-4 py-2 text-left text-sm text-slate-200 hover:bg-slate-700"
+                >
+                  ⚙️ 配置变换参数
+                </button>
+              )}
+
               {/* 模型评估节点 */}
               {node.type === "model_evaluation" && (
                 <button
@@ -1703,6 +1755,24 @@ function NodeConfigDialog({
             </div>
           </div>
         )}
+        {node.type === "data_cleaning" && (
+          <DataCleaningConfigPanel
+            node={node}
+            onSave={(config) => {
+              onSave(config);
+              onClose();
+            }}
+          />
+        )}
+        {node.type === "feature_transform" && (
+          <FeatureTransformConfigPanel
+            node={node}
+            onSave={(config) => {
+              onSave(config);
+              onClose();
+            }}
+          />
+        )}
         {node.type === "model_evaluation" && (
           <ModelEvaluationConfig
             node={node}
@@ -1892,6 +1962,193 @@ function AlgorithmConfigPanel({
             onClose();
           }}
           className="flex-1"
+        >
+          保存
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+// 数据清洗配置组件
+function DataCleaningConfigPanel({
+  node,
+  onSave,
+}: {
+  node: Node;
+  onSave: (config: Record<string, unknown>) => void;
+}) {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const [missingValueStrategy, setMissingValueStrategy] = useState<string>(() => {
+    if (typeof window === "undefined") return "mean";
+    return (node.config?.missing_value_strategy as string) || "mean";
+  });
+  const [handleOutliers, setHandleOutliers] = useState<boolean>(() => {
+    if (typeof window === "undefined") return false;
+    return (node.config?.handle_outliers as boolean) ?? false;
+  });
+  const [outlierMethod, setOutlierMethod] = useState<string>(() => {
+    if (typeof window === "undefined") return "iqr";
+    return (node.config?.outlier_method as string) || "iqr";
+  });
+  const [outlierThreshold, setOutlierThreshold] = useState<number>(() => {
+    if (typeof window === "undefined") return 3.0;
+    return (node.config?.outlier_threshold as number) ?? 3.0;
+  });
+
+  if (!mounted) {
+    return <div className="text-slate-400">加载中...</div>;
+  }
+
+  return (
+    <div className="space-y-4">
+      <div className="space-y-2">
+        <label className="block text-sm font-medium text-slate-200">缺失值处理策略</label>
+        <select
+          value={missingValueStrategy}
+          onChange={(e) => setMissingValueStrategy(e.target.value)}
+          className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-slate-200 focus:border-blue-500 focus:outline-none"
+        >
+          <option value="mean">均值填充（数值特征）</option>
+          <option value="median">中位数填充（数值特征）</option>
+          <option value="mode">众数填充</option>
+          <option value="fill_zero">填充0/unknown</option>
+          <option value="drop">删除包含缺失值的行</option>
+        </select>
+      </div>
+
+      <div className="space-y-2">
+        <label className="flex items-center gap-2 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={handleOutliers}
+            onChange={(e) => setHandleOutliers(e.target.checked)}
+            className="w-4 h-4 rounded border-slate-600 bg-slate-700 text-blue-500 focus:ring-2 focus:ring-blue-500"
+          />
+          <span className="text-sm text-slate-200">处理异常值</span>
+        </label>
+      </div>
+
+      {handleOutliers && (
+        <>
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-slate-200">异常值检测方法</label>
+            <select
+              value={outlierMethod}
+              onChange={(e) => setOutlierMethod(e.target.value)}
+              className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-slate-200 focus:border-blue-500 focus:outline-none"
+            >
+              <option value="iqr">IQR方法（四分位距）</option>
+              <option value="zscore">Z-score方法</option>
+            </select>
+          </div>
+
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-slate-200">
+              异常值阈值: {outlierThreshold}
+            </label>
+            <input
+              type="range"
+              min="1"
+              max="5"
+              step="0.5"
+              value={outlierThreshold}
+              onChange={(e) => setOutlierThreshold(parseFloat(e.target.value))}
+              className="w-full"
+            />
+            <div className="flex justify-between text-xs text-slate-400">
+              <span>1.0</span>
+              <span>3.0</span>
+              <span>5.0</span>
+            </div>
+          </div>
+        </>
+      )}
+
+      <div className="mt-6 flex justify-end gap-3">
+        <Button variant="outline" onClick={() => onSave({})}>
+          取消
+        </Button>
+        <Button
+          onClick={() => {
+            onSave({
+              missing_value_strategy: missingValueStrategy,
+              handle_outliers: handleOutliers,
+              outlier_method: outlierMethod,
+              outlier_threshold: outlierThreshold,
+            });
+          }}
+        >
+          保存
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+// 特征变换配置组件
+function FeatureTransformConfigPanel({
+  node,
+  onSave,
+}: {
+  node: Node;
+  onSave: (config: Record<string, unknown>) => void;
+}) {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const [transformType, setTransformType] = useState<string>(() => {
+    if (typeof window === "undefined") return "standardize";
+    return (node.config?.transform_type as string) || "standardize";
+  });
+  const [selectedColumns, setSelectedColumns] = useState<string[]>(() => {
+    if (typeof window === "undefined") return [];
+    return (node.config?.columns as string[]) || [];
+  });
+
+  if (!mounted) {
+    return <div className="text-slate-400">加载中...</div>;
+  }
+
+  return (
+    <div className="space-y-4">
+      <div className="space-y-2">
+        <label className="block text-sm font-medium text-slate-200">变换类型</label>
+        <select
+          value={transformType}
+          onChange={(e) => setTransformType(e.target.value)}
+          className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-slate-200 focus:border-blue-500 focus:outline-none"
+        >
+          <option value="standardize">标准化（Z-score，均值0，标准差1）</option>
+          <option value="normalize">归一化（Min-Max，0-1范围）</option>
+          <option value="robust">鲁棒标准化（中位数和四分位距）</option>
+          <option value="label_encode">标签编码（类别特征转数值）</option>
+        </select>
+      </div>
+
+      <div className="rounded-lg bg-slate-800/50 p-3">
+        <p className="text-xs text-slate-300">
+          💡 提示：如果不指定列，将自动对所有数值列进行变换。
+        </p>
+      </div>
+
+      <div className="mt-6 flex justify-end gap-3">
+        <Button variant="outline" onClick={() => onSave({})}>
+          取消
+        </Button>
+        <Button
+          onClick={() => {
+            onSave({
+              transform_type: transformType,
+              columns: selectedColumns.length > 0 ? selectedColumns : null,
+            });
+          }}
         >
           保存
         </Button>

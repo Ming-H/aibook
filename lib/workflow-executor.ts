@@ -224,6 +224,108 @@ async function executeNode(
 
       return await analysisRes.json();
 
+    case "data_cleaning":
+      // 数据清洗节点：需要前置节点的文件输出
+      let cleaningFile: File;
+      if (inputData && typeof inputData === "object" && "file" in inputData) {
+        cleaningFile = (inputData as { file: File }).file;
+      } else if (file) {
+        cleaningFile = file;
+      } else {
+        throw new Error("数据清洗节点需要数据文件");
+      }
+
+      const cleaningConfig = node.config ?? {};
+      const cleaningForm = new FormData();
+      cleaningForm.append("file", cleaningFile);
+      cleaningForm.append(
+        "config",
+        JSON.stringify({
+          missing_value_strategy: cleaningConfig.missing_value_strategy || "mean",
+          handle_outliers: cleaningConfig.handle_outliers || false,
+          outlier_method: cleaningConfig.outlier_method || "iqr",
+          outlier_threshold: cleaningConfig.outlier_threshold || 3.0,
+        })
+      );
+
+      const cleaningRes = await authFetch(
+        `${BACKEND_BASE}/api/v1/experiments/data-cleaning`,
+        {
+          method: "POST",
+          body: cleaningForm,
+        }
+      );
+
+      if (!cleaningRes.ok) {
+        const data = await cleaningRes.json().catch(() => ({}));
+        throw new Error(data.detail ?? "数据清洗失败");
+      }
+
+      const cleaningResult = await cleaningRes.json();
+      
+      // 将 Base64 编码的 CSV 转换回 File 对象，供后续节点使用
+      const cleanedCsvContent = atob(cleaningResult.cleaned_data_csv);
+      const cleanedBlob = new Blob([cleanedCsvContent], { type: "text/csv" });
+      const cleanedFile = new File([cleanedBlob], `cleaned_${cleaningFile.name}`, {
+        type: "text/csv",
+      });
+
+      return {
+        ...cleaningResult,
+        file: cleanedFile, // 返回清洗后的文件供后续节点使用
+        type: "data_cleaning",
+      };
+
+    case "feature_transform":
+      // 特征变换节点：需要前置节点的文件输出
+      let transformFile: File;
+      if (inputData && typeof inputData === "object" && "file" in inputData) {
+        transformFile = (inputData as { file: File }).file;
+      } else if (file) {
+        transformFile = file;
+      } else {
+        throw new Error("特征变换节点需要数据文件");
+      }
+
+      const transformConfig = node.config ?? {};
+      const transformForm = new FormData();
+      transformForm.append("file", transformFile);
+      transformForm.append(
+        "config",
+        JSON.stringify({
+          transform_type: transformConfig.transform_type || "standardize",
+          columns: transformConfig.columns || null,
+        })
+      );
+
+      const transformRes = await authFetch(
+        `${BACKEND_BASE}/api/v1/experiments/feature-transform`,
+        {
+          method: "POST",
+          body: transformForm,
+        }
+      );
+
+      if (!transformRes.ok) {
+        const data = await transformRes.json().catch(() => ({}));
+        throw new Error(data.detail ?? "特征变换失败");
+      }
+
+      const transformResult = await transformRes.json();
+      
+      // 将 Base64 编码的 CSV 转换回 File 对象，供后续节点使用
+      const transformedCsvContent = atob(transformResult.transformed_data_csv);
+      const transformedBlob = new Blob([transformedCsvContent], { type: "text/csv" });
+      const transformedFile = new File([transformedBlob], `transformed_${transformFile.name}`, {
+        type: "text/csv",
+      });
+
+      return {
+        ...transformResult,
+        file: transformedFile, // 返回变换后的文件供后续节点使用
+        type: "feature_transform",
+      };
+
     case "model_training":
       if (!inputData || typeof inputData !== "object") {
         throw new Error("模型训练节点需要前置节点的输出");
