@@ -15,23 +15,291 @@
   }
 
   body {
-    @apply bg-slate-950 text-slate-100 antialiased;
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", ui-sans-serif,
-      "Segoe UI", sans-serif;
+    @apply bg-white text-slate-900 antialiased;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* 深色模式 */
+  @media (prefers-color-scheme: dark) {
+    body {
+      @apply bg-slate-950 text-slate-100;
+    }
   }
 }
 
-@layer components {
-  .btn-primary {
-    @apply inline-flex items-center justify-center rounded-full bg-gradient-to-r from-blue-500 to-cyan-500 px-5 py-2 text-xs font-semibold text-slate-950 shadow-brand-soft transition hover:from-blue-400 hover:to-cyan-400 disabled:cursor-not-allowed disabled:opacity-60;
-  }
-
-  .btn-outline {
-    @apply inline-flex items-center justify-center rounded-full border border-slate-700 bg-slate-950 px-4 py-1.5 text-xs text-slate-200 transition hover:border-slate-500;
-  }
-
-  .card {
-    @apply rounded-2xl border border-slate-800 bg-slate-900/80 p-5 shadow-lg shadow-black/40;
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
   }
 }
 
+/* 自定义滚动条 */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-slate-100 dark:bg-slate-900;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-slate-300 dark:bg-slate-700 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-slate-400 dark:bg-slate-600;
+}
+
+/* Markdown 内容样式 - 极简现代 */
+.prose {
+  @apply text-slate-700 dark:text-slate-300;
+  max-width: none;
+}
+
+.prose h1,
+.prose h2,
+.prose h3,
+.prose h4,
+.prose h5,
+.prose h6 {
+  @apply text-slate-900 dark:text-slate-100 font-bold;
+  scroll-margin-top: 2rem;
+}
+
+.prose h1 {
+  @apply text-3xl md:text-4xl mb-6 mt-12 leading-tight;
+}
+
+.prose h2 {
+  @apply text-2xl md:text-3xl mb-5 mt-10 pb-3 border-b border-slate-200 dark:border-slate-800;
+}
+
+.prose h3 {
+  @apply text-xl md:text-2xl mb-4 mt-8;
+}
+
+.prose h4 {
+  @apply text-lg md:text-xl mb-3 mt-6;
+}
+
+.prose p {
+  @apply mb-5 leading-relaxed;
+}
+
+.prose a {
+  @apply text-blue-600 underline underline-offset-2 transition-colors hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300;
+}
+
+.prose strong {
+  @apply font-semibold text-slate-900 dark:text-slate-100;
+}
+
+.prose em {
+  @apply italic;
+}
+
+.prose code {
+  @apply rounded-lg bg-slate-100 px-1.5 py-0.5 text-sm font-medium text-slate-900 dark:bg-slate-800 dark:text-slate-100;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+}
+
+.prose pre {
+  @apply mb-5 overflow-x-auto rounded-xl bg-slate-900 p-4 text-sm;
+}
+
+.prose pre code {
+  @apply bg-transparent p-0 text-slate-100 dark:text-slate-100;
+}
+
+.prose ul,
+.prose ol {
+  @apply mb-5 ml-6 space-y-2;
+}
+
+.prose li {
+  @apply text-slate-700 dark:text-slate-300;
+}
+
+.prose li::marker {
+  @apply text-slate-400 dark:text-slate-600;
+}
+
+.prose blockquote {
+  @apply mb-5 border-l-4 border-blue-500 pl-4 italic text-slate-600 dark:text-slate-400;
+}
+
+.prose table {
+  @apply mb-5 w-full overflow-hidden rounded-xl border border-slate-200 dark:border-slate-800;
+}
+
+.prose thead {
+  @apply bg-slate-50 dark:bg-slate-800/50;
+}
+
+.prose th {
+  @apply border border-slate-200 px-4 py-3 text-left text-sm font-semibold text-slate-900 dark:border-slate-700 dark:text-slate-100;
+}
+
+.prose td {
+  @apply border border-slate-200 px-4 py-3 text-sm text-slate-700 dark:border-slate-700 dark:text-slate-300;
+}
+
+.prose img {
+  @apply my-6 rounded-xl shadow-lg;
+}
+
+.prose hr {
+  @apply my-10 border-slate-200 dark:border-slate-800;
+}
+
+/* 代码高亮主题 */
+.hljs {
+  background: transparent !important;
+  color: rgb(203 213 225);
+}
+
+.hljs-comment,
+.hljs-quote {
+  color: rgb(148 163 184);
+  font-style: italic;
+}
+
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-subst {
+  color: rgb(248 113 113);
+}
+
+.hljs-number,
+.hljs-literal,
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag .hljs-attr {
+  color: rgb(251 146 60);
+}
+
+.hljs-string,
+.hljs-doctag {
+  color: rgb(74 222 128);
+}
+
+.hljs-title,
+.hljs-section,
+.hljs-selector-id {
+  color: rgb(96 165 250);
+  font-weight: bold;
+}
+
+.hljs-type,
+.hljs-class .hljs-title {
+  color: rgb(251 191 36);
+}
+
+.hljs-tag,
+.hljs-name,
+.hljs-attribute {
+  color: rgb(248 113 113);
+  font-weight: normal;
+}
+
+.hljs-regexp,
+.hljs-link {
+  color: rgb(251 146 60);
+}
+
+.hljs-symbol,
+.hljs-bullet {
+  color: rgb(74 222 128);
+}
+
+.hljs-built_in,
+.hljs-builtin-name {
+  color: rgb(96 165 250);
+}
+
+.hljs-meta {
+  color: rgb(148 163 184);
+}
+
+.hljs-deletion {
+  background: rgb(127 29 29);
+}
+
+.hljs-addition {
+  background: rgb(20 83 45);
+}
+
+.hljs-emphasis {
+  font-style: italic;
+}
+
+.hljs-strong {
+  font-weight: bold;
+}
+
+/* 深色模式下的代码高亮 */
+.dark .hljs {
+  color: rgb(203 213 225);
+}
+
+.dark .hljs-comment,
+.dark .hljs-quote {
+  color: rgb(100 116 139);
+}
+
+.dark .hljs-keyword,
+.dark .hljs-selector-tag,
+.dark .hljs-subst {
+  color: rgb(248 113 113);
+}
+
+.dark .hljs-number,
+.dark .hljs-literal,
+.dark .hljs-variable,
+.dark .hljs-template-variable,
+.dark .hljs-tag .hljs-attr {
+  color: rgb(251 146 60);
+}
+
+.dark .hljs-string,
+.dark .hljs-doctag {
+  color: rgb(134 239 172);
+}
+
+.dark .hljs-title,
+.dark .hljs-section,
+.dark .hljs-selector-id {
+  color: rgb(96 165 250);
+  font-weight: bold;
+}
+
+.dark .hljs-type,
+.dark .hljs-class .hljs-title {
+  color: rgb(250 204 21);
+}
+
+.dark .hljs-tag,
+.dark .hljs-name,
+.dark .hljs-attribute {
+  color: rgb(248 113 113);
+  font-weight: normal;
+}
+
+/* 动画关键帧 */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.6s ease-out both;
+}

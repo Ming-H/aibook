@@ -1,71 +1,43 @@
-"use client";
-
 import Link from "next/link";
-import { Button } from "@/components/ui/Button";
-import { useAuth } from "@/components/AuthProvider";
 
 export function Navbar() {
-  const { isAuthenticated, logout, user } = useAuth();
-
   return (
-    <header className="sticky top-0 z-50 border-b border-slate-800/50 bg-slate-950/80 backdrop-blur-xl">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 md:px-6">
-        <Link href="/" className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-tr from-blue-500 via-purple-500 to-cyan-400 shadow-lg shadow-blue-500/40">
-            <span className="text-lg font-bold text-white">AB</span>
+    <header className="sticky top-0 z-50 w-full border-b border-slate-200/50 bg-white/80 backdrop-blur-xl dark:border-slate-800/50 dark:bg-slate-950/80">
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
+        <Link href="/" className="flex items-center gap-3 group">
+          <div className="relative flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 shadow-lg shadow-blue-500/25 transition-all duration-300 group-hover:shadow-xl group-hover:shadow-blue-500/40 group-hover:scale-105">
+            <span className="text-lg">🤖</span>
           </div>
-          <div>
-            <div className="text-base font-bold tracking-wide text-slate-100">AI Book</div>
-            <div className="text-xs text-slate-400">一站式机器学习平台</div>
+          <div className="flex flex-col">
+            <span className="text-base font-bold tracking-tight text-slate-900 group-hover:text-blue-600 dark:text-white dark:group-hover:text-blue-400 transition-colors">
+              AI Hot Tech
+            </span>
+            <span className="text-xs text-slate-500 dark:text-slate-500">每日 AI 技术热点</span>
           </div>
         </Link>
-        <nav className="hidden items-center gap-6 md:flex">
+
+        <nav className="hidden items-center gap-8 md:flex">
           <Link
             href="/"
-            className="text-sm font-medium text-slate-300 transition-colors hover:text-slate-100"
+            className="text-sm font-medium text-slate-600 hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-400 transition-colors"
           >
-            创建实验
+            首页
           </Link>
           <Link
-            href="/experiments"
-            className="text-sm font-medium text-slate-300 transition-colors hover:text-slate-100"
+            href="/archive"
+            className="text-sm font-medium text-slate-600 hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-400 transition-colors"
           >
-            实验历史
-          </Link>
-          <Link
-            href="/models"
-            className="text-sm font-medium text-slate-300 transition-colors hover:text-slate-100"
-          >
-            模型管理
+            归档
           </Link>
         </nav>
-        <div className="flex items-center gap-3">
-          {isAuthenticated ? (
-            <>
-              {user && (
-                <span className="hidden text-sm text-slate-400 md:inline">
-                  {user.email}
-                </span>
-              )}
-              <Button variant="outline" size="sm" onClick={logout}>
-                登出
-              </Button>
-            </>
-          ) : (
-            <>
-              <Link href="/login">
-                <Button variant="ghost" size="sm">
-                  登录
-                </Button>
-              </Link>
-              <Link href="/register">
-                <Button size="sm">注册</Button>
-              </Link>
-            </>
-          )}
-        </div>
+
+        {/* 移动端菜单按钮（可选） */}
+        <button className="md:hidden inline-flex items-center justify-center rounded-lg p-2 text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800">
+          <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
       </div>
     </header>
   );
 }
-

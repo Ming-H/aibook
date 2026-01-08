@@ -1,167 +1,215 @@
-# AI Book - 一站式机器学习平台
+# AI Hot Tech - AI 技术热点展示平台
 
-面向不会编程学生的可视化机器学习建模与数据分析平台。
+一个现代化的 AI 技术热点内容展示平台，每天呈现最新的 AI 技术话题。
 
-## 功能特性
+![AI Hot Tech](https://img.shields.io/badge/AI-Hot%20Tech-blue)
+![Next.js](https://img.shields.io/badge/Next.js-14-black)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.0-38bdf8)
 
-- 🎨 **可视化工作流编辑器** - 拖拽式节点编辑，类似 n8n 的交互体验
-- 📊 **数据上传与处理** - 支持 CSV 文件上传和特征分析
-- 🤖 **多种机器学习算法** - 支持分类和回归任务
-  - 随机森林 (Random Forest)
-  - 支持向量机 (SVM)
-  - 逻辑回归 (Logistic Regression)
-  - 线性回归 (Linear Regression)
-  - 梯度提升 (Gradient Boosting)
-  - K近邻 (KNN)
-- 📈 **模型评估** - 完整的模型性能评估指标和可视化
-- 💾 **实验管理** - 保存和管理历史实验，支持重新训练
-- 🔐 **用户认证** - 基于 JWT 的用户注册和登录系统
-- ☁️ **云端存储** - 使用 Supabase PostgreSQL 存储实验数据
+## ✨ 特性
 
-## 技术栈
+- 📅 **时间轴展示** - 按日期倒序展示每日 AI 技术热点
+- 🎨 **现代化设计** - 采用玻璃态效果、渐变色和流畅动画
+- 📝 **Markdown 支持** - 完整的 Markdown 渲染和代码高亮
+- 🌙 **深色模式** - 支持深色/浅色主题切换
+- 📱 **响应式布局** - 完美适配各种设备
+- ⚡ **静态生成** - 基于 Next.js SSG，快速加载
+- 🔍 **文章归档** - 按月份浏览历史文章
 
-### 前端
-- **Next.js 14** - React 框架，App Router
-- **TypeScript** - 类型安全
-- **Tailwind CSS** - 样式框架
-- **React Hooks** - 状态管理
-
-### 后端
-- **FastAPI** - Python Web 框架
-- **Scikit-learn** - 机器学习库
-- **Pandas** - 数据处理
-- **PostgreSQL / Supabase** - 数据库
-
-## 项目结构
-
-```
-aibook/
-├── app/                    # Next.js 应用目录
-│   ├── page.tsx           # 首页
-│   ├── workflow/          # 工作流编辑器
-│   ├── experiments/       # 实验历史
-│   └── workflows/         # 工作流管理
-├── backend/               # FastAPI 后端
-│   ├── main.py           # API 入口
-│   ├── ml_core.py        # 机器学习核心逻辑
-│   ├── database.py       # 数据库连接
-│   └── schemas.py        # 数据模型
-├── components/           # React 组件
-│   ├── ui/              # UI 组件库
-│   └── AuthProvider.tsx # 认证提供者
-└── lib/                  # 工具库
-    ├── auth.ts          # 认证工具
-    └── workflow-executor.ts # 工作流执行器
-```
-
-## 快速开始
+## 🚀 快速开始
 
 ### 前置要求
 
-- Node.js 18+ 
-- Python 3.9+
-- Conda (推荐用于 Python 环境管理)
-- PostgreSQL 或 Supabase 账户
+- Node.js 18+
+- npm 或 yarn 或 pnpm
 
-### 安装步骤
+### 安装
 
-1. **克隆仓库**
 ```bash
-git clone <your-repo-url>
+# 克隆仓库
+git clone https://github.com/Ming-H/aibook.git
 cd aibook
-```
 
-2. **安装前端依赖**
-```bash
+# 安装依赖
 npm install
 ```
 
-3. **设置 Python 环境**
+### 配置内容源
+
+项目从 `/Users/z/Documents/work/content-forge-ai/data/{YYYYMMDD}/longform/` 目录读取文章内容。
+
+如需更改内容源路径，请修改 `lib/fs-utils.ts` 中的 `CONTENT_BASE_PATH`：
+
+```typescript
+const CONTENT_BASE_PATH = "/your/content/path";
+```
+
+### 开发
+
 ```bash
-# 创建 conda 环境
-conda create -n aibook_env python=3.9
-conda activate aibook_env
-
-# 安装后端依赖
-cd backend
-pip install -r requirements.txt
-```
-
-4. **配置环境变量**
-
-创建 `backend/.env` 文件：
-```env
-USE_SUPABASE=true
-SUPABASE_DB_URL=your_supabase_connection_string
-JWT_SECRET=your_jwt_secret_key
-```
-
-创建 `.env.local` 文件（前端）：
-```env
-NEXT_PUBLIC_BACKEND_URL=http://localhost:8000
-```
-
-5. **初始化数据库**
-```bash
-cd backend
-python -c "from database import init_db; init_db()"
-```
-
-6. **启动开发服务器**
-
-前端（端口 3000）：
-```bash
+# 启动开发服务器
 npm run dev
 ```
 
-后端（端口 8000）：
+访问 [http://localhost:3000](http://localhost:3000) 查看网站。
+
+### 构建
+
 ```bash
-cd backend
-uvicorn main:app --reload
+# 构建生产版本
+npm run build
+
+# 启动生产服务器
+npm start
 ```
 
-## 使用说明
+## 📁 项目结构
 
-### 创建工作流
+```
+aibook/
+├── app/                          # Next.js App Router
+│   ├── page.tsx                  # 首页 - 时间轴展示
+│   ├── layout.tsx                # 根布局
+│   ├── globals.css               # 全局样式
+│   ├── archive/                  # 归档页面
+│   │   └── page.tsx
+│   └── articles/                 # 文章详情页
+│       └── [date]/
+│           └── [slug]/
+│               └── page.tsx
+├── components/                   # React 组件
+│   ├── Navbar.tsx                # 导航栏
+│   └── ui/                       # UI 组件
+├── lib/                          # 工具库
+│   ├── content-loader.ts         # 内容加载器
+│   ├── fs-utils.ts               # 文件系统工具
+│   └── markdown-parser.ts        # Markdown 解析器
+├── types/                        # TypeScript 类型定义
+│   ├── content.ts                # 内容类型
+│   └── article.ts                # 文章类型
+└── public/                       # 静态资源
+```
 
-1. 从左侧拖拽功能模块到画布
-2. 右键点击"数据上传"节点上传 CSV 文件
-3. 连接节点建立数据流（点击节点的连接点）
-4. 配置模型训练参数（右键点击"模型训练"节点）
-5. 选择算法（拖拽算法节点或在下拉菜单中选择）
-6. 点击"运行工作流"执行
-7. 查看结果并保存实验
+## 🎨 技术栈
 
-### 查看历史实验
+### 前端框架
+- **Next.js 14** - React 全栈框架
+- **TypeScript** - 类型安全
+- **Tailwind CSS** - 原子化 CSS 框架
 
-- 访问 `/experiments` 查看所有历史实验
-- 点击实验查看详细信息
-- 点击"重新训练"可以导入到画布继续编辑
+### 内容处理
+- **unified** - 统一的文本处理框架
+- **remark** - Markdown 解析器
+- **rehype** - HTML 处理器
+- **gray-matter** - Frontmatter 解析
+- **reading-time** - 阅读时间计算
 
-## 部署
+### 主要特性
+- ⚡️ **静态站点生成 (SSG)** - 构建时预渲染，SEO 友好
+- 🎨 **现代设计系统** - 蓝紫粉渐变、玻璃态效果
+- 🌙 **深色模式** - 基于 Tailwind 的深色主题
+- 📱 **响应式设计** - 移动优先的设计理念
+- ⚡ **代码分割** - 按需加载，优化性能
 
-### Vercel 部署（前端）
+## 📝 内容格式
+
+文章文件命名格式：
+```
+article_{emoji}_{platform}_{model_name}_{YYYYMMDD}_{HHMMSS}.md
+```
+
+示例：
+```
+article_🤗_meta-llama_Llama-3.1-8B-Inst_20260108_123847.md
+```
+
+文章 Frontmatter 格式：
+```yaml
+---
+title: 文章标题
+tags: ["标签1", "标签2"]
+wordCount: 5000
+readTime: 25
+---
+```
+
+## 🎯 页面说明
+
+### 首页 (/)
+- 时间轴风格展示每日文章
+- 统计信息（天数、文章数）
+- 文章卡片（标题、摘要、标签、阅读时间）
+
+### 文章详情页 (/articles/[date]/[slug])
+- 完整的 Markdown 渲染
+- 代码高亮支持
+- 阅读时间、字数统计
+- 标签显示
+- 相关文章推荐
+
+### 归档页 (/archive)
+- 按月份分组展示
+- 统计卡片（文章数、发布日、月份数）
+- 完整文章列表
+
+## 🏗️ 部署
+
+### Vercel 部署（推荐）
 
 1. 将代码推送到 GitHub
-2. 在 Vercel 中导入项目
-3. 配置环境变量 `NEXT_PUBLIC_BACKEND_URL`
+2. 在 [Vercel](https://vercel.com) 中导入项目
+3. Vercel 会自动检测 Next.js 并进行部署
 
-### 后端部署
+### 其他平台
 
-推荐使用支持 Python 的云平台（如 Railway、Render、Heroku）部署 FastAPI 应用。
+支持任何支持 Next.js 的托管平台：
+- Netlify
+- AWS Amplify
+- Cloudflare Pages
+- Railway
 
-## 开发计划
+## 🔧 配置
 
-- [ ] 更多特征工程功能
-- [ ] 模型导出和部署
-- [ ] 数据可视化增强
-- [ ] 协作功能
-- [ ] 模型版本管理
+### 环境变量
 
-## 许可证
+创建 `.env.local` 文件（可选）：
+
+```env
+# 内容源路径（如需覆盖默认路径）
+CONTENT_BASE_PATH=/your/content/path
+```
+
+### 自定义样式
+
+在 `app/globals.css` 中修改 CSS 变量来自定义颜色和样式：
+
+```css
+/* 修改主题色 */
+.bg-gradient-to-r {
+  /* 自定义渐变色 */
+}
+```
+
+## 📊 性能优化
+
+- ✅ 静态站点生成（SSG）
+- ✅ 图片优化
+- ✅ 代码分割
+- ✅ CSS 压缩
+- ✅ 缓存策略
+
+## 🤝 贡献
+
+欢迎提交 Issue 和 Pull Request！
+
+## 📄 许可证
 
 MIT License
 
-## 贡献
+## 🌟 致谢
 
-欢迎提交 Issue 和 Pull Request！
+- 设计灵感：Google、Meta 等现代科技网站
+- 图标：Heroicons
+- 字体：系统字体栈
+- CSS 框架：Tailwind CSS
