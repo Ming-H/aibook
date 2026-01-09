@@ -1,22 +1,22 @@
 /**
- * 内容加载器 - 负责加载和解析所有文章内容
+ * 内容加载器 - 负责从 GitHub API 加载和解析所有文章内容
  */
 
 import {
-  listArticleDates,
+  listDataDates,
   listArticlesForDate,
-  readArticleFile,
+  getArticleContent,
+} from "./github-api";
+import {
   extractMetadataFromFilename,
   generateSlug,
   formatDate,
-  getArticleFullPath,
 } from "./fs-utils";
 import {
   parseMarkdown,
   extractTagsFromFrontmatter,
   extractWordCountFromFrontmatter,
   extractReadTimeFromFrontmatter,
-  extractSourceFromFrontmatter,
 } from "./markdown-parser";
 import type { ArticleMetadata, Article, ArticleByDate } from "../types/content";
 
@@ -35,7 +35,7 @@ export function clearCache(): void {
 }
 
 /**
- * 获取所有文章的元数据（按日期分组）
+ * 获取所有文章的元数据
  */
 export async function getAllArticles(): Promise<ArticleMetadata[]> {
   // 检查缓存
@@ -44,12 +44,15 @@ export async function getAllArticles(): Promise<ArticleMetadata[]> {
   }
 
   const allMetadata: ArticleMetadata[] = [];
-  const dates = listArticleDates();
+  const dates = await listDataDates();
 
   for (const date of dates) {
     const articles = await getArticlesByDate(date);
     allMetadata.push(...articles);
   }
+
+  // 按日期降序排序
+  allMetadata.sort((a, b) => b.date.localeCompare(a.date));
 
   // 缓存结果
   metadataCache.set("all", allMetadata);
@@ -68,7 +71,7 @@ export async function getArticlesByDate(date: string): Promise<ArticleMetadata[]
     return metadataCache.get(cacheKey)!;
   }
 
-  const files = listArticlesForDate(date);
+  const files = await listArticlesForDate(date);
   const articles: ArticleMetadata[] = [];
 
   for (const filename of files) {
@@ -90,7 +93,7 @@ export async function getArticlesByDate(date: string): Promise<ArticleMetadata[]
  * 获取按日期分组的文章列表
  */
 export async function getArticlesGroupedByDate(): Promise<ArticleByDate[]> {
-  const dates = listArticleDates();
+  const dates = await listDataDates();
   const grouped: ArticleByDate[] = [];
 
   for (const date of dates) {
@@ -114,8 +117,8 @@ export async function getArticleMetadata(date: string, filename: string): Promis
     return metadataCache.get(cacheKey)!;
   }
 
-  // 读取文件内容
-  const content = readArticleFile(date, filename);
+  // 从 GitHub API 读取文件内容
+  const { content } = await getArticleContent(date, filename);
 
   // 解析 Markdown
   const parsed = await parseMarkdown(content);
@@ -147,7 +150,7 @@ export async function getArticleMetadata(date: string, filename: string): Promis
     modelName: fileMeta.modelName,
     date,
     timestamp: fileMeta.timestamp,
-    fullPath: getArticleFullPath(date, filename),
+    fullPath: `${date}/${filename}`,
     excerpt,
     wordCount,
     tags,
@@ -180,8 +183,9 @@ export async function getArticle(date: string, slug: string): Promise<Article | 
     return null;
   }
 
-  // 读取并解析内容
-  const content = readArticleFile(date, articleMetadata.fullPath.split("/").pop()!);
+  // 从 GitHub API 读取内容
+  const filename = articleMetadata.fullPath.split("/").pop()!;
+  const { content } = await getArticleContent(date, filename);
   const parsed = await parseMarkdown(content);
 
   const article: Article = {
@@ -200,8 +204,8 @@ export async function getArticle(date: string, slug: string): Promise<Article | 
 /**
  * 获取所有日期列表
  */
-export function getAllDates(): string[] {
-  return listArticleDates();
+export async function getAllDates(): Promise<string[]> {
+  return await listDataDates();
 }
 
 /**

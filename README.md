@@ -12,10 +12,11 @@
 - 📅 **时间轴展示** - 按日期倒序展示每日 AI 技术热点
 - 🎨 **现代化设计** - 采用玻璃态效果、渐变色和流畅动画
 - 📝 **Markdown 支持** - 完整的 Markdown 渲染和代码高亮
-- 🌙 **深色模式** - 支持深色/浅色主题切换
+- 🌙 **深色模式** - 深色主题设计
 - 📱 **响应式布局** - 完美适配各种设备
-- ⚡ **静态生成** - 基于 Next.js SSG，快速加载
+- ⚡ **GitHub API 数据源** - 从 GitHub 仓库读取内容
 - 🔍 **文章归档** - 按月份浏览历史文章
+- 🔄 **自动更新** - Vercel Cron Jobs 每日自动刷新内容
 
 ## 🚀 快速开始
 
@@ -23,6 +24,7 @@
 
 - Node.js 18+
 - npm 或 yarn 或 pnpm
+- GitHub 账户（用于存储内容）
 
 ### 安装
 
@@ -35,14 +37,36 @@ cd aibook
 npm install
 ```
 
-### 配置内容源
+### 配置环境变量
 
-项目从 `/Users/z/Documents/work/content-forge-ai/data/{YYYYMMDD}/longform/` 目录读取文章内容。
+创建 `.env.local` 文件：
 
-如需更改内容源路径，请修改 `lib/fs-utils.ts` 中的 `CONTENT_BASE_PATH`：
+```env
+# GitHub API 配置
+GITHUB_TOKEN=ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+GITHUB_DATA_REPO=Ming-H/aibook-data
+CRON_SECRET=your-random-secret-key-here
+```
 
-```typescript
-const CONTENT_BASE_PATH = "/your/content/path";
+**获取 GitHub Token：**
+1. 访问 https://github.com/settings/tokens
+2. 点击 "Generate new token (classic)"
+3. 勾选 `repo` 权限
+4. 复制生成的 token
+
+**创建数据仓库：**
+1. 在 GitHub 上创建新仓库 `aibook-data`
+2. 按以下结构组织内容：
+```
+aibook-data/
+├── 20260108/
+│   └── longform/
+│       ├── article_🤗_meta-llama_Llama-3.1-8B-Inst_20260108_123847.md
+│       └── ...
+├── 20260109/
+│   └── longform/
+│       └── ...
+└── README.md
 ```
 
 ### 开发
@@ -72,6 +96,11 @@ aibook/
 │   ├── page.tsx                  # 首页 - 时间轴展示
 │   ├── layout.tsx                # 根布局
 │   ├── globals.css               # 全局样式
+│   ├── sitemap.ts                # SEO Sitemap
+│   ├── robots.ts                 # Robots.txt
+│   ├── api/                      # API 路由
+│   │   └── revalidate/           # ISR 重新验证
+│   │       └── route.ts
 │   ├── archive/                  # 归档页面
 │   │   └── page.tsx
 │   └── articles/                 # 文章详情页
@@ -79,16 +108,17 @@ aibook/
 │           └── [slug]/
 │               └── page.tsx
 ├── components/                   # React 组件
-│   ├── Navbar.tsx                # 导航栏
-│   └── ui/                       # UI 组件
+│   └── Navbar.tsx                # 导航栏
 ├── lib/                          # 工具库
+│   ├── github-api.ts             # GitHub API 封装
 │   ├── content-loader.ts         # 内容加载器
-│   ├── fs-utils.ts               # 文件系统工具
+│   ├── fs-utils.ts               # 文件名解析工具
 │   └── markdown-parser.ts        # Markdown 解析器
 ├── types/                        # TypeScript 类型定义
-│   ├── content.ts                # 内容类型
-│   └── article.ts                # 文章类型
-└── public/                       # 静态资源
+│   └── content.ts                # 内容类型
+├── vercel.json                   # Vercel 配置
+├── next.config.mjs               # Next.js 配置
+└── .env.example                  # 环境变量示例
 ```
 
 ## 🎨 技术栈
@@ -99,6 +129,7 @@ aibook/
 - **Tailwind CSS** - 原子化 CSS 框架
 
 ### 内容处理
+- **@octokit/rest** - GitHub API 客户端
 - **unified** - 统一的文本处理框架
 - **remark** - Markdown 解析器
 - **rehype** - HTML 处理器
@@ -107,8 +138,8 @@ aibook/
 
 ### 主要特性
 - ⚡️ **静态站点生成 (SSG)** - 构建时预渲染，SEO 友好
+- 🔄 **增量静态再生 (ISR)** - 按需更新内容
 - 🎨 **现代设计系统** - 蓝紫粉渐变、玻璃态效果
-- 🌙 **深色模式** - 基于 Tailwind 的深色主题
 - 📱 **响应式设计** - 移动优先的设计理念
 - ⚡ **代码分割** - 按需加载，优化性能
 
@@ -134,51 +165,66 @@ readTime: 25
 ---
 ```
 
-## 🎯 页面说明
+## 🏗️ 部署到 Vercel
 
-### 首页 (/)
-- 时间轴风格展示每日文章
-- 统计信息（天数、文章数）
-- 文章卡片（标题、摘要、标签、阅读时间）
+### 1. 准备工作
 
-### 文章详情页 (/articles/[date]/[slug])
-- 完整的 Markdown 渲染
-- 代码高亮支持
-- 阅读时间、字数统计
-- 标签显示
-- 相关文章推荐
+**创建 GitHub Personal Access Token：**
+1. 访问 https://github.com/settings/tokens
+2. 点击 "Generate new token (classic)"
+3. 设置权限：勾选 `repo`（完整仓库访问权限）
+4. 复制生成的 token（仅显示一次）
 
-### 归档页 (/archive)
-- 按月份分组展示
-- 统计卡片（文章数、发布日、月份数）
-- 完整文章列表
+**创建数据仓库：**
+1. 在 GitHub 上创建新仓库 `aibook-data`
+2. 迁移现有文章到该仓库，保持目录结构
 
-## 🏗️ 部署
+### 2. Vercel 部署
 
-### Vercel 部署（推荐）
+1. 访问 [Vercel](https://vercel.com)
+2. 点击 "Add New Project"
+3. 导入你的 GitHub 仓库
+4. 配置环境变量：
 
-1. 将代码推送到 GitHub
-2. 在 [Vercel](https://vercel.com) 中导入项目
-3. Vercel 会自动检测 Next.js 并进行部署
+```
+GITHUB_TOKEN=ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+GITHUB_DATA_REPO=Ming-H/aibook-data
+CRON_SECRET=随机生成的密钥
+```
 
-### 其他平台
+5. 点击 "Deploy"
 
-支持任何支持 Next.js 的托管平台：
-- Netlify
-- AWS Amplify
-- Cloudflare Pages
-- Railway
+### 3. 配置域名（可选）
+
+1. 在 Vercel 项目设置中添加自定义域名
+2. 在域名注册商处添加 DNS 记录：
+```
+Type: CNAME
+Name: www
+Value: cname.vercel-dns.com
+```
+
+3. 等待 SSL 证书生成（通常几分钟到几小时）
+
+### 4. 自动更新
+
+项目已配置 Vercel Cron Jobs，每天凌晨 2 点（UTC）自动刷新内容。
+
+手动触发更新：
+```bash
+curl -X GET "https://your-domain.com/api/revalidate" \
+  -H "Authorization: Bearer YOUR_CRON_SECRET"
+```
 
 ## 🔧 配置
 
 ### 环境变量
 
-创建 `.env.local` 文件（可选）：
-
-```env
-# 内容源路径（如需覆盖默认路径）
-CONTENT_BASE_PATH=/your/content/path
-```
+| 变量名 | 说明 | 必需 |
+|--------|------|------|
+| `GITHUB_TOKEN` | GitHub Personal Access Token | 是 |
+| `GITHUB_DATA_REPO` | 数据仓库 (格式: owner/repo) | 是 |
+| `CRON_SECRET` | Cron 密钥，用于保护 ISR 端点 | 是 |
 
 ### 自定义样式
 
@@ -194,10 +240,70 @@ CONTENT_BASE_PATH=/your/content/path
 ## 📊 性能优化
 
 - ✅ 静态站点生成（SSG）
-- ✅ 图片优化
+- ✅ 增量静态再生（ISR）
 - ✅ 代码分割
 - ✅ CSS 压缩
 - ✅ 缓存策略
+- ✅ GitHub API 缓存
+
+## 🔄 数据同步
+
+### 自动同步脚本
+
+创建 `scripts/sync-data.js`：
+
+```javascript
+const { execSync } = require("child_process");
+const fs = require("fs");
+const path = require("path");
+
+const DATA_SOURCE = "/path/to/content-forge-ai/data";
+const DATA_REPO = "/path/to/aibook-data";
+
+function syncData() {
+  console.log("Starting data sync...");
+
+  const dirs = fs.readdirSync(DATA_SOURCE);
+  for (const dir of dirs) {
+    const sourcePath = path.join(DATA_SOURCE, dir);
+    const targetPath = path.join(DATA_REPO, dir);
+
+    if (!fs.existsSync(targetPath)) {
+      console.log(`Copying ${dir}...`);
+      execSync(`cp -r "${sourcePath}" "${targetPath}"`);
+    }
+  }
+
+  execSync(`cd "${DATA_REPO}" && git add .`);
+  execSync(`cd "${DATA_REPO}" && git commit -m "Update data: ${new Date().toISOString()}"`);
+  execSync(`cd "${DATA_REPO}" && git push`);
+
+  console.log("Data sync completed!");
+}
+
+syncData();
+```
+
+### GitHub Actions 自动化
+
+在 `aibook-data` 仓库创建 `.github/workflows/sync.yml`：
+
+```yaml
+name: Sync to Main Site
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  trigger-rebuild:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Vercel Rebuild
+        run: |
+          curl -X POST "https://api.vercel.com/v1/integrations/deploy/Qm.../..." \
+            -H "Content-Type: application/json"
+```
 
 ## 🤝 贡献
 
@@ -213,3 +319,4 @@ MIT License
 - 图标：Heroicons
 - 字体：系统字体栈
 - CSS 框架：Tailwind CSS
+- 托管平台：Vercel

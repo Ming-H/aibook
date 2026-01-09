@@ -10,6 +10,8 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@octokit/rest": "^22.0.1",
+    "dotenv": "^17.2.3",
     "gray-matter": "^4.0.3",
     "hast": "^0.0.2",
     "mdast": "^2.3.2",

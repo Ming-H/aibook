@@ -1,68 +1,6 @@
 /**
- * 文件系统工具 - 用于读取 content-forge-ai 生成的文章
+ * 文件系统工具 - 用于处理文件名和日期格式化等工具函数
  */
-
-import { readdirSync, readFileSync, existsSync, statSync } from "fs";
-import { join } from "path";
-
-// 内容来源路径
-const CONTENT_BASE_PATH = "/Users/z/Documents/work/content-forge-ai/data";
-
-/**
- * 获取所有有内容的日期列表
- */
-export function listArticleDates(): string[] {
-  const dates: string[] = [];
-
-  if (!existsSync(CONTENT_BASE_PATH)) {
-    return dates;
-  }
-
-  const entries = readdirSync(CONTENT_BASE_PATH, { withFileTypes: true });
-
-  for (const entry of entries) {
-    if (entry.isDirectory() && /^\d{8}$/.test(entry.name)) {
-      const longformPath = join(CONTENT_BASE_PATH, entry.name, "longform");
-      if (existsSync(longformPath)) {
-        dates.push(entry.name);
-      }
-    }
-  }
-
-  // 按日期降序排序
-  return dates.sort().reverse();
-}
-
-/**
- * 获取指定日期的文章文件列表
- */
-export function listArticlesForDate(date: string): string[] {
-  const longformPath = join(CONTENT_BASE_PATH, date, "longform");
-
-  if (!existsSync(longformPath)) {
-    return [];
-  }
-
-  const files = readdirSync(longformPath);
-  // 过滤 .md 文件并按时间戳排序
-  return files
-    .filter((f) => f.endsWith(".md"))
-    .sort()
-    .reverse();
-}
-
-/**
- * 读取文章文件内容
- */
-export function readArticleFile(date: string, filename: string): string {
-  const filePath = join(CONTENT_BASE_PATH, date, "longform", filename);
-
-  if (!existsSync(filePath)) {
-    throw new Error(`文章文件不存在: ${filePath}`);
-  }
-
-  return readFileSync(filePath, "utf-8");
-}
 
 /**
  * 从文件名提取元数据
@@ -149,19 +87,4 @@ export function formatDate(dateStr: string): string {
     month: "long",
     day: "numeric",
   });
-}
-
-/**
- * 获取文章文件完整路径
- */
-export function getArticleFullPath(date: string, filename: string): string {
-  return join(CONTENT_BASE_PATH, date, "longform", filename);
-}
-
-/**
- * 检查文章是否存在
- */
-export function articleExists(date: string, filename: string): boolean {
-  const filePath = join(CONTENT_BASE_PATH, date, "longform", filename);
-  return existsSync(filePath);
 }
