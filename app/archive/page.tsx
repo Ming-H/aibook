@@ -27,107 +27,135 @@ export default async function ArchivePage() {
   const sortedMonths = Array.from(monthlyGroups.entries()).sort().reverse();
 
   return (
-    <div className="min-h-screen px-6 py-16 md:py-24">
-      <div className="mx-auto max-w-5xl">
-        {/* 页面头部 */}
-        <div className="mb-16 text-center">
-          <h1 className="mb-4 text-5xl font-bold tracking-tight text-slate-900 md:text-6xl dark:text-white">
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-950 to-purple-950">
+      {/* 动态背景 */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-0 right-1/4 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-1/3 left-1/4 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: "1s" }} />
+      </div>
+
+      {/* 页面头部 */}
+      <section className="relative px-6 py-24">
+        <div className="relative mx-auto max-w-6xl text-center">
+          <h1 className="mb-6 text-6xl md:text-7xl font-black tracking-tight text-white">
             文章归档
           </h1>
-          <p className="mx-auto max-w-2xl text-lg text-slate-600 dark:text-slate-400">
+          <p className="mx-auto mb-12 max-w-2xl text-xl text-slate-400">
             共 {allArticles.length} 篇文章，跨越 {dates.length} 天的探索之旅
           </p>
-        </div>
 
-        {/* 统计卡片 */}
-        <div className="mb-16 grid gap-6 md:grid-cols-3">
-          <div className="rounded-2xl border border-slate-200 bg-white p-6 text-center shadow-sm dark:border-slate-800 dark:bg-slate-900/50">
-            <div className="text-4xl font-bold text-blue-600 dark:text-blue-400">{allArticles.length}</div>
-            <div className="mt-2 text-sm text-slate-600 dark:text-slate-400">篇文章</div>
-          </div>
-          <div className="rounded-2xl border border-slate-200 bg-white p-6 text-center shadow-sm dark:border-slate-800 dark:bg-slate-900/50">
-            <div className="text-4xl font-bold text-purple-600 dark:text-purple-400">{dates.length}</div>
-            <div className="mt-2 text-sm text-slate-600 dark:text-slate-400">个发布日</div>
-          </div>
-          <div className="rounded-2xl border border-slate-200 bg-white p-6 text-center shadow-sm dark:border-slate-800 dark:bg-slate-900/50">
-            <div className="text-4xl font-bold text-pink-600 dark:text-pink-400">{sortedMonths.length}</div>
-            <div className="mt-2 text-sm text-slate-600 dark:text-slate-400">个月份</div>
-          </div>
-        </div>
-
-        {/* 按月份分组 */}
-        <div className="space-y-16">
-          {sortedMonths.map(([month, articles], monthIndex) => (
-            <div key={month}>
-              {/* 月份标题 */}
-              <div className="mb-8 flex items-center gap-4">
-                <h2 className="text-2xl font-bold text-slate-900 dark:text-white">{month}</h2>
-                <div className="h-px flex-1 bg-gradient-to-r from-slate-200 to-transparent dark:from-slate-800" />
+          {/* 统计卡片 */}
+          <div className="grid gap-6 md:grid-cols-3 max-w-4xl mx-auto">
+            <div className="group rounded-3xl bg-white/5 border border-white/10 p-8 backdrop-blur-xl transition-all hover:bg-white/10 hover:border-white/20 hover:scale-105">
+              <div className="text-5xl font-black text-white group-hover:text-blue-400 transition-colors mb-2">
+                {allArticles.length}
               </div>
+              <div className="text-sm text-slate-400">篇文章</div>
+            </div>
 
-              {/* 文章列表 */}
-              <div className="space-y-3">
-                {articles.map((article, articleIndex) => (
-                  <Link
-                    key={`${article.date}-${article.slug}`}
-                    href={`/articles/${article.date}/${article.slug}`}
-                    className="group block"
-                  >
-                    <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/10 hover:border-blue-200 dark:border-slate-800 dark:bg-slate-900/50 dark:hover:shadow-blue-500/5 dark:hover:border-slate-700">
-                      <div className="flex items-start justify-between gap-4">
-                        <div className="flex-1 min-w-0">
-                          <h3 className="mb-2 text-lg font-semibold text-slate-900 group-hover:text-blue-600 dark:text-white dark:group-hover:text-blue-400 transition-colors line-clamp-1">
-                            {article.emoji && <span className="mr-2">{article.emoji}</span>}
-                            {article.title}
-                          </h3>
-                          <div className="flex flex-wrap items-center gap-4 text-sm text-slate-600 dark:text-slate-400">
-                            <span className="flex items-center gap-1.5">
-                              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                              </svg>
-                              {formatDate(article.date)}
-                            </span>
-                            <span>·</span>
-                            <span className="flex items-center gap-1.5">
-                              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                              </svg>
-                              {article.readTime} 分钟
-                            </span>
-                            {article.wordCount && (
-                              <>
-                                <span>·</span>
-                                <span>{article.wordCount} 字</span>
-                              </>
-                            )}
-                            {article.tags && article.tags.length > 0 && (
-                              <>
-                                <span>·</span>
+            <div className="group rounded-3xl bg-white/5 border border-white/10 p-8 backdrop-blur-xl transition-all hover:bg-white/10 hover:border-white/20 hover:scale-105">
+              <div className="text-5xl font-black text-white group-hover:text-purple-400 transition-colors mb-2">
+                {dates.length}
+              </div>
+              <div className="text-sm text-slate-400">个发布日</div>
+            </div>
+
+            <div className="group rounded-3xl bg-white/5 border border-white/10 p-8 backdrop-blur-xl transition-all hover:bg-white/10 hover:border-white/20 hover:scale-105">
+              <div className="text-5xl font-black text-white group-hover:text-pink-400 transition-colors mb-2">
+                {sortedMonths.length}
+              </div>
+              <div className="text-sm text-slate-400">个月份</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 按月份分组 */}
+      <section className="relative px-6 pb-24">
+        <div className="mx-auto max-w-6xl">
+          <div className="space-y-16">
+            {sortedMonths.map(([month, articles]) => (
+              <div key={month}>
+                {/* 月份标题 */}
+                <div className="mb-8 flex items-center gap-6">
+                  <div className="flex-shrink-0 rounded-2xl bg-gradient-to-br from-blue-500 to-purple-500 px-8 py-4 shadow-2xl shadow-blue-500/25">
+                    <div className="text-2xl font-black text-white">
+                      {month.replace('年', ' ').replace('月', '')}
+                    </div>
+                  </div>
+                  <div className="h-px flex-1 bg-gradient-to-r from-white/10 to-transparent" />
+                </div>
+
+                {/* 文章列表 */}
+                <div className="space-y-4">
+                  {articles.map((article) => (
+                    <Link
+                      key={`${article.date}-${article.slug}`}
+                      href={`/articles/${article.date}/${article.slug}`}
+                      className="group block"
+                    >
+                      <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl transition-all duration-300 hover:bg-white/10 hover:border-white/20 hover:scale-[1.01]">
+                        {/* 顶部装饰条 */}
+                        <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 opacity-0 group-hover:opacity-100 transition-opacity" />
+
+                        <div className="flex items-start justify-between gap-6 p-8">
+                          <div className="flex-1 min-w-0">
+                            {/* 标题 */}
+                            <h3 className="mb-3 text-2xl font-bold text-white group-hover:text-blue-400 transition-colors line-clamp-1">
+                              {article.emoji && <span className="mr-2">{article.emoji}</span>}
+                              {article.title}
+                            </h3>
+
+                            {/* 元信息 */}
+                            <div className="flex flex-wrap items-center gap-6 text-sm text-slate-500">
+                              <span className="flex items-center gap-2">
+                                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                                {formatDate(article.date)}
+                              </span>
+                              <span className="flex items-center gap-2">
+                                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                {article.readTime} 分钟
+                              </span>
+                              {article.wordCount && (
+                                <span className="flex items-center gap-2">
+                                  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                  </svg>
+                                  {article.wordCount} 字
+                                </span>
+                              )}
+                              {article.tags && article.tags.length > 0 && (
                                 <div className="flex gap-2">
                                   {article.tags.slice(0, 2).map((tag) => (
-                                    <span key={tag} className="rounded-full bg-blue-50 px-2 py-0.5 text-xs text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
+                                    <span key={tag} className="rounded-full bg-blue-500/10 border border-blue-500/20 px-3 py-1 text-xs font-semibold text-blue-400">
                                       {tag}
                                     </span>
                                   ))}
                                 </div>
-                              </>
-                            )}
+                              )}
+                            </div>
+                          </div>
+
+                          {/* 箭头图标 */}
+                          <div className="flex-shrink-0 rounded-full bg-white/5 p-3 opacity-0 group-hover:opacity-100 transition-opacity group-hover:scale-110">
+                            <svg className="h-5 w-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                            </svg>
                           </div>
                         </div>
-                        <div className="flex-shrink-0">
-                          <svg className="h-5 w-5 text-slate-400 transition-transform group-hover:translate-x-1 group-hover:text-blue-600 dark:group-hover:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                          </svg>
-                        </div>
                       </div>
-                    </div>
-                  </Link>
-                ))}
+                    </Link>
+                  ))}
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
-      </div>
+      </section>
     </div>
   );
 }
