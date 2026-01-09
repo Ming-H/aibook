@@ -23,6 +23,7 @@ const [owner, repo] = process.env.GITHUB_DATA_REPO.split("/");
 
 /**
  * 列出所有数据日期（YYYYMMDD 格式的目录）
+ * 从 data/ 目录下读取
  */
 export async function listDataDates(): Promise<string[]> {
   const allDates: string[] = [];
@@ -36,7 +37,7 @@ export async function listDataDates(): Promise<string[]> {
       const { data } = await octokit.rest.repos.listContents({
         owner,
         repo,
-        path: "",
+        path: "data",
         per_page: 100,
         page,
       });
@@ -65,13 +66,14 @@ export async function listDataDates(): Promise<string[]> {
 
 /**
  * 列出指定日期的文章文件列表
+ * 从 data/{date}/longform/ 目录下读取
  */
 export async function listArticlesForDate(date: string): Promise<string[]> {
   try {
     const { data } = await octokit.rest.repos.listContents({
       owner,
       repo,
-      path: `${date}/longform`,
+      path: `data/${date}/longform`,
     });
 
     if (!Array.isArray(data)) {
@@ -92,6 +94,7 @@ export async function listArticlesForDate(date: string): Promise<string[]> {
 
 /**
  * 获取文章文件内容
+ * 从 data/{date}/longform/{filename} 读取
  */
 export async function getArticleContent(
   date: string,
@@ -101,7 +104,7 @@ export async function getArticleContent(
     const { data } = await octokit.rest.repos.getContent({
       owner,
       repo,
-      path: `${date}/longform/${filename}`,
+      path: `data/${date}/longform/${filename}`,
     });
 
     if ("content" in data && data.type === "file") {
@@ -120,13 +123,14 @@ export async function getArticleContent(
 
 /**
  * 获取文章文件的 SHA（用于缓存验证）
+ * 从 data/{date}/longform/{filename} 读取
  */
 export async function getArticleSha(date: string, filename: string): Promise<string | null> {
   try {
     const { data } = await octokit.rest.repos.getContent({
       owner,
       repo,
-      path: `${date}/longform/${filename}`,
+      path: `data/${date}/longform/${filename}`,
     });
 
     if ("sha" in data) {
