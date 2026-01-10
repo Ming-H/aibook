@@ -64,20 +64,28 @@ function extractSeriesNumber(seriesId: string): number {
 export async function getAllSeries(): Promise<SeriesMetadata[]> {
   // 检查缓存
   if (seriesListCache.has("all")) {
+    console.log('[getAllSeries] Returning cached series');
     return seriesListCache.get("all")!;
   }
 
+  console.log('[getAllSeries] Fetching series from GitHub...');
   const seriesIds = await listSeries();
+  console.log('[getAllSeries] Found series IDs:', seriesIds);
+
   const seriesList: SeriesMetadata[] = [];
 
   for (const seriesId of seriesIds) {
     try {
+      console.log(`[getAllSeries] Loading series: ${seriesId}`);
       const metadata = await getSeriesInfo(seriesId);
       if (metadata) {
+        console.log(`[getAllSeries] Successfully loaded: ${metadata.title}`);
         seriesList.push(metadata);
+      } else {
+        console.warn(`[getAllSeries] No metadata found for: ${seriesId}`);
       }
     } catch (error) {
-      console.error(`加载系列失败: ${seriesId}`, error);
+      console.error(`[getAllSeries] Failed to load series ${seriesId}:`, error);
     }
   }
 
@@ -87,6 +95,7 @@ export async function getAllSeries(): Promise<SeriesMetadata[]> {
   // 缓存结果
   seriesListCache.set("all", seriesList);
 
+  console.log(`[getAllSeries] Returning ${seriesList.length} series`);
   return seriesList;
 }
 

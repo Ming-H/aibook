@@ -5,8 +5,22 @@ export const dynamic = "force-static";
 export const revalidate = 3600;
 
 export default async function SeriesPage() {
-  const allSeries = await getAllSeries();
-  const totalEpisodes = await getTotalEpisodes();
+  let allSeries = [];
+  let totalEpisodes = 0;
+
+  try {
+    allSeries = await getAllSeries();
+    console.log('[Series Page] Loaded series:', allSeries.length);
+  } catch (error) {
+    console.error('[Series Page] Failed to load series:', error);
+  }
+
+  try {
+    totalEpisodes = await getTotalEpisodes();
+    console.log('[Series Page] Total episodes:', totalEpisodes);
+  } catch (error) {
+    console.error('[Series Page] Failed to load episodes:', error);
+  }
 
   return (
     <div className="min-h-screen bg-[var(--background-primary)] bg-noise">

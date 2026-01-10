@@ -13,6 +13,11 @@ const cleanEnv = (value: string | undefined): string | undefined => {
 const githubToken = cleanEnv(process.env.GITHUB_TOKEN);
 const githubDataRepo = cleanEnv(process.env.GITHUB_DATA_REPO);
 
+console.log('[GitHub API] Environment check:');
+console.log('[GitHub API] - GITHUB_TOKEN exists:', !!githubToken);
+console.log('[GitHub API] - GITHUB_TOKEN length:', githubToken?.length || 0);
+console.log('[GitHub API] - GITHUB_DATA_REPO:', githubDataRepo);
+
 if (!githubToken) {
   throw new Error("GITHUB_TOKEN is not defined in environment variables");
 }
