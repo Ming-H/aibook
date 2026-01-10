@@ -180,23 +180,32 @@ export async function listSeries(): Promise<string[]> {
   const allSeries: string[] = [];
 
   try {
+    console.log(`[listSeries] Fetching series from ${owner}/${repo}/data/series`);
     const { data } = await octokit.rest.repos.getContent({
       owner,
       repo,
       path: "data/series",
     });
 
+    console.log(`[listSeries] GitHub API returned ${Array.isArray(data) ? data.length : 0} items`);
+
     if (Array.isArray(data)) {
-      // 过滤出系列目录（按 series_1, series_2 等命名）
+      // 过滤出系列目录（按 series_1_*, series_2_* 等命名）
       const directories = data
-        .filter((item) => item.type === "dir" && /^series_\d+$/.test(item.name))
+        .filter((item) => {
+          const isDir = item.type === "dir";
+          const matchesPattern = /^series_\d+/.test(item.name);
+          console.log(`[listSeries] Checking ${item.name}: dir=${isDir}, matches=${matchesPattern}`);
+          return isDir && matchesPattern;
+        })
         .map((item) => item.name)
         .sort();
 
+      console.log(`[listSeries] Found directories:`, directories);
       allSeries.push(...directories);
     }
   } catch (error) {
-    console.error("Failed to list series from GitHub:", error);
+    console.error("[listSeries] Failed to list series from GitHub:", error);
   }
 
   return allSeries;
