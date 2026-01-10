@@ -1,11 +1,12 @@
 import { getAllSeries, getTotalEpisodes } from "@/lib/series-loader";
 import Link from "next/link";
+import type { SeriesMetadata } from "@/types/content";
 
 export const dynamic = "force-static";
 export const revalidate = 3600;
 
 export default async function SeriesPage() {
-  let allSeries = [];
+  let allSeries: SeriesMetadata[] = [];
   let totalEpisodes = 0;
 
   try {
