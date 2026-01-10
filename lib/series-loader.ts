@@ -102,16 +102,23 @@ export async function getSeriesInfo(seriesId: string): Promise<SeriesMetadata | 
   }
 
   const order = extractSeriesNumber(seriesId);
+  const seriesInfo = metadata?.series_info || {};
+
+  // 系列默认 emoji 映射
+  const defaultEmojis: Record<string, string> = {
+    "series_1_llm_foundation": "🧠",
+    "series_2_rag_technique": "🔍",
+  };
 
   return {
     id: seriesId,
-    title: metadata?.series_title || metadata?.title || `系列 ${order}`,
-    description: metadata?.series_description || metadata?.description || `包含 ${episodes.length} 期内容`,
-    emoji: metadata?.series_emoji || metadata?.emoji,
+    title: seriesInfo.name || metadata?.series_title || metadata?.title || `系列 ${order}`,
+    description: seriesInfo.description || metadata?.series_description || metadata?.description || `包含 ${episodes.length} 期内容`,
+    emoji: metadata?.series_emoji || metadata?.emoji || seriesInfo.emoji || defaultEmojis[seriesId] || "📚",
     cover: metadata?.cover,
     order,
     totalEpisodes: episodes.length,
-    tags: metadata?.tags,
+    tags: seriesInfo.tags || metadata?.tags,
     createdAt: metadata?.created_at,
     updatedAt: metadata?.updated_at,
   };
