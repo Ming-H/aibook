@@ -4,22 +4,30 @@
 
 import { Octokit } from "@octokit/rest";
 
+// 清理环境变量中的换行符和空格
+const cleanEnv = (value: string | undefined): string | undefined => {
+  return value?.trim().replace(/\n/g, '');
+};
+
 // 环境变量验证
-if (!process.env.GITHUB_TOKEN) {
+const githubToken = cleanEnv(process.env.GITHUB_TOKEN);
+const githubDataRepo = cleanEnv(process.env.GITHUB_DATA_REPO);
+
+if (!githubToken) {
   throw new Error("GITHUB_TOKEN is not defined in environment variables");
 }
 
-if (!process.env.GITHUB_DATA_REPO) {
+if (!githubDataRepo) {
   throw new Error("GITHUB_DATA_REPO is not defined in environment variables");
 }
 
 // 初始化 Octokit 实例
 export const octokit = new Octokit({
-  auth: process.env.GITHUB_TOKEN,
+  auth: githubToken,
 });
 
 // 解析仓库所有者和名称
-const [owner, repo] = process.env.GITHUB_DATA_REPO.split("/");
+const [owner, repo] = githubDataRepo.split("/");
 
 /**
  * 列出所有数据日期（YYYYMMDD 格式的目录）
@@ -34,7 +42,7 @@ export async function listDataDates(): Promise<string[]> {
   // 分页获取所有目录
   while (hasMore) {
     try {
-      const { data } = await octokit.rest.repos.listContents({
+      const { data } = await octokit.rest.repos.getContent({
         owner,
         repo,
         path: "data",
@@ -70,7 +78,7 @@ export async function listDataDates(): Promise<string[]> {
  */
 export async function listArticlesForDate(date: string): Promise<string[]> {
   try {
-    const { data } = await octokit.rest.repos.listContents({
+    const { data } = await octokit.rest.repos.getContent({
       owner,
       repo,
       path: `data/${date}/longform`,
@@ -154,4 +162,165 @@ export async function articleExists(date: string, filename: string): Promise<boo
   } catch {
     return false;
   }
+}
+
+// ==================== 系列相关功能 ====================
+
+/**
+ * 列出所有系列目录
+ * 从 data/series/ 目录下读取
+ * 数据结构: series_1, series_2, ...
+ */
+export async function listSeries(): Promise<string[]> {
+  const allSeries: string[] = [];
+
+  try {
+    const { data } = await octokit.rest.repos.getContent({
+      owner,
+      repo,
+      path: "data/series",
+    });
+
+    if (Array.isArray(data)) {
+      // 过滤出系列目录（按 series_1, series_2 等命名）
+      const directories = data
+        .filter((item) => item.type === "dir" && /^series_\d+$/.test(item.name))
+        .map((item) => item.name)
+        .sort();
+
+      allSeries.push(...directories);
+    }
+  } catch (error) {
+    console.error("Failed to list series from GitHub:", error);
+  }
+
+  return allSeries;
+}
+
+/**
+ * 列出指定系列的所有episode目录
+ * 从 data/series/{seriesId}/ 目录下读取
+ * 数据结构: episode_001, episode_002, ...
+ */
+export async function listEpisodesForSeries(seriesId: string): Promise<string[]> {
+  try {
+    const { data } = await octokit.rest.repos.getContent({
+      owner,
+      repo,
+      path: `data/series/${seriesId}`,
+    });
+
+    if (!Array.isArray(data)) {
+      return [];
+    }
+
+    // 过滤并返回 episode_* 目录
+    return data
+      .filter((item) => item.type === "dir" && /^episode_\d+$/.test(item.name))
+      .map((item) => item.name)
+      .sort();
+  } catch (error) {
+    console.error(`Failed to list episodes for series ${seriesId}:`, error);
+    return [];
+  }
+}
+
+/**
+ * 获取episode元数据
+ * 从 data/series/{seriesId}/{episodeId}/episode_metadata.json 读取
+ */
+export async function getEpisodeMetadata(
+  seriesId: string,
+  episodeId: string
+): Promise<Record<string, any> | null> {
+  try {
+    const { data } = await octokit.rest.repos.getContent({
+      owner,
+      repo,
+      path: `data/series/${seriesId}/${episodeId}/episode_metadata.json`,
+    });
+
+    if ("content" in data && data.type === "file") {
+      const content = Buffer.from(data.content, "base64").toString("utf-8");
+      return JSON.parse(content);
+    }
+  } catch (error) {
+    console.error(`Failed to get metadata for ${seriesId}/${episodeId}:`, error);
+  }
+
+  return null;
+}
+
+/**
+ * 获取episode文章内容
+ * 从 data/series/{seriesId}/{episodeId}/longform/ 读取第一个.md文件
+ */
+export async function getEpisodeArticleContent(
+  seriesId: string,
+  episodeId: string
+): Promise<{ content: string; sha: string; filename: string } | null> {
+  try {
+    // 首先获取 longform 目录下的文件列表
+    const { data: dirData } = await octokit.rest.repos.getContent({
+      owner,
+      repo,
+      path: `data/series/${seriesId}/${episodeId}/longform`,
+    });
+
+    let mdFileName: string | null = null;
+
+    if (Array.isArray(dirData)) {
+      // 找到第一个 .md 文件
+      const mdFile = dirData.find((item) => item.type === "file" && item.name.endsWith(".md"));
+      if (mdFile) {
+        mdFileName = mdFile.name;
+      }
+    }
+
+    if (!mdFileName) {
+      return null;
+    }
+
+    // 然后获取该文件的内容
+    const { data } = await octokit.rest.repos.getContent({
+      owner,
+      repo,
+      path: `data/series/${seriesId}/${episodeId}/longform/${mdFileName}`,
+    });
+
+    if ("content" in data && data.content) {
+      return {
+        content: Buffer.from(data.content, "base64").toString("utf-8"),
+        sha: data.sha,
+        filename: mdFileName,
+      };
+    }
+  } catch (error) {
+    console.error(`Failed to fetch article for ${seriesId}/${episodeId}:`, error);
+  }
+
+  return null;
+}
+
+/**
+ * 获取系列配置文件
+ * 从 data/series/{seriesId}/series_metadata.json 读取
+ */
+export async function getSeriesMetadata(seriesId: string): Promise<Record<string, any> | null> {
+  try {
+    const { data } = await octokit.rest.repos.getContent({
+      owner,
+      repo,
+      path: `data/series/${seriesId}/series_metadata.json`,
+    });
+
+    if ("content" in data && data.type === "file") {
+      const content = Buffer.from(data.content, "base64").toString("utf-8");
+      return JSON.parse(content);
+    }
+  } catch (error) {
+    console.error(`Failed to get series metadata for ${seriesId}:`, error);
+  }
+
+  return null;
 }

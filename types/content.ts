@@ -46,3 +46,39 @@ export interface ParsedArticle {
   content: string;
   frontmatter?: Record<string, any>;
 }
+
+// 系列相关类型定义
+export interface SeriesMetadata {
+  id: string;
+  title: string;
+  description: string;
+  emoji?: string;
+  cover?: string;
+  order: number;
+  totalEpisodes: number;
+  tags?: string[];
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface SeriesEpisode {
+  episodeNumber: number;
+  title: string;
+  slug: string;
+  excerpt?: string;
+  wordCount?: number;
+  readTime?: number;
+  tags?: string[];
+  publishedAt?: string;
+}
+
+export interface SeriesWithEpisodes extends SeriesMetadata {
+  episodes: SeriesEpisode[];
+}
+
+export interface SeriesArticleMetadata {
+  seriesId: string;
+  seriesTitle: string;
+  episodeNumber: number;
+  article: ArticleMetadata;
+}

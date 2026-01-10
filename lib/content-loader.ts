@@ -24,7 +24,7 @@ import type { ArticleMetadata, Article, ArticleByDate } from "../types/content";
  * 缓存已加载的文章
  */
 const articleCache = new Map<string, Article>();
-const metadataCache = new Map<string, ArticleMetadata[]>();
+const metadataCache = new Map<string, ArticleMetadata | ArticleMetadata[]>();
 
 /**
  * 清除缓存
@@ -40,7 +40,7 @@ export function clearCache(): void {
 export async function getAllArticles(): Promise<ArticleMetadata[]> {
   // 检查缓存
   if (metadataCache.has("all")) {
-    return metadataCache.get("all")!;
+    return metadataCache.get("all")! as ArticleMetadata[];
   }
 
   const allMetadata: ArticleMetadata[] = [];
@@ -68,7 +68,7 @@ export async function getArticlesByDate(date: string): Promise<ArticleMetadata[]
 
   // 检查缓存
   if (metadataCache.has(cacheKey)) {
-    return metadataCache.get(cacheKey)!;
+    return metadataCache.get(cacheKey)! as ArticleMetadata[];
   }
 
   const files = await listArticlesForDate(date);
@@ -114,7 +114,7 @@ export async function getArticleMetadata(date: string, filename: string): Promis
 
   // 检查缓存
   if (metadataCache.has(cacheKey)) {
-    return metadataCache.get(cacheKey)!;
+    return metadataCache.get(cacheKey)! as ArticleMetadata;
   }
 
   // 从 GitHub API 读取文件内容
