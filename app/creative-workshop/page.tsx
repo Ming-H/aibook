@@ -68,10 +68,26 @@ export default function CreativeWorkshopPage() {
         }),
       });
 
-      const data = await response.json();
-
+      // 先检查响应状态
       if (!response.ok) {
-        throw new Error(data.details || data.error || '生成失败');
+        let errorMessage = '生成失败，请稍后重试';
+
+        try {
+          const data = await response.json();
+          errorMessage = data.details || data.error || errorMessage;
+        } catch {
+          // 如果无法解析 JSON，使用默认错误消息
+        }
+
+        throw new Error(errorMessage);
+      }
+
+      // 解析成功的响应
+      let data;
+      try {
+        data = await response.json();
+      } catch {
+        throw new Error('服务器返回的数据格式错误');
       }
 
       setGeneratedImages([{

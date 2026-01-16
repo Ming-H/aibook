@@ -184,17 +184,40 @@ export default function QuizCreatePage() {
         }),
       });
 
-      const data = await response.json();
-
+      // 先检查响应状态
       if (!response.ok) {
-        throw new Error(data.details || data.error || '生成失败');
+        let errorMessage = '生成失败，请稍后重试';
+
+        try {
+          const data = await response.json();
+          errorMessage = data.details || data.error || errorMessage;
+        } catch {
+          // 如果无法解析 JSON，使用默认错误消息
+        }
+
+        throw new Error(errorMessage);
+      }
+
+      // 解析成功的响应
+      let data;
+      try {
+        data = await response.json();
+      } catch {
+        throw new Error('服务器返回的数据格式错误');
       }
 
       // 保存到 sessionStorage 并跳转到预览页面
       sessionStorage.setItem('generatedQuiz', JSON.stringify(data.quiz));
       router.push('/quiz-generator/preview');
     } catch (err) {
-      setError(err instanceof Error ? err.message : '生成失败，请重试');
+      const message = err instanceof Error ? err.message : '生成失败，请重试';
+
+      // 检查是否是环境变量未配置的错误
+      if (message.includes('API') || message.includes('configured') || message.includes('environment variable')) {
+        setError('系统配置错误：AI 服务未正确配置。请联系管理员或稍后再试。');
+      } else {
+        setError(message);
+      }
     } finally {
       setIsGenerating(false);
     }
