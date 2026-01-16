@@ -17,8 +17,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const day = article.date.slice(6, 8);
     const dateStr = `${year}-${month}-${day}`;
 
+    // 从 fullPath 提取 articleDir (格式: "20260114_133012_标题/filename.md")
+    const articleDir = article.fullPath?.split("/")[0] || article.date;
+
     return {
-      url: `https://www.aibook.website/articles/${article.date}/${article.slug}`,
+      url: `https://www.devfoxai.cn/articles/${articleDir}/${article.slug}`,
       lastModified: new Date(dateStr),
       changeFrequency: "weekly" as const,
       priority: 0.7,
@@ -36,19 +39,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
       return [
         {
-          url: `https://www.aibook.website/series`,
+          url: `https://www.devfoxai.cn/series`,
           lastModified: new Date(),
           changeFrequency: "daily" as const,
           priority: 0.9,
         },
         {
-          url: `https://www.aibook.website/series/${series.id}`,
+          url: `https://www.devfoxai.cn/series/${series.id}`,
           lastModified: series.updatedAt ? new Date(series.updatedAt) : new Date(),
           changeFrequency: "weekly" as const,
           priority: 0.8,
         },
         ...episodes.map((episode) => ({
-          url: `https://www.aibook.website/series/${series.id}/${episode.episodeNumber}`,
+          url: `https://www.devfoxai.cn/series/${series.id}/${episode.episodeNumber}`,
           lastModified: episode.publishedAt ? new Date(episode.publishedAt) : new Date(),
           changeFrequency: "weekly" as const,
           priority: 0.7,
@@ -59,13 +62,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   return [
     {
-      url: "https://www.aibook.website",
+      url: "https://www.devfoxai.cn",
       lastModified: new Date(),
       changeFrequency: "daily" as const,
       priority: 1,
     },
     {
-      url: "https://www.aibook.website/archive",
+      url: "https://www.devfoxai.cn/archive",
       lastModified: new Date(),
       changeFrequency: "weekly" as const,
       priority: 0.8,

@@ -88,10 +88,13 @@ export default async function ArchivePage() {
 
                 {/* 文章列表 */}
                 <div className="space-y-4">
-                  {articles.map((article) => (
+                  {articles.map((article) => {
+                    // 从 fullPath 提取 articleDir (格式: "20260114_133012_标题/filename.md")
+                    const articleDir = article.fullPath?.split("/")[0] || article.date;
+                    return (
                     <Link
                       key={`${article.date}-${article.slug}`}
-                      href={`/articles/${article.date}/${article.slug}`}
+                      href={`/articles/${articleDir}/${article.slug}`}
                       className="group block"
                     >
                       <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl transition-all duration-300 hover:bg-white/10 hover:border-white/20 hover:scale-[1.01]">
@@ -149,7 +152,8 @@ export default async function ArchivePage() {
                         </div>
                       </div>
                     </Link>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             ))}

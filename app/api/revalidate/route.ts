@@ -1,6 +1,11 @@
 import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 
+// 清理环境变量中的换行符和空格
+const cleanEnv = (value: string | undefined): string | undefined => {
+  return value?.trim().replace(/\n/g, '');
+};
+
 /**
  * ISR 重新验证 API 路由
  * 由 Vercel Cron Jobs 每天调用，用于刷新内容
@@ -8,9 +13,10 @@ import { NextResponse } from "next/server";
 export async function GET(request: Request) {
   // 验证 cron secret
   const authHeader = request.headers.get("authorization");
-  const expectedAuth = `Bearer ${process.env.CRON_SECRET}`;
+  const cronSecret = cleanEnv(process.env.CRON_SECRET);
+  const expectedAuth = `Bearer ${cronSecret}`;
 
-  if (!process.env.CRON_SECRET || authHeader !== expectedAuth) {
+  if (!cronSecret || authHeader !== expectedAuth) {
     return NextResponse.json(
       { message: "Unauthorized" },
       { status: 401 }

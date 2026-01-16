@@ -35,11 +35,11 @@ export const octokit = new Octokit({
 const [owner, repo] = githubDataRepo.split("/");
 
 /**
- * 列出所有数据日期（YYYYMMDD 格式的目录）
- * 从 data/ 目录下读取
+ * 列出所有自定义文章目录（YYYYMMDD_HHMMSS_标题 格式的目录）
+ * 从 data/custom/ 目录下读取
  */
 export async function listDataDates(): Promise<string[]> {
-  const allDates: string[] = [];
+  const allArticles: string[] = [];
 
   let page = 1;
   let hasMore = true;
@@ -50,43 +50,43 @@ export async function listDataDates(): Promise<string[]> {
       const { data } = await octokit.rest.repos.getContent({
         owner,
         repo,
-        path: "data",
+        path: "data/custom",
         per_page: 100,
         page,
       });
 
       if (Array.isArray(data)) {
-        // 过滤出 8 位数字的目录名（日期格式）
+        // 过滤出符合日期格式的目录名（YYYYMMDD_HHMMSS_标题）
         const directories = data
-          .filter((item) => item.type === "dir" && /^\d{8}$/.test(item.name))
+          .filter((item) => item.type === "dir" && /^\d{8}_\d{6}/.test(item.name))
           .map((item) => item.name);
 
-        allDates.push(...directories);
+        allArticles.push(...directories);
         hasMore = data.length === 100;
         page++;
       } else {
         hasMore = false;
       }
     } catch (error) {
-      console.error("Failed to list dates from GitHub:", error);
+      console.error("Failed to list articles from GitHub:", error);
       hasMore = false;
     }
   }
 
   // 按日期降序排序
-  return allDates.sort().reverse();
+  return allArticles.sort().reverse();
 }
 
 /**
- * 列出指定日期的文章文件列表
- * 从 data/{date}/longform/ 目录下读取
+ * 列出指定文章目录的 markdown 文件
+ * 从 data/custom/{articleDir}/ 目录下读取
  */
-export async function listArticlesForDate(date: string): Promise<string[]> {
+export async function listArticlesForDate(articleDir: string): Promise<string[]> {
   try {
     const { data } = await octokit.rest.repos.getContent({
       owner,
       repo,
-      path: `data/${date}/longform`,
+      path: `data/custom/${articleDir}`,
     });
 
     if (!Array.isArray(data)) {
@@ -100,24 +100,24 @@ export async function listArticlesForDate(date: string): Promise<string[]> {
       .sort()
       .reverse();
   } catch (error) {
-    console.error(`Failed to list articles for date ${date}:`, error);
+    console.error(`Failed to list articles for ${articleDir}:`, error);
     return [];
   }
 }
 
 /**
  * 获取文章文件内容
- * 从 data/{date}/longform/{filename} 读取
+ * 从 data/custom/{articleDir}/{filename} 读取
  */
 export async function getArticleContent(
-  date: string,
+  articleDir: string,
   filename: string
 ): Promise<{ content: string; sha: string }> {
   try {
     const { data } = await octokit.rest.repos.getContent({
       owner,
       repo,
-      path: `data/${date}/longform/${filename}`,
+      path: `data/custom/${articleDir}/${filename}`,
     });
 
     if ("content" in data && data.type === "file") {
@@ -129,21 +129,21 @@ export async function getArticleContent(
 
     throw new Error("Unexpected response type from GitHub API");
   } catch (error) {
-    console.error(`Failed to fetch article ${date}/${filename}:`, error);
+    console.error(`Failed to fetch article ${articleDir}/${filename}:`, error);
     throw new Error(`Failed to fetch article content: ${error instanceof Error ? error.message : String(error)}`);
   }
 }
 
 /**
  * 获取文章文件的 SHA（用于缓存验证）
- * 从 data/{date}/longform/{filename} 读取
+ * 从 data/custom/{articleDir}/{filename} 读取
  */
-export async function getArticleSha(date: string, filename: string): Promise<string | null> {
+export async function getArticleSha(articleDir: string, filename: string): Promise<string | null> {
   try {
     const { data } = await octokit.rest.repos.getContent({
       owner,
       repo,
-      path: `data/${date}/longform/${filename}`,
+      path: `data/custom/${articleDir}/${filename}`,
     });
 
     if ("sha" in data) {
@@ -152,7 +152,7 @@ export async function getArticleSha(date: string, filename: string): Promise<str
 
     return null;
   } catch (error) {
-    console.error(`Failed to get SHA for ${date}/${filename}:`, error);
+    console.error(`Failed to get SHA for ${articleDir}/${filename}:`, error);
     return null;
   }
 }
@@ -160,9 +160,9 @@ export async function getArticleSha(date: string, filename: string): Promise<str
 /**
  * 检查文章是否存在
  */
-export async function articleExists(date: string, filename: string): Promise<boolean> {
+export async function articleExists(articleDir: string, filename: string): Promise<boolean> {
   try {
-    await getArticleContent(date, filename);
+    await getArticleContent(articleDir, filename);
     return true;
   } catch {
     return false;

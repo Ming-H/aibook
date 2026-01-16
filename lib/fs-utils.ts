@@ -3,7 +3,38 @@
  */
 
 /**
- * 从文件名提取元数据
+ * 从目录名提取元数据（新格式）
+ * 目录名格式: YYYYMMDD_HHMMSS_标题
+ */
+export function extractMetadataFromDirname(dirname: string): {
+  emoji: string | null;
+  platform: string;
+  modelName: string;
+  date: string;
+  timestamp: string;
+  title: string;
+} {
+  // 匹配格式: YYYYMMDD_HHMMSS_标题
+  const match = dirname.match(/^(\d{8})_(\d{6})_(.+)$/);
+
+  if (!match) {
+    throw new Error(`无效的目录名格式: ${dirname}`);
+  }
+
+  const [, date, timestamp, title] = match;
+
+  return {
+    emoji: "📝", // 默认 emoji
+    platform: "custom",
+    modelName: title,
+    date,
+    timestamp,
+    title,
+  };
+}
+
+/**
+ * 从文件名提取元数据（旧格式，保留兼容性）
  * 文件名格式: article_{emoji}_{platform}_{model_name}_{YYYYMMDD}_{HHMMSS}.md
  */
 export function extractMetadataFromFilename(filename: string): {

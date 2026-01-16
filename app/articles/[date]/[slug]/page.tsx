@@ -9,10 +9,14 @@ export const dynamic = "force-static";
 export async function generateStaticParams() {
   const articles = await getAllArticles();
 
-  return articles.map((article) => ({
-    date: article.date,
-    slug: article.slug,
-  }));
+  return articles.map((article) => {
+    // 从 fullPath 中提取 articleDir (格式: "20260114_133012_标题/filename.md")
+    const articleDir = article.fullPath.split("/")[0];
+    return {
+      date: articleDir, // 使用完整的目录名而不是日期
+      slug: article.slug,
+    };
+  });
 }
 
 export async function generateMetadata({ params }: { params: { date: string; slug: string } }): Promise<Metadata> {

@@ -8,6 +8,7 @@ import {
   getArticleContent,
 } from "./github-api";
 import {
+  extractMetadataFromDirname,
   extractMetadataFromFilename,
   generateSlug,
   formatDate,
@@ -93,12 +94,14 @@ export async function getArticlesByDate(date: string): Promise<ArticleMetadata[]
  * 获取按日期分组的文章列表
  */
 export async function getArticlesGroupedByDate(): Promise<ArticleByDate[]> {
-  const dates = await listDataDates();
+  const articleDirs = await listDataDates();
   const grouped: ArticleByDate[] = [];
 
-  for (const date of dates) {
-    const articles = await getArticlesByDate(date);
-    if (articles.length > 0) {
+  for (const articleDir of articleDirs) {
+    const articles = await getArticlesByDate(articleDir);
+    if (articles.length > 0 && articles[0]) {
+      // 使用文章中的日期（从目录名提取的）作为分组键
+      const date = articles[0].date;
       grouped.push({ date, articles });
     }
   }
@@ -109,8 +112,8 @@ export async function getArticlesGroupedByDate(): Promise<ArticleByDate[]> {
 /**
  * 获取文章元数据
  */
-export async function getArticleMetadata(date: string, filename: string): Promise<ArticleMetadata> {
-  const cacheKey = `${date}:${filename}`;
+export async function getArticleMetadata(articleDir: string, filename: string): Promise<ArticleMetadata> {
+  const cacheKey = `${articleDir}:${filename}`;
 
   // 检查缓存
   if (metadataCache.has(cacheKey)) {
@@ -118,13 +121,13 @@ export async function getArticleMetadata(date: string, filename: string): Promis
   }
 
   // 从 GitHub API 读取文件内容
-  const { content } = await getArticleContent(date, filename);
+  const { content } = await getArticleContent(articleDir, filename);
 
   // 解析 Markdown
   const parsed = await parseMarkdown(content);
 
-  // 从文件名提取基本信息
-  const fileMeta = extractMetadataFromFilename(filename);
+  // 从目录名提取基本信息（新格式）
+  const dirMeta = extractMetadataFromDirname(articleDir);
 
   // 从 frontmatter 提取额外信息
   const tags = extractTagsFromFrontmatter(parsed.frontmatter);
@@ -133,7 +136,7 @@ export async function getArticleMetadata(date: string, filename: string): Promis
 
   // 提取标题
   const titleMatch = content.match(/^#\s+(.+)$/m);
-  const title = titleMatch ? titleMatch[1].trim() : fileMeta.modelName;
+  const title = titleMatch ? titleMatch[1].trim() : dirMeta.title;
 
   // 生成 slug
   const slug = generateSlug(title);
@@ -145,17 +148,17 @@ export async function getArticleMetadata(date: string, filename: string): Promis
   const metadata: ArticleMetadata = {
     slug,
     title,
-    emoji: fileMeta.emoji || undefined,
-    platform: fileMeta.platform,
-    modelName: fileMeta.modelName,
-    date,
-    timestamp: fileMeta.timestamp,
-    fullPath: `${date}/${filename}`,
+    emoji: dirMeta.emoji || undefined,
+    platform: dirMeta.platform,
+    modelName: dirMeta.modelName,
+    date: dirMeta.date,
+    timestamp: dirMeta.timestamp,
+    fullPath: `${articleDir}/${filename}`,
     excerpt,
     wordCount,
     tags,
     readTime,
-    publishedAt: new Date(`${date.slice(0, 4)}-${date.slice(4, 6)}-${date.slice(6, 8)}`),
+    publishedAt: new Date(`${dirMeta.date.slice(0, 4)}-${dirMeta.date.slice(4, 6)}-${dirMeta.date.slice(6, 8)}`),
   };
 
   // 缓存结果
@@ -167,8 +170,8 @@ export async function getArticleMetadata(date: string, filename: string): Promis
 /**
  * 获取完整的文章内容
  */
-export async function getArticle(date: string, slug: string): Promise<Article | null> {
-  const cacheKey = `article:${date}:${slug}`;
+export async function getArticle(articleDir: string, slug: string): Promise<Article | null> {
+  const cacheKey = `article:${articleDir}:${slug}`;
 
   // 检查缓存
   if (articleCache.has(cacheKey)) {
@@ -176,7 +179,7 @@ export async function getArticle(date: string, slug: string): Promise<Article | 
   }
 
   // 查找匹配的文章
-  const articles = await getArticlesByDate(date);
+  const articles = await getArticlesByDate(articleDir);
   const articleMetadata = articles.find((a) => a.slug === slug);
 
   if (!articleMetadata) {
@@ -185,7 +188,7 @@ export async function getArticle(date: string, slug: string): Promise<Article | 
 
   // 从 GitHub API 读取内容
   const filename = articleMetadata.fullPath.split("/").pop()!;
-  const { content } = await getArticleContent(date, filename);
+  const { content } = await getArticleContent(articleDir, filename);
   const parsed = await parseMarkdown(content);
 
   const article: Article = {

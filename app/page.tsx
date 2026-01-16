@@ -180,13 +180,16 @@ export default async function HomePage() {
 
                   {/* 文章卡片网格 - 3D 效果 */}
                   <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-                    {group.articles.map((article, articleIndex) => (
-                      <Link
-                        key={`${article.date}-${article.slug}`}
-                        href={`/articles/${article.date}/${article.slug}`}
-                        className="group block animate-fade-in-up"
-                        style={{ animationDelay: `${(groupIndex * 0.05) + (articleIndex * 0.03)}s` }}
-                      >
+                    {group.articles.map((article, articleIndex) => {
+                      // 从 fullPath 提取 articleDir (格式: "20260114_133012_标题/filename.md")
+                      const articleDir = article.fullPath?.split("/")[0] || article.date;
+                      return (
+                        <Link
+                          key={`${article.date}-${article.slug}`}
+                          href={`/articles/${articleDir}/${article.slug}`}
+                          className="group block animate-fade-in-up"
+                          style={{ animationDelay: `${(groupIndex * 0.05) + (articleIndex * 0.03)}s` }}
+                        >
                         <article className="card-3d-interactive relative h-full overflow-hidden rounded-3xl glass-card border border-[var(--border-default)] transition-all duration-500 hover:border-[var(--border-strong)] hover-glow">
                           {/* 顶部装饰条 - 霓虹效果 */}
                           <div className="absolute top-0 left-0 right-0 h-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
@@ -263,7 +266,8 @@ export default async function HomePage() {
                           />
                         </article>
                       </Link>
-                    ))}
+                      );
+                    })}
                   </div>
                 </div>
               ))}
