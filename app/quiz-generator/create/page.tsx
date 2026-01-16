@@ -11,7 +11,7 @@ import Link from 'next/link';
 import { Select, type SelectOption } from '@/components/ui/Select';
 import { Slider } from '@/components/ui/Slider';
 import { TagInput } from '@/components/ui/TagInput';
-import type { QuizConfig } from '@/lib/glm-api';
+import { AVAILABLE_QUIZ_MODELS, type QuizConfig, type QuizModelId } from '@/lib/glm-api';
 
 // 学科选项
 const SUBJECT_OPTIONS: SelectOption[] = [
@@ -69,6 +69,9 @@ export default function QuizCreatePage() {
   const [step, setStep] = useState<Step>(1);
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState('');
+
+  // 选中的模型
+  const [selectedModel, setSelectedModel] = useState<QuizModelId>(AVAILABLE_QUIZ_MODELS[0].id);
 
   // 表单状态
   const [config, setConfig] = useState<QuizConfig>({
@@ -175,7 +178,10 @@ export default function QuizCreatePage() {
       const response = await fetch('/api/quiz/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(config),
+        body: JSON.stringify({
+          ...config,
+          model: selectedModel,
+        }),
       });
 
       const data = await response.json();
@@ -274,6 +280,60 @@ export default function QuizCreatePage() {
                 placeholder="请选择年级"
                 required
               />
+
+              {/* 模型选择 */}
+              <div>
+                <label className="block text-sm font-medium text-[var(--text-secondary)] mb-3">
+                  选择 AI 模型
+                  <span className="ml-2 text-xs text-[var(--text-muted)]">(官方模型，稳定可靠)</span>
+                </label>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {AVAILABLE_QUIZ_MODELS.map((model) => (
+                    <button
+                      key={model.id}
+                      type="button"
+                      onClick={() => setSelectedModel(model.id)}
+                      className={`
+                        px-4 py-3 rounded-xl border-2 transition-all duration-200 text-left relative
+                        ${selectedModel === model.id
+                          ? 'border-[var(--color-brand)] bg-[var(--color-brand)]/10 shadow-lg'
+                          : 'border-[var(--border-default)] hover:border-[var(--border-strong)] bg-[var(--background-tertiary)]'
+                        }
+                      `}
+                    >
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <div className={`font-semibold text-sm ${
+                              selectedModel === model.id ? 'text-[var(--color-brand)]' : 'text-[var(--text-primary)]'
+                            }`}>
+                              {model.name}
+                            </div>
+                            {model.recommended && (
+                              <span className="px-2 py-0.5 text-xs rounded-full bg-[var(--neon-green)]/20 text-[var(--neon-green)] font-medium">
+                                推荐
+                              </span>
+                            )}
+                          </div>
+                          <div className="text-xs text-[var(--text-muted)]">
+                            {model.description}
+                          </div>
+                        </div>
+                        {selectedModel === model.id && (
+                          <div className="w-5 h-5 rounded-full bg-[var(--color-brand)] flex items-center justify-center flex-shrink-0 ml-2">
+                            <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                            </svg>
+                          </div>
+                        )}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+                <p className="mt-2 text-xs text-[var(--text-muted)]">
+                  💡 所有模型均来自 ModelScope 官方，稳定可靠
+                </p>
+              </div>
 
               {/* 出题模式切换 */}
               <div>
@@ -515,6 +575,19 @@ export default function QuizCreatePage() {
                 <div className="flex justify-between py-3 border-b border-[var(--border-subtle)]">
                   <span className="text-[var(--text-secondary)]">年级</span>
                   <span className="font-medium text-[var(--text-primary)]">{config.grade}</span>
+                </div>
+                <div className="flex justify-between py-3 border-b border-[var(--border-subtle)]">
+                  <span className="text-[var(--text-secondary)]">AI 模型</span>
+                  <div className="flex items-center gap-2">
+                    <span className="font-medium text-[var(--text-primary)]">
+                      {AVAILABLE_QUIZ_MODELS.find(m => m.id === selectedModel)?.name || selectedModel}
+                    </span>
+                    {AVAILABLE_QUIZ_MODELS.find(m => m.id === selectedModel)?.recommended && (
+                      <span className="px-2 py-0.5 text-xs rounded-full bg-[var(--neon-green)]/20 text-[var(--neon-green)] font-medium">
+                        推荐
+                      </span>
+                    )}
+                  </div>
                 </div>
                 <div className="flex justify-between py-3 border-b border-[var(--border-subtle)]">
                   <span className="text-[var(--text-secondary)]">出题模式</span>

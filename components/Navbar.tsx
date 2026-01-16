@@ -31,6 +31,7 @@ export function Navbar() {
     { href: '/daily', label: '今日热点', icon: '🔥' },
     { href: '/series', label: 'LLM系列', icon: '📚' },
     { href: '/quiz-generator', label: '智能出题', icon: '✨' },
+    { href: '/creative-workshop', label: '创意工坊', icon: '🎨' },
     { href: '/archive', label: '归档', icon: '📁' },
   ];
 

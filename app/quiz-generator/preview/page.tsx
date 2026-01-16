@@ -11,11 +11,24 @@ import Link from 'next/link';
 import type { Quiz } from '@/lib/glm-api';
 import { exportQuiz } from '@/lib/glm-api';
 
+// HTML 转义辅助函数
+function escapeHtml(text: string): string {
+  const map: Record<string, string> = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#039;',
+  };
+  return text.replace(/[&<>"']/g, (m) => map[m]);
+}
+
 export default function QuizPreviewPage() {
   const router = useRouter();
   const [quiz, setQuiz] = useState<Quiz | null>(null);
   const [loading, setLoading] = useState(true);
-  const [downloadFormat, setDownloadFormat] = useState<'json' | 'text' | 'markdown'>('markdown');
+  const [downloadFormat, setDownloadFormat] = useState<'docx' | 'image' | 'json' | 'text' | 'markdown'>('docx');
+  const [isDownloading, setIsDownloading] = useState(false);
 
   useEffect(() => {
     // 从 sessionStorage 读取试卷数据
@@ -36,23 +49,149 @@ export default function QuizPreviewPage() {
   }, [router]);
 
   // 下载试卷
-  const handleDownload = () => {
+  const handleDownload = async () => {
     if (!quiz) return;
 
+    setIsDownloading(true);
+
     try {
-      const content = exportQuiz(quiz, downloadFormat);
-      const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `${quiz.title}.${downloadFormat === 'text' ? 'txt' : downloadFormat === 'markdown' ? 'md' : 'json'}`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
+      const fileName = `${quiz.title}`;
+
+      switch (downloadFormat) {
+        case 'docx': {
+          const docxModule = await import('docx');
+          const { Document, Packer, Paragraph, AlignmentType, HeadingLevel } = docxModule;
+
+          const doc = new Document({
+            sections: [{
+              properties: {},
+              children: [
+                new Paragraph({
+                  text: quiz.title,
+                  heading: HeadingLevel.HEADING_1,
+                  alignment: AlignmentType.CENTER,
+                }),
+                new Paragraph({
+                  text: `学科：${quiz.subject}  年级：${quiz.grade}  难度：${
+                    quiz.difficulty === 'easy' ? '简单' : quiz.difficulty === 'medium' ? '中等' : '困难'
+                  }  总分：${quiz.totalPoints}分`,
+                  alignment: AlignmentType.CENTER,
+                }),
+                ...quiz.questions.flatMap((question, index) => [
+                  new Paragraph({
+                    text: `${index + 1}. ${question.content}  (${question.points}分)`,
+                    heading: HeadingLevel.HEADING_2,
+                  }),
+                  ...(question.type === 'choice' && question.options
+                    ? question.options.map((option, i) => new Paragraph({
+                        text: `${String.fromCharCode(65 + i)}. ${option}`,
+                        bullet: {
+                          level: 0,
+                        },
+                      }))
+                    : []
+                  ),
+                  new Paragraph(''),
+                ]),
+              ],
+            }],
+          });
+
+          const blob = await Packer.toBlob(doc);
+
+          // 使用原生下载方式
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `${fileName}.docx`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+          break;
+        }
+
+        case 'image': {
+          const { default: html2canvas } = await import('html2canvas');
+
+          // 创建一个临时的 DOM 元素来渲染试卷
+          const element = document.createElement('div');
+          element.style.position = 'absolute';
+          element.style.left = '-9999px';
+          element.style.width = '800px';
+          element.style.padding = '40px';
+          element.style.background = 'white';
+          element.style.fontFamily = 'Arial, sans-serif';
+
+          element.innerHTML = `
+            <div style="font-family: Arial, sans-serif; padding: 20px;">
+              <h1 style="text-align: center; color: #333;">${quiz.title}</h1>
+              <div style="text-align: center; color: #666; margin-bottom: 20px;">
+                学科：${quiz.subject} | 年级：${quiz.grade} | 难度：${
+                  quiz.difficulty === 'easy' ? '简单' : quiz.difficulty === 'medium' ? '中等' : '困难'
+                } | 总分：${quiz.totalPoints}分
+              </div>
+              <hr style="border: 1px solid #ddd; margin: 20px 0;" />
+              ${quiz.questions.map((question, index) => `
+                <div style="margin-bottom: 25px;">
+                  <h3 style="color: #333; font-size: 16px;">${index + 1}. ${question.content} (${question.points}分)</h3>
+                  ${question.type === 'choice' && question.options ? `
+                    <div style="margin-left: 20px;">
+                      ${question.options.map((option, i) => `
+                        <div style="margin: 5px 0; color: #666;">${String.fromCharCode(65 + i)}. ${option}</div>
+                      `).join('')}
+                    </div>
+                  ` : ''}
+                </div>
+              `).join('')}
+            </div>
+          `;
+
+          document.body.appendChild(element);
+
+          try {
+            const canvas = await html2canvas(element, {
+              scale: 2,
+              useCORS: true,
+              logging: false,
+            });
+
+            canvas.toBlob((blob) => {
+              if (blob) {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `${fileName}.png`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+              }
+            });
+          } finally {
+            document.body.removeChild(element);
+          }
+          break;
+        }
+
+        default: {
+          const content = exportQuiz(quiz, downloadFormat as 'json' | 'text' | 'markdown');
+          const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `${fileName}.${downloadFormat === 'text' ? 'txt' : downloadFormat === 'markdown' ? 'md' : 'json'}`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+        }
+      }
     } catch (error) {
       console.error('Download failed:', error);
-      alert('下载失败，请重试');
+      alert('下载失败：' + (error instanceof Error ? error.message : '未知错误'));
+    } finally {
+      setIsDownloading(false);
     }
   };
 
@@ -90,22 +229,34 @@ export default function QuizPreviewPage() {
           <div className="flex items-center gap-3">
             <select
               value={downloadFormat}
-              onChange={(e) => setDownloadFormat(e.target.value as 'json' | 'text' | 'markdown')}
+              onChange={(e) => setDownloadFormat(e.target.value as 'docx' | 'image' | 'json' | 'text' | 'markdown')}
               className="px-4 py-2 bg-[var(--background-secondary)] border border-[var(--border-default)] rounded-lg text-sm text-[var(--text-primary)]"
               style={{ fontFamily: 'var(--font-body)' }}
             >
-              <option value="markdown">Markdown</option>
-              <option value="text">纯文本</option>
-              <option value="json">JSON</option>
+              <option value="docx">📝 Word 文档</option>
+              <option value="image">🖼️ 图片 (PNG)</option>
+              <option value="markdown">📋 Markdown</option>
+              <option value="text">📄 纯文本</option>
+              <option value="json">🔧 JSON 数据</option>
             </select>
             <button
               onClick={handleDownload}
-              className="px-6 py-2 bg-[var(--gradient-primary)] text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all hover:scale-105 flex items-center gap-2"
+              disabled={isDownloading}
+              className="px-6 py-2 bg-[var(--gradient-primary)] text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all hover:scale-105 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-              </svg>
-              下载试卷
+              {isDownloading ? (
+                <>
+                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                  <span>生成中...</span>
+                </>
+              ) : (
+                <>
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                  </svg>
+                  下载试卷
+                </>
+              )}
             </button>
           </div>
         </div>

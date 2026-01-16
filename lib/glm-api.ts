@@ -1,6 +1,6 @@
 /**
- * GLM-4.7 API 客户端
- * 用于智能出题功能
+ * ModelScope 多模型 API 客户端
+ * 用于智能出题功能，支持多个 AI 模型
  */
 
 // 清理环境变量中的换行符和空格
@@ -8,22 +8,62 @@ const cleanEnv = (value: string | undefined): string | undefined => {
   return value?.trim().replace(/\n/g, '');
 };
 
-// 环境变量验证
-const glmApiKey = cleanEnv(process.env.GLM_API_KEY);
-const glmApiBaseUrl = cleanEnv(process.env.GLM_API_BASE_URL) || 'https://open.bigmodel.cn/api/paas/v4';
+// 环境变量验证 - 使用 ModelScope API
+const modelScopeApiKey = cleanEnv(process.env.MODELSCOPE_API_KEY);
+const modelScopeBaseUrl = cleanEnv(process.env.MODELSCOPE_BASE_URL) || 'https://api-inference.modelscope.cn/v1';
 
-if (!glmApiKey) {
-  console.warn('GLM_API_KEY is not defined in environment variables. GLM API features will be disabled.');
+if (!modelScopeApiKey) {
+  console.warn('MODELSCOPE_API_KEY is not defined in environment variables. ModelScope API features will be disabled.');
 }
 
 /**
- * GLM API 基础配置
+ * 可用的模型列表
+ * 使用 ModelScope 上实际存在的支持 OpenAI 格式的模型
  */
-const GLM_CONFIG = {
-  baseURL: glmApiBaseUrl,
-  apiKey: glmApiKey,
-  model: 'glm-4', // 使用 GLM-4 模型
-  timeout: 60000, // 60 秒超时
+export const AVAILABLE_QUIZ_MODELS = [
+  {
+    id: 'ZhipuAI/GLM-4.7',
+    name: 'GLM-4.7',
+    description: '智谱AI最新模型，综合能力出色，擅长编程',
+    category: 'official',
+    recommended: true,
+  },
+  {
+    id: 'deepseek-ai/DeepSeek-V3.2',
+    name: 'DeepSeek-V3.2',
+    description: '深度求索最新模型，推理能力强',
+    category: 'official',
+    recommended: false,
+  },
+  {
+    id: 'Qwen/Qwen3-Coder-480B-A35B-Instruct',
+    name: 'Qwen3 Coder 480B',
+    description: '通义千问编程模型，代码相关题目优秀',
+    category: 'official',
+    recommended: false,
+  },
+  {
+    id: 'Qwen/Qwen3-235B-A22B-Instruct-2507',
+    name: 'Qwen3 235B',
+    description: '通义千问大型模型，综合能力强',
+    category: 'official',
+    recommended: false,
+  },
+] as const;
+
+/**
+ * 模型类型
+ */
+export type QuizModelId = typeof AVAILABLE_QUIZ_MODELS[number]['id'];
+
+/**
+ * ModelScope API 基础配置
+ */
+const MODELSCOPE_CONFIG = {
+  baseURL: modelScopeBaseUrl,
+  apiKey: modelScopeApiKey,
+  defaultModel: 'ZhipuAI/GLM-4.7' as QuizModelId, // 默认使用 GLM-4.7
+  timeout: 120000, // 120 秒超时（大型模型可能需要更长时间）
 };
 
 /**
@@ -82,6 +122,7 @@ export interface QuizConfig {
   totalCount?: number; // 总题数
   requirements?: string; // 额外要求
   customContent?: string; // 自定义内容（基于文本出题）
+  model?: QuizModelId; // 可选的模型选择，默认使用 ZhipuAI/GLM-4.7
 }
 
 /**
@@ -183,51 +224,64 @@ ${requirements ? `额外要求：${requirements}` : ''}
 }
 
 /**
- * 调用 GLM API
+ * 调用 ModelScope API (兼容 OpenAI 格式)
  */
-async function callGLMAPI(messages: GLMChatRequest['messages']): Promise<string> {
-  if (!GLM_CONFIG.apiKey) {
-    throw new Error('GLM API key is not configured');
+async function callModelScopeAPI(
+  messages: GLMChatRequest['messages'],
+  model?: QuizModelId
+): Promise<string> {
+  if (!MODELSCOPE_CONFIG.apiKey) {
+    throw new Error('ModelScope API key is not configured');
   }
 
+  const modelId = model || MODELSCOPE_CONFIG.defaultModel;
+
   const requestBody: GLMChatRequest = {
-    model: GLM_CONFIG.model,
+    model: modelId,
     messages,
     temperature: 0.3,  // 降低温度以获得更确定的输出
     top_p: 0.9,
   };
 
   try {
-    const response = await fetch(`${GLM_CONFIG.baseURL}/chat/completions`, {
+    const url = `${MODELSCOPE_CONFIG.baseURL}/chat/completions`;
+    console.log('[ModelScope API] Request URL:', url);
+    console.log('[ModelScope API] Model:', modelId);
+    console.log('[ModelScope API] Has API Key:', !!MODELSCOPE_CONFIG.apiKey);
+
+    const response = await fetch(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${GLM_CONFIG.apiKey}`,
+        'Authorization': `Bearer ${MODELSCOPE_CONFIG.apiKey}`,
       },
       body: JSON.stringify(requestBody),
-      signal: AbortSignal.timeout(GLM_CONFIG.timeout),
+      signal: AbortSignal.timeout(MODELSCOPE_CONFIG.timeout),
     });
+
+    console.log('[ModelScope API] Response Status:', response.status);
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      throw new Error(`GLM API error: ${response.status} - ${JSON.stringify(errorData)}`);
+      console.error('[ModelScope API] Error Response:', errorData);
+      throw new Error(`ModelScope API error: ${response.status} - ${JSON.stringify(errorData)}`);
     }
 
     const data: GLMChatResponse = await response.json();
 
     if (!data.choices?.[0]?.message?.content) {
-      throw new Error('Invalid GLM API response: missing content');
+      throw new Error('Invalid ModelScope API response: missing content');
     }
 
     return data.choices[0].message.content;
   } catch (error) {
     if (error instanceof Error) {
       if (error.name === 'AbortError') {
-        throw new Error('GLM API request timeout');
+        throw new Error('ModelScope API request timeout');
       }
       throw error;
     }
-    throw new Error('Unknown error calling GLM API');
+    throw new Error('Unknown error calling ModelScope API');
   }
 }
 
@@ -340,7 +394,7 @@ export async function generateQuiz(config: QuizConfig): Promise<Quiz> {
     },
   ];
 
-  const response = await callGLMAPI(messages);
+  const response = await callModelScopeAPI(messages, config.model);
   const quizData = parseQuizResponse(response);
 
   return {
@@ -362,7 +416,8 @@ export async function regenerateQuestion(
     subject: string;
     grade: string;
     topics: string[];
-  }
+  },
+  model?: QuizModelId
 ): Promise<Question> {
   const questionType = originalQuestion.type === 'choice' ? '选择题' : originalQuestion.type === 'fill-blank' ? '填空题' : '简答题';
 
@@ -384,7 +439,7 @@ export async function regenerateQuestion(
     },
   ];
 
-  const response = await callGLMAPI(messages);
+  const response = await callModelScopeAPI(messages, model);
 
   // 使用相同的解析逻辑
   const firstBrace = response.indexOf('{');
@@ -411,13 +466,13 @@ export async function regenerateQuestion(
 }
 
 /**
- * 验证 GLM API 配置
+ * 验证 ModelScope API 配置
  */
 export function validateGLMConfig(): { valid: boolean; error?: string } {
-  if (!GLM_CONFIG.apiKey) {
+  if (!MODELSCOPE_CONFIG.apiKey) {
     return {
       valid: false,
-      error: 'GLM_API_KEY environment variable is not set',
+      error: 'MODELSCOPE_API_KEY environment variable is not set',
     };
   }
 
@@ -427,7 +482,7 @@ export function validateGLMConfig(): { valid: boolean; error?: string } {
 /**
  * 导出试卷为不同格式
  */
-export function exportQuiz(quiz: Quiz, format: 'json' | 'text' | 'markdown'): string {
+export function exportQuiz(quiz: Quiz, format: 'json' | 'text' | 'markdown' | 'pdf' | 'docx' | 'image'): string | Blob {
   switch (format) {
     case 'json':
       return JSON.stringify(quiz, null, 2);
@@ -480,6 +535,12 @@ export function exportQuiz(quiz: Quiz, format: 'json' | 'text' | 'markdown'): st
 
       return md;
     }
+
+    case 'pdf':
+    case 'docx':
+    case 'image':
+      // 这些格式需要特殊处理，返回空字符串，实际处理在客户端
+      return '';
 
     default:
       throw new Error(`Unsupported export format: ${format}`);

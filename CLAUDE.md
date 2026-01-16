@@ -4,11 +4,20 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-AI Hot Tech is a static site generator that displays AI technology news articles and series content. Content is stored in a GitHub repository and fetched via GitHub API during build time. The site uses Next.js 14 App Router with SSG/ISR for optimal performance.
+AI Hot Tech is a static site generator that displays AI technology news articles, series content, and interactive learning tools. Content is stored in a GitHub repository and fetched via GitHub API during build time. The site uses Next.js 14 App Router with SSG/ISR for optimal performance.
+
+**Content Channels:**
+- **Daily Hot Tech** (`/daily`) - Daily AI industry news digests from `data/daily/{YYYYMMDD}/digest/`
+- **Series Learning** (`/series`) - Structured learning paths from `data/series/`
+- **Archive** (`/archive`) - Historical content browser
+- **Quiz Generator** (`/quiz-generator`) - Interactive quiz creation tool powered by GLM-4.7 API
+- **Creative Workshop** (`/creative-workshop`) - AI-powered image generation tool using ModelScope API
 
 **Content Sources:**
+- Daily digests: `data/daily/{YYYYMMDD}/digest/digest_*.md`
 - Daily articles: `data/{YYYYMMDD}/longform/*.md`
 - Series content: `data/series/series_{N}/episode_{N}/longform/*.md`
+- Custom/Legacy articles: `data/custom/{YYYYMMDD_HHMMSS_title}/article_*.md`
 
 ## Development Commands
 
@@ -36,7 +45,7 @@ vercel logs
 
 ### Content Loading Architecture
 
-The system has two parallel content loading paths:
+The system has three parallel content loading paths:
 
 1. **Daily Articles** (`lib/content-loader.ts`)
    - Fetches from `data/{YYYYMMDD}/longform/` structure
@@ -50,7 +59,12 @@ The system has two parallel content loading paths:
    - Each episode has an `episode_metadata.json`
    - Caches in `seriesCache`, `seriesListCache`, and `episodeCache` Maps
 
-**Why two loaders?** Daily articles and series content have different metadata structures and access patterns. Separating them allows for optimized caching and query strategies for each content type.
+3. **Daily Digests** (`lib/daily-loader.ts`)
+   - Fetches from `data/daily/{YYYYMMDD}/digest/` structure
+   - Optimized for daily news digest format
+   - Separate cache for digest content
+
+**Why separate loaders?** Daily articles, series content, and daily digests have different metadata structures and access patterns. Separating them allows for optimized caching and query strategies for each content type.
 
 ### Data Flow
 
@@ -121,6 +135,8 @@ Series use separate JSON metadata files instead of encoding everything in filena
 | `GITHUB_TOKEN` | Yes | GitHub Personal Access Token with `repo` scope |
 | `GITHUB_DATA_REPO` | Yes | Data repository in format `owner/repo` |
 | `CRON_SECRET` | Yes | Secret for protecting ISR endpoint at `/api/revalidate` |
+| `GLM_API_KEY` | Optional | GLM-4.7 API key for quiz generation feature |
+| `MODELSCOPE_API_KEY` | Optional | ModelScope API key for image generation feature |
 
 **Important**: Environment variables set via Vercel CLI may contain trailing newlines. Use `cleanEnv()` from `lib/github-api.ts` to strip them.
 
@@ -130,6 +146,8 @@ Series use separate JSON metadata files instead of encoding everything in filena
 - **unified** + **remark** + **rehype** - Markdown processing pipeline
 - **gray-matter** - Frontmatter parsing
 - **reading-time** - Read time calculation
+- **GLM-4.7 API** - Quiz generation via `lib/glm-api.ts`
+- **ModelScope API** - Image generation via `lib/modelscope-api.ts`
 
 ### Core Modules
 
@@ -138,6 +156,9 @@ Series use separate JSON metadata files instead of encoding everything in filena
 | `lib/github-api.ts` | GitHub API wrapper, cleanEnv(), directory listing, content fetching |
 | `lib/content-loader.ts` | Daily article caching, metadata, search/filter, related articles |
 | `lib/series-loader.ts` | Series/episode caching, metadata extraction, episode ordering |
+| `lib/daily-loader.ts` | Daily digest caching and content loading |
+| `lib/glm-api.ts` | GLM-4.7 API integration for quiz generation |
+| `lib/modelscope-api.ts` | ModelScope API integration for image generation |
 | `lib/markdown-parser.ts` | Markdown → HTML conversion with remark/rehype, heading extraction |
 | `lib/fs-utils.ts` | Filename parsing, slug generation, date formatting |
 | `types/content.ts` | TypeScript interfaces for all content types |
@@ -207,6 +228,69 @@ The markdown parser (lib/markdown-parser.ts) processes:
 ```
 
 The series loader (lib/series-loader.ts) reads these JSON files to build the series structure, then combines with article content from the longform/ subdirectories.
+
+### Creative Workshop
+
+The `/creative-workshop` route provides an AI-powered image generation tool using ModelScope API:
+
+**Architecture:**
+- Client-side generation interface with style selection
+- Async task creation and polling for image generation
+- Multiple preset styles (landscape, portrait, cartoon, cyberpunk, watercolor, 3D render)
+- Download functionality for generated images
+
+**Key Components:**
+- `lib/modelscope-api.ts` - ModelScope API wrapper with async task handling
+- `app/creative-workshop/page.tsx` - Main image generation interface
+- `app/api/image/generate/route.ts` - API endpoint for image generation
+
+**ModelScope API Integration:**
+- Uses `Tongyi-MAI/Z-Image-Turbo` model by default
+- Async task creation with polling for completion
+- 5-minute timeout with 5-second polling interval
+- Support for custom models and LoRA configurations
+
+### Quiz Generator
+
+The `/quiz-generator` route provides an interactive quiz creation tool powered by GLM-4.7 API:
+
+**Architecture:**
+- Three-step workflow: Configuration → Question Setup → Generation & Preview
+- Real-time quiz regeneration capability
+- Multiple export formats (JSON, Text, Markdown)
+
+**Key Components:**
+- `lib/glm-api.ts` - GLM-4.7 API wrapper with sophisticated prompt engineering
+- `app/quiz-generator/page.tsx` - Main quiz generator interface
+- `components/ui/` - Reusable form controls (Select, Slider, TagInput)
+
+**GLM API Integration:**
+- JSON response parsing with error recovery
+- Context-aware prompts for different question types
+- Support for multiple choice, true/false, fill-in-blank, and short answer questions
+
+### Design System
+
+The site uses a custom dark theme design system with glass morphism effects:
+
+**Key Design Features:**
+- Dark theme with vibrant accent colors
+- Glass morphism (backdrop-blur, semi-transparent backgrounds)
+- Neon gradient system for branding
+- Animated gradient backgrounds and particle effects
+- 3D card hover effects
+- Custom scrollbar styling
+
+**Theming:**
+- CSS custom properties for consistent theming
+- Tailwind CSS with custom design tokens
+- Responsive design system with mobile-first approach
+
+**UI Components** (`components/ui/`):
+- Glass card components
+- Theme-aware form controls
+- Navigation system
+- Reusable button and input components
 
 ### Sitemap Generation
 

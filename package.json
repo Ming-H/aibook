@@ -11,9 +11,15 @@
   },
   "dependencies": {
     "@octokit/rest": "^22.0.1",
+    "@types/html2pdf.js": "^0.10.0",
+    "docx": "^9.5.1",
     "dotenv": "^17.2.3",
+    "file-saver": "^2.0.5",
     "gray-matter": "^4.0.3",
     "hast": "^0.0.2",
+    "html2canvas": "^1.4.1",
+    "html2pdf.js": "^0.14.0",
+    "jspdf": "^4.0.0",
     "mdast": "^2.3.2",
     "next": "14.2.5",
     "react": "18.3.1",
@@ -31,6 +37,7 @@
     "unist-util-visit": "^5.0.0"
   },
   "devDependencies": {
+    "@types/file-saver": "^2.0.7",
     "@types/node": "^20.12.12",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
