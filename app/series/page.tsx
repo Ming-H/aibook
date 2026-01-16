@@ -159,7 +159,7 @@ export default async function SeriesPage() {
                       {/* 系列编号 */}
                       <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-[var(--background-tertiary)] border border-[var(--border-subtle)] px-5 py-2">
                         <span className="text-xs font-black tracking-widest" style={{ color: 'var(--color-brand)' }}>
-                          SERIES {String(series.order).padStart(2, '0')}
+                          系列 {String(series.order).padStart(2, '0')}
                         </span>
                       </div>
 

@@ -95,7 +95,7 @@ export default async function SeriesEpisodePage({
             <div>
               <div className="mb-2 inline-flex items-center gap-2 rounded-full bg-purple-500/20 border border-purple-500/30 px-4 py-1.5">
                 <span className="text-xs font-bold text-purple-300">
-                  SERIES {String(seriesInfo.order).padStart(2, '0')} · 第 {episodeNumber} 期
+                  系列 {String(seriesInfo.order).padStart(2, '0')} · 第 {episodeNumber} 期
                 </span>
               </div>
               <div className="text-lg text-slate-400">{seriesInfo.title}</div>

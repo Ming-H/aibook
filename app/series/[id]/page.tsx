@@ -74,7 +74,7 @@ export default async function SeriesDetailPage({
                 )}
                 <div>
                   <div className="mb-2 inline-flex items-center gap-2 rounded-full bg-purple-500/20 border border-purple-500/30 px-4 py-2">
-                    <span className="text-sm font-bold text-purple-300">SERIES {String(seriesData.order).padStart(2, '0')}</span>
+                    <span className="text-sm font-bold text-purple-300">系列 {String(seriesData.order).padStart(2, '0')}</span>
                   </div>
                   <h1 className="text-4xl md:text-5xl font-black text-white">
                     {seriesData.title}
