@@ -2,26 +2,13 @@ import { getAllSeries, getSeriesEpisode, getSeriesWithEpisodes } from "@/lib/ser
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-export const dynamic = "force-static";
+export const dynamic = "force-dynamic";
 export const revalidate = 3600;
 
 export async function generateStaticParams() {
-  const allSeries = await getAllSeries();
-  const params: { id: string; episode: string }[] = [];
-
-  for (const series of allSeries) {
-    const seriesData = await getSeriesWithEpisodes(series.id);
-    if (seriesData) {
-      for (const episode of seriesData.episodes) {
-        params.push({
-          id: series.id,
-          episode: String(episode.episodeNumber),
-        });
-      }
-    }
-  }
-
-  return params;
+  // 返回空数组，使用 fallback 在运行时生成页面
+  // 这样可以避免构建时超时
+  return [];
 }
 
 export default async function SeriesEpisodePage({

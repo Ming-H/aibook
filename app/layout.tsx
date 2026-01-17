@@ -1,6 +1,7 @@
 import "./globals.css";
 import type { ReactNode } from "react";
 import { Navbar } from "@/components/Navbar";
+import { SessionProvider } from "@/components/providers";
 
 export const metadata = {
   title: "AI Hot Tech - 每日 AI 技术热点",
@@ -11,10 +12,12 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="zh-CN" className="scroll-smooth">
       <body className="min-h-screen bg-slate-950 text-slate-100 antialiased">
-        <div className="min-h-screen">
-          <Navbar />
-          <main>{children}</main>
-        </div>
+        <SessionProvider>
+          <div className="min-h-screen">
+            <Navbar />
+            <main>{children}</main>
+          </div>
+        </SessionProvider>
       </body>
     </html>
   );

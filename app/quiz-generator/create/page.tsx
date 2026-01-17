@@ -1,17 +1,20 @@
 /**
  * 智能出题配置页
  * 三步骤表单：基础配置 → 题型配置 → 确认生成
+ * 需要登录和订阅才能使用
  */
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { Select, type SelectOption } from '@/components/ui/Select';
 import { Slider } from '@/components/ui/Slider';
 import { TagInput } from '@/components/ui/TagInput';
 import { AVAILABLE_QUIZ_MODELS, type QuizConfig, type QuizModelId } from '@/lib/glm-api';
+import { generateQuizOnClient, type Quiz } from '@/lib/client-quiz-generator';
 
 // 学科选项
 const SUBJECT_OPTIONS: SelectOption[] = [
@@ -66,9 +69,19 @@ type Step = 1 | 2 | 3;
 
 export default function QuizCreatePage() {
   const router = useRouter();
+  const { data: session, status } = useSession();
   const [step, setStep] = useState<Step>(1);
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState('');
+  const [subscriptionStatus, setSubscriptionStatus] = useState<{
+    valid: boolean;
+    message?: string;
+    subscription?: {
+      remainingQuizzes: number;
+      quizLimit: number;
+    };
+  } | null>(null);
+  const [progressMessage, setProgressMessage] = useState('');
 
   // 选中的模型
   const [selectedModel, setSelectedModel] = useState<QuizModelId>(AVAILABLE_QUIZ_MODELS[0].id);
@@ -93,6 +106,29 @@ export default function QuizCreatePage() {
 
   // 出题模式：知识点模式 vs 自定义内容模式
   const [useCustomContent, setUseCustomContent] = useState(false);
+
+  // 检查登录状态和订阅状态
+  useEffect(() => {
+    if (status === 'loading') return;
+
+    if (!session) {
+      router.push('/auth/signin');
+      return;
+    }
+
+    // 检查订阅状态
+    const checkSubscription = async () => {
+      try {
+        const res = await fetch('/api/subscription/check');
+        const data = await res.json();
+        setSubscriptionStatus(data);
+      } catch (err) {
+        console.error('[Subscription Check] Error:', err);
+      }
+    };
+
+    checkSubscription();
+  }, [session, status, router]);
 
   // 计算总分
   const totalPoints =
@@ -167,49 +203,51 @@ export default function QuizCreatePage() {
     }
   };
 
-  // 生成试卷（分批生成模式）
+  // 生成试卷（客户端直接调用 API）
   const handleGenerate = async () => {
     if (!validateStep(2)) return;
 
+    // 检查订阅状态
+    if (!subscriptionStatus?.valid) {
+      setError(subscriptionStatus?.message || '请先订阅才能使用智能出题功能');
+      router.push('/subscribe');
+      return;
+    }
+
     setIsGenerating(true);
     setError('');
+    setProgressMessage('');
 
     try {
-      const response = await fetch('/api/quiz/generate', {
+      // 从环境变量获取 API Key
+      const apiKey = process.env.NEXT_PUBLIC_MODELSCOPE_API_KEY;
+      if (!apiKey) {
+        throw new Error('系统配置错误：API Key 未配置');
+      }
+
+      // 客户端直接调用 ModelScope API
+      const quiz = await generateQuizOnClient(
+        { ...config, model: selectedModel },
+        apiKey,
+        (message) => setProgressMessage(message)
+      );
+
+      // 记录使用情况
+      await fetch('/api/quiz/record-usage', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...config,
-          model: selectedModel,
-        }),
       });
 
-      if (!response.ok) {
-        let errorMessage = '生成失败，请稍后重试';
-        try {
-          const data = await response.json();
-          errorMessage = data.details || data.error || errorMessage;
-        } catch {}
-        throw new Error(errorMessage);
-      }
-
-      const data = await response.json();
-      if (data.success && data.quiz) {
-        sessionStorage.setItem('generatedQuiz', JSON.stringify(data.quiz));
-        router.push('/quiz-generator/preview');
-      } else {
-        throw new Error(data.details || data.error || '生成失败');
-      }
+      // 保存到 sessionStorage 并跳转到预览页
+      sessionStorage.setItem('generatedQuiz', JSON.stringify(quiz));
+      router.push('/quiz-generator/preview');
     } catch (err) {
       const message = err instanceof Error ? err.message : '生成失败，请重试';
       console.error('[Quiz] Error:', message);
-      if (message.includes('API') || message.includes('configured') || message.includes('environment variable')) {
-        setError('系统配置错误：AI 服务未正确配置。请联系管理员或稍后再试。');
-      } else {
-        setError(message);
-      }
+      setError(message);
     } finally {
       setIsGenerating(false);
+      setProgressMessage('');
     }
   };
 

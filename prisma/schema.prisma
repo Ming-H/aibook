@@ -1,0 +1,107 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// 用户模型
+model User {
+  id           String        @id @default(cuid())
+  email        String        @unique
+  name         String?
+  password     String?       // 密码登录时使用
+  emailVerified DateTime?
+  image        String?
+  isAdmin      Boolean       @default(false) // 管理员标记
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  // 关系
+  subscription Subscription?
+  quizUsage    QuizUsage[]
+  accounts     Account[]
+  sessions     Session[]
+}
+
+// NextAuth Account 模型
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+// NextAuth Session 模型
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// NextAuth VerificationToken 模型
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// 订阅模型
+model Subscription {
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // 订阅状态
+  status          String   @default("INACTIVE")  // ACTIVE, INACTIVE, CANCELED
+
+  // 订阅时间（1年有效期）
+  startDate       DateTime @default(now())
+  endDate         DateTime
+
+  // 使用统计（仅记录，不限制）
+  quizzesGenerated Int     @default(0) // 总共生成的试卷数
+
+  // 支付信息
+  paymentMethod   String?  // alipay, wechat
+  transactionId   String?  @unique
+  amount          Float?
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+// 试卷使用记录
+model QuizUsage {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  quizCount Int      @default(1)
+  month     String   // 格式: YYYY-MM
+
+  createdAt DateTime @default(now())
+
+  @@unique([userId, month])
+}
