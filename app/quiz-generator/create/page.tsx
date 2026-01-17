@@ -195,12 +195,15 @@ export default function QuizCreatePage() {
 
       // 检查是否是流式响应
       const contentType = response.headers.get('content-type');
+      console.log('[Quiz] Content-Type:', contentType);
+
       if (contentType?.includes('text/event-stream')) {
         // 处理流式响应
         const reader = response.body?.getReader();
         const decoder = new TextDecoder();
         let buffer = '';
         let quiz: any = null;
+        let eventCount = 0;
 
         if (!reader) {
           throw new Error('无法读取响应流');
@@ -208,7 +211,10 @@ export default function QuizCreatePage() {
 
         while (true) {
           const { done, value } = await reader.read();
-          if (done) break;
+          if (done) {
+            console.log('[Quiz] Stream done, received', eventCount, 'events');
+            break;
+          }
 
           buffer += decoder.decode(value, { stream: true });
           const lines = buffer.split('\n');
@@ -216,10 +222,13 @@ export default function QuizCreatePage() {
 
           for (const line of lines) {
             if (line.startsWith('data: ')) {
-              const data = line.slice(6);
+              const data = line.slice(6).trim();
+              if (!data) continue;
+
               try {
                 const parsed = JSON.parse(data);
-                console.log('[Quiz] Stream event:', parsed);
+                eventCount++;
+                console.log('[Quiz] Stream event:', parsed.type, parsed);
 
                 if (parsed.type === 'error') {
                   throw new Error(parsed.error || '生成失败');
@@ -227,16 +236,19 @@ export default function QuizCreatePage() {
 
                 if (parsed.type === 'done') {
                   quiz = parsed.data;
+                  console.log('[Quiz] Received quiz data');
                 }
               } catch (e) {
-                console.error('[Quiz] Parse error:', e);
+                console.error('[Quiz] Parse error for line:', data, e);
               }
             }
           }
         }
 
+        console.log('[Quiz] Final check - quiz:', quiz ? 'found' : 'NOT FOUND');
+
         if (!quiz) {
-          throw new Error('未收到生成的试卷');
+          throw new Error('未收到生成的试卷，请重试');
         }
 
         // 保存到 sessionStorage 并跳转到预览页面
@@ -254,6 +266,7 @@ export default function QuizCreatePage() {
       }
     } catch (err) {
       const message = err instanceof Error ? err.message : '生成失败，请重试';
+      console.error('[Quiz] Error:', message);
       if (message.includes('API') || message.includes('configured') || message.includes('environment variable')) {
         setError('系统配置错误：AI 服务未正确配置。请联系管理员或稍后再试。');
       } else {

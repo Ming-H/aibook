@@ -98,9 +98,11 @@ export async function POST(request: NextRequest) {
 
           // 调用带进度的生成函数
           await generateQuizWithProgress(body, (progress) => {
+            console.log('[Quiz Generate API] Sending progress:', progress.type);
             controller.enqueue(encoder.encode(`data: ${JSON.stringify(progress)}\n\n`));
           });
 
+          console.log('[Quiz Generate API] Stream completed');
           controller.close();
         } catch (error) {
           console.error('[Quiz Generate API] Stream error:', error);
