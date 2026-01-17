@@ -7,7 +7,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { generateQuiz, validateGLMConfig, QuizConfig } from '@/lib/glm-api';
 
 export const runtime = 'nodejs';
-export const dynamic = 'force-static';
 
 /**
  * 验证出题配置
