@@ -115,7 +115,7 @@ async function createImageGenerationTask(config: ImageGenerationConfig): Promise
   };
 
   try {
-    const response = await fetch(`${MODELSCOPE_CONFIG.baseURL}/v1/images/generations`, {
+    const response = await fetch(`${MODELSCOPE_CONFIG.baseURL}/images/generations`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${MODELSCOPE_CONFIG.apiKey}`,
@@ -165,7 +165,7 @@ async function pollTaskStatus(taskId: string): Promise<GeneratedImage> {
   while (attempts < MODELSCOPE_CONFIG.maxPollAttempts) {
     try {
       const response = await fetch(
-        `${MODELSCOPE_CONFIG.baseURL}/v1/tasks/${taskId}`,
+        `${MODELSCOPE_CONFIG.baseURL}/tasks/${taskId}`,
         {
           method: 'GET',
           headers: {
