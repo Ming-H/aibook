@@ -167,7 +167,7 @@ export default function QuizCreatePage() {
     }
   };
 
-  // 生成试卷
+  // 生成试卷（使用流式响应）
   const handleGenerate = async () => {
     if (!validateStep(2)) return;
 
@@ -184,35 +184,76 @@ export default function QuizCreatePage() {
         }),
       });
 
-      // 先检查响应状态
       if (!response.ok) {
         let errorMessage = '生成失败，请稍后重试';
-
         try {
           const data = await response.json();
           errorMessage = data.details || data.error || errorMessage;
-        } catch {
-          // 如果无法解析 JSON，使用默认错误消息
-        }
-
+        } catch {}
         throw new Error(errorMessage);
       }
 
-      // 解析成功的响应
-      let data;
-      try {
-        data = await response.json();
-      } catch {
-        throw new Error('服务器返回的数据格式错误');
-      }
+      // 检查是否是流式响应
+      const contentType = response.headers.get('content-type');
+      if (contentType?.includes('text/event-stream')) {
+        // 处理流式响应
+        const reader = response.body?.getReader();
+        const decoder = new TextDecoder();
+        let buffer = '';
+        let quiz: any = null;
 
-      // 保存到 sessionStorage 并跳转到预览页面
-      sessionStorage.setItem('generatedQuiz', JSON.stringify(data.quiz));
-      router.push('/quiz-generator/preview');
+        if (!reader) {
+          throw new Error('无法读取响应流');
+        }
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split('\n');
+          buffer = lines.pop() || '';
+
+          for (const line of lines) {
+            if (line.startsWith('data: ')) {
+              const data = line.slice(6);
+              try {
+                const parsed = JSON.parse(data);
+                console.log('[Quiz] Stream event:', parsed);
+
+                if (parsed.type === 'error') {
+                  throw new Error(parsed.error || '生成失败');
+                }
+
+                if (parsed.type === 'done') {
+                  quiz = parsed.data;
+                }
+              } catch (e) {
+                console.error('[Quiz] Parse error:', e);
+              }
+            }
+          }
+        }
+
+        if (!quiz) {
+          throw new Error('未收到生成的试卷');
+        }
+
+        // 保存到 sessionStorage 并跳转到预览页面
+        sessionStorage.setItem('generatedQuiz', JSON.stringify(quiz));
+        router.push('/quiz-generator/preview');
+      } else {
+        // 处理普通 JSON 响应（向后兼容）
+        const data = await response.json();
+        if (data.success && data.quiz) {
+          sessionStorage.setItem('generatedQuiz', JSON.stringify(data.quiz));
+          router.push('/quiz-generator/preview');
+        } else {
+          throw new Error(data.details || data.error || '生成失败');
+        }
+      }
     } catch (err) {
       const message = err instanceof Error ? err.message : '生成失败，请重试';
-
-      // 检查是否是环境变量未配置的错误
       if (message.includes('API') || message.includes('configured') || message.includes('environment variable')) {
         setError('系统配置错误：AI 服务未正确配置。请联系管理员或稍后再试。');
       } else {

@@ -413,6 +413,56 @@ export async function generateQuiz(config: QuizConfig): Promise<Quiz> {
 }
 
 /**
+ * 流式生成试卷（带进度回调）
+ * 用于避免 Vercel 免费计划的 10 秒超时限制
+ */
+export async function generateQuizWithProgress(
+  config: QuizConfig,
+  onProgress: (progress: { type: 'progress' | 'done' | 'error'; data?: any; error?: string }) => void
+): Promise<Quiz> {
+  try {
+    onProgress({ type: 'progress', data: { message: '正在连接 AI 模型...' } });
+
+    const prompt = generateQuizPrompt(config);
+
+    onProgress({ type: 'progress', data: { message: '正在生成试卷...' } });
+
+    const messages: GLMChatRequest['messages'] = [
+      {
+        role: 'system',
+        content: '你是一个专业的试卷生成助手。只返回标准的JSON格式，不要添加任何解释或说明文字。JSON必须符合规范，不要使用注释，不要有多余的逗号。',
+      },
+      {
+        role: 'user',
+        content: prompt,
+      },
+    ];
+
+    const response = await callModelScopeAPI(messages, config.model);
+
+    onProgress({ type: 'progress', data: { message: '正在解析结果...' } });
+
+    const quizData = parseQuizResponse(response);
+
+    const quiz: Quiz = {
+      id: `quiz-${Date.now()}`,
+      subject: config.subject,
+      grade: config.grade,
+      difficulty: config.difficulty,
+      ...quizData,
+      createdAt: new Date().toISOString(),
+    };
+
+    onProgress({ type: 'done', data: quiz });
+    return quiz;
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    onProgress({ type: 'error', error: errorMessage });
+    throw error;
+  }
+}
+
+/**
  * 重新生成单个题目
  */
 export async function regenerateQuestion(
