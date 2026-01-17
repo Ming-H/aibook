@@ -101,9 +101,9 @@ export interface GeneratedImage {
 }
 
 /**
- * 调用 ModelScope 图片生成 API（异步模式）
+ * 调用 ModelScope 图片生成 API（使用 OpenAI 兼容格式）
  */
-async function createImageGenerationTask(config: ImageGenerationConfig): Promise<string> {
+async function createImageGenerationTask(config: ImageGenerationConfig): Promise<GeneratedImage> {
   if (!MODELSCOPE_CONFIG.apiKey) {
     throw new Error('ModelScope API key is not configured');
   }
@@ -111,8 +111,14 @@ async function createImageGenerationTask(config: ImageGenerationConfig): Promise
   const requestBody = {
     model: config.model || MODELSCOPE_CONFIG.model,
     prompt: config.prompt,
-    ...(config.loras && { loras: config.loras }),
+    n: 1,
+    size: '1024x1024',
   };
+
+  console.log('[ModelScope Image API] Request:', {
+    url: `${MODELSCOPE_CONFIG.baseURL}/images/generations`,
+    model: requestBody.model,
+  });
 
   try {
     const response = await fetch(`${MODELSCOPE_CONFIG.baseURL}/images/generations`, {
@@ -120,27 +126,31 @@ async function createImageGenerationTask(config: ImageGenerationConfig): Promise
       headers: {
         'Authorization': `Bearer ${MODELSCOPE_CONFIG.apiKey}`,
         'Content-Type': 'application/json',
-        'X-ModelScope-Async-Mode': 'true',
       },
-      body: JSON.stringify(requestBody, (key, value) => {
-        // 确保 Unicode 字符正确编码
-        return typeof value === 'string' ? value : value;
-      }),
-      signal: AbortSignal.timeout(30000), // 30 秒创建任务超时
+      body: JSON.stringify(requestBody),
+      signal: AbortSignal.timeout(120000), // 2 分钟超时
     });
 
+    console.log('[ModelScope Image API] Response Status:', response.status);
+
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(`ModelScope API error: ${response.status} - ${JSON.stringify(errorData)}`);
+      const errorText = await response.text();
+      console.error('[ModelScope Image API] Error Response:', errorText);
+      throw new Error(`ModelScope API error: ${response.status} - ${errorText}`);
     }
 
-    const data: ModelScopeAsyncTaskResponse = await response.json();
+    const data = await response.json();
+    console.log('[ModelScope Image API] Success Response:', data);
 
-    if (!data.task_id) {
-      throw new Error('Invalid ModelScope API response: missing task_id');
+    // OpenAI 格式响应：{ data: [{ url: "..." }] }
+    if (data.data && data.data[0] && data.data[0].url) {
+      return {
+        url: data.data[0].url,
+        taskId: Date.now().toString(),
+      };
     }
 
-    return data.task_id;
+    throw new Error('Invalid response format: missing image URL');
   } catch (error) {
     if (error instanceof Error) {
       if (error.name === 'AbortError') {
@@ -222,16 +232,11 @@ async function pollTaskStatus(taskId: string): Promise<GeneratedImage> {
 }
 
 /**
- * 生成图片（完整流程）
+ * 生成图片（使用同步模式，直接返回结果）
  */
 export async function generateImage(config: ImageGenerationConfig): Promise<GeneratedImage> {
-  // 创建任务
-  const taskId = await createImageGenerationTask(config);
-
-  // 轮询任务状态
-  const result = await pollTaskStatus(taskId);
-
-  return result;
+  // 直接调用 API，同步返回结果
+  return await createImageGenerationTask(config);
 }
 
 /**
