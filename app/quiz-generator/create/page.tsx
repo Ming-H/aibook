@@ -167,7 +167,7 @@ export default function QuizCreatePage() {
     }
   };
 
-  // 生成试卷（使用客户端轮询模式）
+  // 生成试卷
   const handleGenerate = async () => {
     if (!validateStep(2)) return;
 
@@ -175,8 +175,7 @@ export default function QuizCreatePage() {
     setError('');
 
     try {
-      // 第一步：创建任务
-      const createResponse = await fetch('/api/quiz/generate', {
+      const response = await fetch('/api/quiz/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -185,65 +184,29 @@ export default function QuizCreatePage() {
         }),
       });
 
-      if (!createResponse.ok) {
+      if (!response.ok) {
         let errorMessage = '生成失败，请稍后重试';
         try {
-          const data = await createResponse.json();
+          const data = await response.json();
           errorMessage = data.details || data.error || errorMessage;
         } catch {}
         throw new Error(errorMessage);
       }
 
-      const createData = await createResponse.json();
-      const taskId = createData.taskId;
-
-      console.log('[Quiz] Task created:', taskId);
-
-      // 第二步：客户端轮询任务状态
-      const pollInterval = 2000; // 2 秒轮询一次
-      const maxPollAttempts = 90; // 最多轮询 90 次（3 分钟）
-      let attempts = 0;
-
-      while (attempts < maxPollAttempts) {
-        const statusResponse = await fetch(`/api/quiz/status/${taskId}`);
-
-        if (!statusResponse.ok) {
-          throw new Error('查询任务状态失败');
-        }
-
-        const statusData = await statusResponse.json();
-        console.log('[Quiz] Task status:', statusData.status);
-
-        if (statusData.status === 'succeeded') {
-          if (!statusData.result) {
-            throw new Error('任务完成但没有返回试卷');
-          }
-
-          // 保存到 sessionStorage 并跳转到预览页面
-          sessionStorage.setItem('generatedQuiz', JSON.stringify(statusData.result));
-          router.push('/quiz-generator/preview');
-          return;
-        }
-
-        if (statusData.status === 'failed') {
-          throw new Error(statusData.error || '试卷生成失败');
-        }
-
-        if (statusData.status === 'not_found') {
-          throw new Error('任务未找到，请重试');
-        }
-
-        // 任务仍在进行中（pending 或 running），等待后继续轮询
-        attempts++;
-        await new Promise(resolve => setTimeout(resolve, pollInterval));
+      const data = await response.json();
+      if (data.success && data.quiz) {
+        sessionStorage.setItem('generatedQuiz', JSON.stringify(data.quiz));
+        router.push('/quiz-generator/preview');
+      } else {
+        throw new Error(data.details || data.error || '生成失败');
       }
-
-      throw new Error('试卷生成超时，请稍后重试');
     } catch (err) {
       const message = err instanceof Error ? err.message : '生成失败，请重试';
       console.error('[Quiz] Error:', message);
       if (message.includes('API') || message.includes('configured') || message.includes('environment variable')) {
         setError('系统配置错误：AI 服务未正确配置。请联系管理员或稍后再试。');
+      } else if (message.includes('超时') || message.includes('timeout')) {
+        setError('生成超时，AI 响应时间过长。建议：减少题目数量，或稍后重试。');
       } else {
         setError(message);
       }

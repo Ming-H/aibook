@@ -1,15 +1,15 @@
 /**
- * 出题 API 路由（异步任务版本）
+ * 出题 API 路由（Edge Runtime 版本）
  * POST /api/quiz/generate
  *
- * 使用异步任务模式避免 Vercel 免费计划的 10 秒超时限制
- * 客户端需要轮询 /api/quiz/status/[taskId] 获取结果
+ * 使用 Edge Runtime 获得 30 秒超时限制
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createQuizTask, validateGLMConfig, QuizConfig } from '@/lib/glm-api';
+import { generateQuiz, validateGLMConfig, QuizConfig } from '@/lib/glm-api';
 
-export const runtime = 'nodejs';
+// Edge Runtime 有 30 秒超时（Vercel 免费计划）
+export const runtime = 'edge';
 
 /**
  * 验证出题配置
@@ -59,7 +59,7 @@ function validateQuizConfig(config: any): config is QuizConfig {
 }
 
 export async function POST(request: NextRequest) {
-  console.log('[Quiz Generate API] Request received (async task)');
+  console.log('[Quiz Generate API] Request received (Edge Runtime)');
 
   try {
     // 验证 GLM API 配置
@@ -74,6 +74,7 @@ export async function POST(request: NextRequest) {
 
     // 解析请求体
     const body = await request.json();
+    console.log('[Quiz Generate API] Request received');
 
     // 验证配置
     if (!validateQuizConfig(body)) {
@@ -87,18 +88,20 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log('[Quiz Generate API] Creating task...');
+    console.log('[Quiz Generate API] Starting generation...');
+    const startTime = Date.now();
 
-    // 创建异步任务（立即返回，不等待结果）
-    const { taskId } = await createQuizTask(body);
+    // 调用 GLM API 生成试卷
+    const quiz = await generateQuiz(body);
 
-    console.log('[Quiz Generate API] Task created:', taskId);
+    const duration = Date.now() - startTime;
+    console.log(`[Quiz Generate API] Generated in ${duration}ms`);
 
-    // 返回任务 ID，客户端需要轮询获取结果
+    // 返回结果
     return NextResponse.json(
       {
         success: true,
-        taskId,
+        quiz,
       },
       { status: 200 }
     );
@@ -106,9 +109,20 @@ export async function POST(request: NextRequest) {
     console.error('[Quiz Generate API] Error:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
 
+    // 检查是否是超时错误
+    if (errorMessage.includes('timeout') || errorMessage.includes('AbortError')) {
+      return NextResponse.json(
+        {
+          error: '生成超时，请稍后重试',
+          details: 'AI 模型响应时间过长。建议：减少题目数量，或使用更快的模型。',
+        },
+        { status: 504 }
+      );
+    }
+
     return NextResponse.json(
       {
-        error: 'Failed to create quiz task',
+        error: 'Failed to generate quiz',
         details: errorMessage,
       },
       { status: 500 }
@@ -118,7 +132,7 @@ export async function POST(request: NextRequest) {
 
 // OPTIONS 方法支持 CORS
 export async function OPTIONS() {
-  return new Response(null, {
+  return new NextResponse(null, {
     status: 204,
     headers: {
       'Access-Control-Allow-Methods': 'POST, OPTIONS',
