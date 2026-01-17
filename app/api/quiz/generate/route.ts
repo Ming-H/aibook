@@ -6,8 +6,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { generateQuiz, validateGLMConfig, QuizConfig } from '@/lib/glm-api';
 
-// 使用 Edge Runtime 以获得 30 秒超时（Vercel 免费计划）
-export const runtime = 'edge';
+export const runtime = 'nodejs';
 
 /**
  * 验证出题配置
@@ -70,8 +69,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log('[Quiz Generate API] Config validated');
-
     // 解析请求体
     const body = await request.json();
     console.log('[Quiz Generate API] Request body:', JSON.stringify({ ...body, customContent: body.customContent?.substring(0, 50) + '...' }));
@@ -108,17 +105,6 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('[Quiz Generate API] Error:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-
-    // 检查是否是超时错误
-    if (errorMessage.includes('timeout') || errorMessage.includes('AbortError')) {
-      return NextResponse.json(
-        {
-          error: '生成超时，请稍后重试',
-          details: 'AI 模型响应时间过长，建议减少题目数量或使用更简单的配置',
-        },
-        { status: 504 }
-      );
-    }
 
     return NextResponse.json(
       {
