@@ -1,12 +1,13 @@
 /**
- * 出题 API 路由（流式响应版本）
+ * 出题 API 路由（异步任务版本）
  * POST /api/quiz/generate
  *
- * 使用流式响应避免 Vercel 免费计划的 10 秒超时限制
+ * 使用异步任务模式避免 Vercel 免费计划的 10 秒超时限制
+ * 客户端需要轮询 /api/quiz/status/[taskId] 获取结果
  */
 
-import { NextRequest } from 'next/server';
-import { generateQuizWithProgress, validateGLMConfig, QuizConfig } from '@/lib/glm-api';
+import { NextRequest, NextResponse } from 'next/server';
+import { createQuizTask, validateGLMConfig, QuizConfig } from '@/lib/glm-api';
 
 export const runtime = 'nodejs';
 
@@ -58,17 +59,17 @@ function validateQuizConfig(config: any): config is QuizConfig {
 }
 
 export async function POST(request: NextRequest) {
-  console.log('[Quiz Generate API] Request received (streaming)');
+  console.log('[Quiz Generate API] Request received (async task)');
 
   try {
     // 验证 GLM API 配置
     const configValidation = validateGLMConfig();
     if (!configValidation.valid) {
       console.error('[Quiz Generate API] Config validation failed:', configValidation.error);
-      return new Response(JSON.stringify({ error: 'GLM API not configured', details: configValidation.error }), {
-        status: 500,
-        headers: { 'Content-Type': 'application/json' },
-      });
+      return NextResponse.json(
+        { error: 'GLM API not configured', details: configValidation.error },
+        { status: 500 }
+      );
     }
 
     // 解析请求体
@@ -77,60 +78,41 @@ export async function POST(request: NextRequest) {
     // 验证配置
     if (!validateQuizConfig(body)) {
       console.error('[Quiz Generate API] Validation failed');
-      return new Response(JSON.stringify({
-        error: 'Invalid quiz configuration',
-        details: 'Please provide valid subject, grade, topics, difficulty, question counts, and points',
-      }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' },
-      });
+      return NextResponse.json(
+        {
+          error: 'Invalid quiz configuration',
+          details: 'Please provide valid subject, grade, topics, difficulty, question counts, and points',
+        },
+        { status: 400 }
+      );
     }
 
-    console.log('[Quiz Generate API] Starting quiz generation...');
+    console.log('[Quiz Generate API] Creating task...');
 
-    // 创建流式响应
-    const encoder = new TextEncoder();
-    const stream = new ReadableStream({
-      async start(controller) {
-        try {
-          // 发送开始标记（立即发送，避免超时）
-          controller.enqueue(encoder.encode('data: {"type":"start"}\n\n'));
+    // 创建异步任务（立即返回，不等待结果）
+    const { taskId } = await createQuizTask(body);
 
-          // 调用带进度的生成函数
-          await generateQuizWithProgress(body, (progress) => {
-            console.log('[Quiz Generate API] Sending progress:', progress.type);
-            controller.enqueue(encoder.encode(`data: ${JSON.stringify(progress)}\n\n`));
-          });
+    console.log('[Quiz Generate API] Task created:', taskId);
 
-          console.log('[Quiz Generate API] Stream completed');
-          controller.close();
-        } catch (error) {
-          console.error('[Quiz Generate API] Stream error:', error);
-          const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-          controller.enqueue(encoder.encode(`data: {"type":"error","error":"${errorMessage}"}\n\n`));
-          controller.close();
-        }
+    // 返回任务 ID，客户端需要轮询获取结果
+    return NextResponse.json(
+      {
+        success: true,
+        taskId,
       },
-    });
-
-    return new Response(stream, {
-      headers: {
-        'Content-Type': 'text/event-stream',
-        'Cache-Control': 'no-cache',
-        'Connection': 'keep-alive',
-      },
-    });
+      { status: 200 }
+    );
   } catch (error) {
     console.error('[Quiz Generate API] Error:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
 
-    return new Response(JSON.stringify({
-      error: 'Failed to generate quiz',
-      details: errorMessage,
-    }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    return NextResponse.json(
+      {
+        error: 'Failed to create quiz task',
+        details: errorMessage,
+      },
+      { status: 500 }
+    );
   }
 }
 

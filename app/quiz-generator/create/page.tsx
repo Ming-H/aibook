@@ -167,7 +167,7 @@ export default function QuizCreatePage() {
     }
   };
 
-  // 生成试卷（使用流式响应）
+  // 生成试卷（使用客户端轮询模式）
   const handleGenerate = async () => {
     if (!validateStep(2)) return;
 
@@ -175,7 +175,8 @@ export default function QuizCreatePage() {
     setError('');
 
     try {
-      const response = await fetch('/api/quiz/generate', {
+      // 第一步：创建任务
+      const createResponse = await fetch('/api/quiz/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -184,86 +185,60 @@ export default function QuizCreatePage() {
         }),
       });
 
-      if (!response.ok) {
+      if (!createResponse.ok) {
         let errorMessage = '生成失败，请稍后重试';
         try {
-          const data = await response.json();
+          const data = await createResponse.json();
           errorMessage = data.details || data.error || errorMessage;
         } catch {}
         throw new Error(errorMessage);
       }
 
-      // 检查是否是流式响应
-      const contentType = response.headers.get('content-type');
-      console.log('[Quiz] Content-Type:', contentType);
+      const createData = await createResponse.json();
+      const taskId = createData.taskId;
 
-      if (contentType?.includes('text/event-stream')) {
-        // 处理流式响应
-        const reader = response.body?.getReader();
-        const decoder = new TextDecoder();
-        let buffer = '';
-        let quiz: any = null;
-        let eventCount = 0;
+      console.log('[Quiz] Task created:', taskId);
 
-        if (!reader) {
-          throw new Error('无法读取响应流');
+      // 第二步：客户端轮询任务状态
+      const pollInterval = 2000; // 2 秒轮询一次
+      const maxPollAttempts = 90; // 最多轮询 90 次（3 分钟）
+      let attempts = 0;
+
+      while (attempts < maxPollAttempts) {
+        const statusResponse = await fetch(`/api/quiz/status/${taskId}`);
+
+        if (!statusResponse.ok) {
+          throw new Error('查询任务状态失败');
         }
 
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) {
-            console.log('[Quiz] Stream done, received', eventCount, 'events');
-            break;
+        const statusData = await statusResponse.json();
+        console.log('[Quiz] Task status:', statusData.status);
+
+        if (statusData.status === 'succeeded') {
+          if (!statusData.result) {
+            throw new Error('任务完成但没有返回试卷');
           }
 
-          buffer += decoder.decode(value, { stream: true });
-          const lines = buffer.split('\n');
-          buffer = lines.pop() || '';
-
-          for (const line of lines) {
-            if (line.startsWith('data: ')) {
-              const data = line.slice(6).trim();
-              if (!data) continue;
-
-              try {
-                const parsed = JSON.parse(data);
-                eventCount++;
-                console.log('[Quiz] Stream event:', parsed.type, parsed);
-
-                if (parsed.type === 'error') {
-                  throw new Error(parsed.error || '生成失败');
-                }
-
-                if (parsed.type === 'done') {
-                  quiz = parsed.data;
-                  console.log('[Quiz] Received quiz data');
-                }
-              } catch (e) {
-                console.error('[Quiz] Parse error for line:', data, e);
-              }
-            }
-          }
-        }
-
-        console.log('[Quiz] Final check - quiz:', quiz ? 'found' : 'NOT FOUND');
-
-        if (!quiz) {
-          throw new Error('未收到生成的试卷，请重试');
-        }
-
-        // 保存到 sessionStorage 并跳转到预览页面
-        sessionStorage.setItem('generatedQuiz', JSON.stringify(quiz));
-        router.push('/quiz-generator/preview');
-      } else {
-        // 处理普通 JSON 响应（向后兼容）
-        const data = await response.json();
-        if (data.success && data.quiz) {
-          sessionStorage.setItem('generatedQuiz', JSON.stringify(data.quiz));
+          // 保存到 sessionStorage 并跳转到预览页面
+          sessionStorage.setItem('generatedQuiz', JSON.stringify(statusData.result));
           router.push('/quiz-generator/preview');
-        } else {
-          throw new Error(data.details || data.error || '生成失败');
+          return;
         }
+
+        if (statusData.status === 'failed') {
+          throw new Error(statusData.error || '试卷生成失败');
+        }
+
+        if (statusData.status === 'not_found') {
+          throw new Error('任务未找到，请重试');
+        }
+
+        // 任务仍在进行中（pending 或 running），等待后继续轮询
+        attempts++;
+        await new Promise(resolve => setTimeout(resolve, pollInterval));
       }
+
+      throw new Error('试卷生成超时，请稍后重试');
     } catch (err) {
       const message = err instanceof Error ? err.message : '生成失败，请重试';
       console.error('[Quiz] Error:', message);

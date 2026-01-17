@@ -413,8 +413,111 @@ export async function generateQuiz(config: QuizConfig): Promise<Quiz> {
 }
 
 /**
+ * 仅创建生成任务（不等待结果）
+ * 用于客户端轮询场景，避免服务器超时
+ */
+export async function createQuizTask(config: QuizConfig): Promise<{ taskId: string }> {
+  const taskId = `quiz-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
+  // 存储任务信息到内存（实际生产环境应该使用 Redis 或数据库）
+  if (!global.quizTasks) {
+    global.quizTasks = new Map();
+  }
+
+  global.quizTasks.set(taskId, {
+    status: 'pending',
+    config,
+    result: null,
+    error: null,
+    createdAt: Date.now(),
+  });
+
+  // 异步执行生成任务（不阻塞响应）
+  generateQuizInBackground(taskId, config);
+
+  return { taskId };
+}
+
+/**
+ * 后台生成试卷
+ */
+async function generateQuizInBackground(taskId: string, config: QuizConfig): Promise<void> {
+  try {
+    if (!global.quizTasks) {
+      global.quizTasks = new Map();
+    }
+
+    // 更新状态为运行中
+    const task = global.quizTasks.get(taskId);
+    if (task) {
+      task.status = 'running';
+    }
+
+    // 生成试卷
+    const quiz = await generateQuiz(config);
+
+    // 保存结果
+    if (global.quizTasks.has(taskId)) {
+      global.quizTasks.set(taskId, {
+        status: 'succeeded',
+        config,
+        result: quiz,
+        error: null,
+        createdAt: Date.now(),
+      });
+    }
+  } catch (error) {
+    console.error('[Quiz] Background generation error:', error);
+    if (global.quizTasks?.has(taskId)) {
+      global.quizTasks.set(taskId, {
+        status: 'failed',
+        config,
+        result: null,
+        error: error instanceof Error ? error.message : 'Unknown error',
+        createdAt: Date.now(),
+      });
+    }
+  }
+}
+
+/**
+ * 查询任务状态
+ */
+export async function getQuizTaskStatus(taskId: string): Promise<{
+  status: 'pending' | 'running' | 'succeeded' | 'failed' | 'not_found';
+  result?: Quiz;
+  error?: string;
+}> {
+  if (!global.quizTasks) {
+    return { status: 'not_found' };
+  }
+
+  const task = global.quizTasks.get(taskId);
+  if (!task) {
+    return { status: 'not_found' };
+  }
+
+  return {
+    status: task.status,
+    result: task.result || undefined,
+    error: task.error || undefined,
+  };
+}
+
+// TypeScript 全局类型声明
+declare global {
+  var quizTasks: Map<string, {
+    status: 'pending' | 'running' | 'succeeded' | 'failed';
+    config: QuizConfig;
+    result: Quiz | null;
+    error: string | null;
+    createdAt: number;
+  }> | undefined;
+}
+
+/**
  * 流式生成试卷（带进度回调）
- * 用于避免 Vercel 免费计划的 10 秒超时限制
+ * @deprecated 使用 createQuizTask + 客户端轮询代替
  */
 export async function generateQuizWithProgress(
   config: QuizConfig,
