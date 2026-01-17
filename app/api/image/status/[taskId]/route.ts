@@ -9,7 +9,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getTaskStatus, validateModelScopeConfig } from '@/lib/modelscope-api';
 
 export const runtime = 'nodejs';
-export const dynamic = 'force-static';
 
 interface RouteParams {
   params: Promise<{ taskId: string }>;

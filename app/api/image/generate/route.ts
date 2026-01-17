@@ -10,7 +10,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createImageTaskOnly, validateModelScopeConfig, ImageGenerationConfig } from '@/lib/modelscope-api';
 
 export const runtime = 'nodejs';
-export const dynamic = 'force-static';
 
 /**
  * 验证图片生成配置
