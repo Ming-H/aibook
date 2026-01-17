@@ -5,12 +5,74 @@
  */
 
 import { useState } from 'react';
-import { signIn } from 'next-auth/react';
+import { signIn, signOut, useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { useEffect } from 'react';
 
 export default function SignInPage() {
   const router = useRouter();
+  const { data: session, status } = useSession();
+
+  // 如果已登录，显示已登录状态和退出登录按钮
+  if (status === 'loading') {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">加载中...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (session) {
+    return (
+      <div className="min-h-screen flex items-center justify-center px-4 py-12 sm:px-6 lg:px-8 bg-gradient-to-br from-indigo-50 via-white to-purple-50">
+        <div className="max-w-md w-full">
+          <div className="bg-white shadow-2xl rounded-3xl p-10 border-2 border-purple-100">
+            <div className="text-center">
+              <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <svg className="w-10 h-10 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">已登录</h2>
+              <p className="text-gray-700 mb-6">
+                当前登录账号：<span className="font-semibold">{session.user.email}</span>
+              </p>
+              <div className="space-y-3">
+                <button
+                  onClick={() => router.push('/quiz-generator')}
+                  className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-3 px-6 rounded-xl font-bold hover:from-indigo-700 hover:to-purple-700 transition-all"
+                >
+                  进入智能出题
+                </button>
+                {session.user.isAdmin && (
+                  <button
+                    onClick={() => router.push('/admin')}
+                    className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-3 px-6 rounded-xl font-bold hover:from-purple-700 hover:to-pink-700 transition-all"
+                  >
+                    进入管理后台
+                  </button>
+                )}
+                <button
+                  onClick={async () => {
+                    await signOut({ redirect: false });
+                    router.push('/auth/signin');
+                    router.refresh();
+                  }}
+                  className="w-full bg-gray-200 text-gray-700 py-3 px-6 rounded-xl font-bold hover:bg-gray-300 transition-all"
+                >
+                  退出登录
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
