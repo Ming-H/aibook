@@ -251,6 +251,7 @@ async function pollTaskStatus(taskId: string): Promise<GeneratedImage> {
 
 /**
  * 生成图片（完整流程：创建任务 + 轮询结果）
+ * @deprecated Use createImageGenerationTask + client-side polling instead to avoid serverless timeouts
  */
 export async function generateImage(config: ImageGenerationConfig): Promise<GeneratedImage> {
   // 创建异步任务
@@ -262,6 +263,52 @@ export async function generateImage(config: ImageGenerationConfig): Promise<Gene
   console.log('[ModelScope Image API] Image generated:', result.url);
 
   return result;
+}
+
+/**
+ * 仅创建图片生成任务（不轮询结果）
+ * 用于客户端轮询场景，避免服务器超时
+ */
+export async function createImageTaskOnly(config: ImageGenerationConfig): Promise<{ taskId: string }> {
+  const taskId = await createImageGenerationTask(config);
+  console.log('[ModelScope Image API] Task created:', taskId);
+  return { taskId };
+}
+
+/**
+ * 查询任务状态（单次查询，不轮询）
+ * 用于客户端轮询场景
+ */
+export async function getTaskStatus(taskId: string): Promise<{ status: TaskStatus; outputImages?: string[]; error?: string }> {
+  if (!MODELSCOPE_CONFIG.apiKey) {
+    throw new Error('ModelScope API key is not configured');
+  }
+
+  const response = await fetch(
+    `${MODELSCOPE_CONFIG.baseURL}/tasks/${taskId}`,
+    {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${MODELSCOPE_CONFIG.apiKey}`,
+        'Content-Type': 'application/json',
+        'X-ModelScope-Task-Type': 'image_generation',
+      },
+      signal: AbortSignal.timeout(10000),
+    }
+  );
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`ModelScope API error: ${response.status} - ${errorText}`);
+  }
+
+  const data: ModelScopeTaskStatusResponse = await response.json();
+
+  return {
+    status: data.task_status,
+    outputImages: data.output_images,
+    error: data.error,
+  };
 }
 
 /**

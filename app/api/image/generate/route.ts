@@ -1,10 +1,13 @@
 /**
  * 图片生成 API 路由
  * POST /api/image/generate
+ *
+ * 仅创建任务并返回 task_id，客户端需要轮询 /api/image/status/[taskId] 获取结果
+ * 避免服务器超时问题
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { generateImage, validateModelScopeConfig, ImageGenerationConfig } from '@/lib/modelscope-api';
+import { createImageTaskOnly, validateModelScopeConfig, ImageGenerationConfig } from '@/lib/modelscope-api';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-static';
@@ -49,14 +52,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 调用 ModelScope API 生成图片
-    const image = await generateImage(body);
+    // 创建图片生成任务（不等待结果，避免服务器超时）
+    const result = await createImageTaskOnly(body);
 
-    // 返回结果
+    // 返回任务 ID，客户端需要轮询获取结果
     return NextResponse.json(
       {
         success: true,
-        image,
+        taskId: result.taskId,
       },
       { status: 200 }
     );

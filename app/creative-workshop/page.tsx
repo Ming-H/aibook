@@ -57,7 +57,8 @@ export default function CreativeWorkshopPage() {
       const template = PROMPT_TEMPLATES[selectedStyle];
       const fullPrompt = `${template} ${prompt}`.trim();
 
-      const response = await fetch('/api/image/generate', {
+      // 第一步：创建任务
+      const createResponse = await fetch('/api/image/generate', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -68,33 +69,56 @@ export default function CreativeWorkshopPage() {
         }),
       });
 
-      // 先检查响应状态
-      if (!response.ok) {
+      if (!createResponse.ok) {
         let errorMessage = '生成失败，请稍后重试';
-
         try {
-          const data = await response.json();
+          const data = await createResponse.json();
           errorMessage = data.details || data.error || errorMessage;
-        } catch {
-          // 如果无法解析 JSON，使用默认错误消息
-        }
-
+        } catch {}
         throw new Error(errorMessage);
       }
 
-      // 解析成功的响应
-      let data;
-      try {
-        data = await response.json();
-      } catch {
-        throw new Error('服务器返回的数据格式错误');
+      const createData = await createResponse.json();
+      const taskId = createData.taskId;
+
+      // 第二步：客户端轮询任务状态
+      const pollInterval = 3000; // 3秒轮询一次
+      const maxPollAttempts = 120; // 最多轮询 120 次（6分钟）
+      let attempts = 0;
+
+      while (attempts < maxPollAttempts) {
+        const statusResponse = await fetch(`/api/image/status/${taskId}`);
+
+        if (!statusResponse.ok) {
+          throw new Error('查询任务状态失败');
+        }
+
+        const statusData = await statusResponse.json();
+
+        if (statusData.status === 'SUCCEED') {
+          if (!statusData.outputImages || statusData.outputImages.length === 0) {
+            throw new Error('任务完成但没有返回图片');
+          }
+
+          setGeneratedImages([{
+            url: statusData.outputImages[0],
+            taskId: statusData.taskId,
+            model: selectedModel,
+            prompt: fullPrompt,
+          }, ...generatedImages]);
+          return;
+        }
+
+        if (statusData.status === 'FAILED') {
+          throw new Error(statusData.error || '图片生成失败');
+        }
+
+        // 任务仍在进行中（PENDING 或 RUNNING），等待后继续轮询
+        attempts++;
+        await new Promise(resolve => setTimeout(resolve, pollInterval));
       }
 
-      setGeneratedImages([{
-        ...data.image,
-        model: selectedModel,
-        prompt: fullPrompt,
-      }, ...generatedImages]);
+      throw new Error('图片生成超时，请稍后重试');
     } catch (err) {
       setError(err instanceof Error ? err.message : '生成失败，请重试');
     } finally {
