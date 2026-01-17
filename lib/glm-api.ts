@@ -63,7 +63,7 @@ const MODELSCOPE_CONFIG = {
   baseURL: modelScopeBaseUrl,
   apiKey: modelScopeApiKey,
   defaultModel: 'ZhipuAI/GLM-4.7' as QuizModelId, // 默认使用 GLM-4.7
-  timeout: 120000, // 120 秒超时（大型模型可能需要更长时间）
+  timeout: 8000, // 8 秒超时（Vercel 免费计划限制 10 秒）
 };
 
 /**

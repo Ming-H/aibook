@@ -56,21 +56,28 @@ function validateQuizConfig(config: any): config is QuizConfig {
 }
 
 export async function POST(request: NextRequest) {
+  console.log('[Quiz Generate API] Request received');
+
   try {
     // 验证 GLM API 配置
     const configValidation = validateGLMConfig();
     if (!configValidation.valid) {
+      console.error('[Quiz Generate API] Config validation failed:', configValidation.error);
       return NextResponse.json(
         { error: 'GLM API not configured', details: configValidation.error },
         { status: 500 }
       );
     }
 
+    console.log('[Quiz Generate API] Config validated');
+
     // 解析请求体
     const body = await request.json();
+    console.log('[Quiz Generate API] Request body:', JSON.stringify({ ...body, customContent: body.customContent?.substring(0, 50) + '...' }));
 
     // 验证配置
     if (!validateQuizConfig(body)) {
+      console.error('[Quiz Generate API] Validation failed');
       return NextResponse.json(
         {
           error: 'Invalid quiz configuration',
@@ -80,8 +87,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    console.log('[Quiz Generate API] Starting quiz generation...');
+    const startTime = Date.now();
+
     // 调用 GLM API 生成试卷
     const quiz = await generateQuiz(body);
+
+    const duration = Date.now() - startTime;
+    console.log(`[Quiz Generate API] Quiz generated successfully in ${duration}ms`);
 
     // 返回结果
     return NextResponse.json(
@@ -92,12 +105,24 @@ export async function POST(request: NextRequest) {
       { status: 200 }
     );
   } catch (error) {
-    console.error('Quiz generation error:', error);
+    console.error('[Quiz Generate API] Error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+
+    // 检查是否是超时错误
+    if (errorMessage.includes('timeout') || errorMessage.includes('AbortError')) {
+      return NextResponse.json(
+        {
+          error: '生成超时，请稍后重试',
+          details: 'AI 模型响应时间过长，建议减少题目数量或使用更简单的配置',
+        },
+        { status: 504 }
+      );
+    }
 
     return NextResponse.json(
       {
         error: 'Failed to generate quiz',
-        details: error instanceof Error ? error.message : 'Unknown error',
+        details: errorMessage,
       },
       { status: 500 }
     );
