@@ -383,6 +383,65 @@ function parseQuizResponse(content: string): Omit<Quiz, 'id' | 'subject' | 'grad
 }
 
 /**
+ * 分批生成试卷（每次只生成少量题目，避免超时）
+ */
+export async function generateQuizInBatches(config: QuizConfig): Promise<Quiz> {
+  const { choice = 0, fillBlank = 0, shortAnswer = 0 } = config.questionCounts;
+  const allQuestions: any[] = [];
+  const BATCH_SIZE = 2; // 每批最多 2 道题
+
+  // 生成选择题
+  if (choice > 0) {
+    const choiceBatches = Math.ceil(choice / BATCH_SIZE);
+    for (let i = 0; i < choiceBatches; i++) {
+      const remaining = Math.min(BATCH_SIZE, choice - i * BATCH_SIZE);
+      const batchConfig = { ...config, questionCounts: { choice: remaining, fillBlank: 0, shortAnswer: 0 } };
+      console.log(`[Quiz] Generating choice batch ${i + 1}/${choiceBatches} (${remaining} questions)`);
+      const batchQuiz = await generateQuiz(batchConfig);
+      allQuestions.push(...batchQuiz.questions);
+    }
+  }
+
+  // 生成填空题
+  if (fillBlank > 0) {
+    const fillBlankBatches = Math.ceil(fillBlank / BATCH_SIZE);
+    for (let i = 0; i < fillBlankBatches; i++) {
+      const remaining = Math.min(BATCH_SIZE, fillBlank - i * BATCH_SIZE);
+      const batchConfig = { ...config, questionCounts: { choice: 0, fillBlank: remaining, shortAnswer: 0 } };
+      console.log(`[Quiz] Generating fill-blank batch ${i + 1}/${fillBlankBatches} (${remaining} questions)`);
+      const batchQuiz = await generateQuiz(batchConfig);
+      allQuestions.push(...batchQuiz.questions);
+    }
+  }
+
+  // 生成简答题
+  if (shortAnswer > 0) {
+    const shortAnswerBatches = Math.ceil(shortAnswer / BATCH_SIZE);
+    for (let i = 0; i < shortAnswerBatches; i++) {
+      const remaining = Math.min(BATCH_SIZE, shortAnswer - i * BATCH_SIZE);
+      const batchConfig = { ...config, questionCounts: { choice: 0, fillBlank: 0, shortAnswer: remaining } };
+      console.log(`[Quiz] Generating short-answer batch ${i + 1}/${shortAnswerBatches} (${remaining} questions)`);
+      const batchQuiz = await generateQuiz(batchConfig);
+      allQuestions.push(...batchQuiz.questions);
+    }
+  }
+
+  // 计算总分
+  const totalPoints = allQuestions.reduce((sum: number, q: any) => sum + (Number(q.points) || 0), 0);
+
+  return {
+    id: `quiz-${Date.now()}`,
+    subject: config.subject,
+    grade: config.grade,
+    difficulty: config.difficulty,
+    title: `${config.subject}试卷`,
+    questions: allQuestions,
+    totalPoints,
+    createdAt: new Date().toISOString(),
+  };
+}
+
+/**
  * 生成试卷
  */
 export async function generateQuiz(config: QuizConfig): Promise<Quiz> {

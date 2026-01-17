@@ -1,15 +1,14 @@
 /**
- * 出题 API 路由（Edge Runtime 版本）
+ * 出题 API 路由（分批生成版本）
  * POST /api/quiz/generate
  *
- * 使用 Edge Runtime 获得 30 秒超时限制
+ * 使用分批生成避免超时，每次只生成 1-2 道题
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { generateQuiz, validateGLMConfig, QuizConfig } from '@/lib/glm-api';
+import { generateQuizInBatches, validateGLMConfig, QuizConfig } from '@/lib/glm-api';
 
-// Edge Runtime 有 30 秒超时（Vercel 免费计划）
-export const runtime = 'edge';
+export const runtime = 'nodejs';
 
 /**
  * 验证出题配置
@@ -59,7 +58,7 @@ function validateQuizConfig(config: any): config is QuizConfig {
 }
 
 export async function POST(request: NextRequest) {
-  console.log('[Quiz Generate API] Request received (Edge Runtime)');
+  console.log('[Quiz Generate API] Request received (batch mode)');
 
   try {
     // 验证 GLM API 配置
@@ -74,7 +73,6 @@ export async function POST(request: NextRequest) {
 
     // 解析请求体
     const body = await request.json();
-    console.log('[Quiz Generate API] Request received');
 
     // 验证配置
     if (!validateQuizConfig(body)) {
@@ -88,14 +86,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log('[Quiz Generate API] Starting generation...');
-    const startTime = Date.now();
+    console.log('[Quiz Generate API] Starting batch generation...');
 
-    // 调用 GLM API 生成试卷
-    const quiz = await generateQuiz(body);
+    // 使用分批生成
+    const quiz = await generateQuizInBatches(body);
 
-    const duration = Date.now() - startTime;
-    console.log(`[Quiz Generate API] Generated in ${duration}ms`);
+    console.log('[Quiz Generate API] Batch generation complete');
 
     // 返回结果
     return NextResponse.json(
@@ -109,17 +105,6 @@ export async function POST(request: NextRequest) {
     console.error('[Quiz Generate API] Error:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
 
-    // 检查是否是超时错误
-    if (errorMessage.includes('timeout') || errorMessage.includes('AbortError')) {
-      return NextResponse.json(
-        {
-          error: '生成超时，请稍后重试',
-          details: 'AI 模型响应时间过长。建议：减少题目数量，或使用更快的模型。',
-        },
-        { status: 504 }
-      );
-    }
-
     return NextResponse.json(
       {
         error: 'Failed to generate quiz',
@@ -132,7 +117,7 @@ export async function POST(request: NextRequest) {
 
 // OPTIONS 方法支持 CORS
 export async function OPTIONS() {
-  return new NextResponse(null, {
+  return new Response(null, {
     status: 204,
     headers: {
       'Access-Control-Allow-Methods': 'POST, OPTIONS',

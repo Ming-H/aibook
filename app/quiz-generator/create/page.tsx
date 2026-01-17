@@ -167,7 +167,7 @@ export default function QuizCreatePage() {
     }
   };
 
-  // 生成试卷
+  // 生成试卷（分批生成模式）
   const handleGenerate = async () => {
     if (!validateStep(2)) return;
 
@@ -205,8 +205,6 @@ export default function QuizCreatePage() {
       console.error('[Quiz] Error:', message);
       if (message.includes('API') || message.includes('configured') || message.includes('environment variable')) {
         setError('系统配置错误：AI 服务未正确配置。请联系管理员或稍后再试。');
-      } else if (message.includes('超时') || message.includes('timeout')) {
-        setError('生成超时，AI 响应时间过长。建议：减少题目数量，或稍后重试。');
       } else {
         setError(message);
       }
