@@ -96,21 +96,15 @@ export async function POST(request: NextRequest) {
 
     // 模拟支付成功（测试环境）
     // 在生产环境中，移除这段代码，使用真实的支付 API
-    if (process.env.NODE_ENV === 'development' || process.env.MOCK_PAYMENT === 'true') {
-      // 模拟支付成功，直接创建订阅（1年有效期）
-      const { createSubscription } = await import('@/lib/subscription-check');
-      await createSubscription({
-        userId: session.user.id,
-        paymentMethod,
-        transactionId: orderId,
-        amount,
-        years: 1, // 1年有效期
-      });
-
+    if (process.env.MOCK_PAYMENT === 'true') {
+      // 返回个人收款码，让用户扫码支付
       return NextResponse.json({
         success: true,
-        message: '支付成功（模拟），订阅有效期1年',
+        useQRCode: true,
+        message: '请扫码支付后联系管理员开通订阅',
         orderId,
+        // 收款码图片路径（需要放在 public 目录）
+        qrCode: '/alipay-qr.png',
       });
     }
 

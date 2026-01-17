@@ -61,12 +61,13 @@ export default function SubscribePage() {
         throw new Error(data.error || '创建订单失败');
       }
 
-      // 跳转到支付页面
-      if (data.paymentUrl) {
-        window.location.href = data.paymentUrl;
-      } else if (data.qrCode) {
-        // 显示二维码支付
+      // 显示个人收款码
+      if (data.useQRCode && data.qrCode) {
         setShowQRCode(data.qrCode);
+      } else if (data.paymentUrl) {
+        window.location.href = data.paymentUrl;
+      } else if (data.message) {
+        alert(data.message);
       }
     } catch (error) {
       console.error('[Subscribe] Error:', error);
@@ -175,12 +176,24 @@ export default function SubscribePage() {
       {showQRCode && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-2xl p-8 max-w-md w-full mx-4">
-            <h3 className="text-2xl font-bold text-center mb-4">扫码支付</h3>
+            <h3 className="text-2xl font-bold text-center mb-2">扫码支付</h3>
+            <p className="text-center text-gray-600 mb-4">
+              订阅费用：¥{PLAN_PRICE}/年
+            </p>
             <div className="bg-white p-4 rounded-xl border-2 border-dashed border-gray-300">
-              <img src={showQRCode} alt="支付二维码" className="w-full" />
+              <img src={showQRCode} alt="支付宝收款码" className="w-full" />
             </div>
-            <p className="mt-4 text-center text-gray-600">
-              请使用支付宝扫描二维码完成支付
+            <div className="mt-4 bg-blue-50 rounded-xl p-4">
+              <p className="text-sm text-blue-900 font-semibold mb-2">支付步骤：</p>
+              <ol className="text-sm text-blue-800 space-y-1 list-decimal list-inside">
+                <li>使用支付宝扫描上方二维码</li>
+                <li>支付 ¥{PLAN_PRICE}（备注你的邮箱）</li>
+                <li>截图保存支付凭证</li>
+                <li>联系客服开通订阅</li>
+              </ol>
+            </div>
+            <p className="mt-4 text-center text-gray-700 font-medium">
+              支付完成后，请添加微信：<span className="text-blue-600">MingFire520</span>
             </p>
             <button
               type="button"
@@ -190,7 +203,7 @@ export default function SubscribePage() {
               }}
               className="mt-6 w-full bg-indigo-600 text-white py-3 px-6 rounded-xl font-medium hover:bg-indigo-700"
             >
-              支付完成
+              我已支付，稍后联系客服
             </button>
           </div>
         </div>
