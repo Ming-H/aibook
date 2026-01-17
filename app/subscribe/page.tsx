@@ -22,7 +22,7 @@ const PLAN_FEATURES = [
 export default function SubscribePage() {
   const { data: session, status } = useSession();
   const router = useRouter();
-  const [paymentMethod, setPaymentMethod] = useState<'alipay' | 'wechat'>('alipay');
+  const paymentMethod = 'alipay'; // 固定为支付宝
   const [loading, setLoading] = useState(false);
 
   if (status === 'loading') {
@@ -129,39 +129,14 @@ export default function SubscribePage() {
               ))}
             </ul>
 
-            {/* 支付方式选择 */}
+            {/* 支付方式 */}
             <div className="mt-10">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">选择支付方式：</h3>
-              <div className="grid grid-cols-2 gap-4">
-                <button
-                  type="button"
-                  onClick={() => setPaymentMethod('alipay')}
-                  className={`flex items-center justify-center px-6 py-4 border-2 rounded-xl transition-all ${
-                    paymentMethod === 'alipay'
-                      ? 'border-blue-500 bg-blue-50'
-                      : 'border-gray-200 hover:border-gray-300'
-                  }`}
-                >
-                  <svg className="w-8 h-8" viewBox="0 0 24 24" fill="#1677FF">
-                    <path d="M19.5 3h-15A1.5 1.5 0 003 4.5v15A1.5 1.5 0 004.5 21h15a1.5 1.5 0 001.5-1.5v-15A1.5 1.5 0 0019.5 3zM12 6a3 3 0 110 6 3 3 0 010-6zm0 8c2.67 0 8 1.34 8 4v2H4v-2c0-2.66 5.33-4 8-4z"/>
-                  </svg>
-                  <span className="ml-2 font-medium">支付宝</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setPaymentMethod('wechat')}
-                  className={`flex items-center justify-center px-6 py-4 border-2 rounded-xl transition-all ${
-                    paymentMethod === 'wechat'
-                      ? 'border-green-500 bg-green-50'
-                      : 'border-gray-200 hover:border-gray-300'
-                  }`}
-                >
-                  <svg className="w-8 h-8" viewBox="0 0 24 24" fill="#07C160">
-                    <path d="M8.5 13.5l2.5 3 4.5-5.5M17 3H7a4 4 0 00-4 4v10a4 4 0 004 4h10a4 4 0 004-4V7a4 4 0 00-4-4z"/>
-                  </svg>
-                  <span className="ml-2 font-medium">微信支付</span>
-                </button>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">支付方式</h3>
+              <div className="flex items-center justify-center px-6 py-4 border-2 border-blue-500 bg-blue-50 rounded-xl">
+                <svg className="w-8 h-8" viewBox="0 0 24 24" fill="#1677FF">
+                  <path d="M19.5 3h-15A1.5 1.5 0 003 4.5v15A1.5 1.5 0 004.5 21h15a1.5 1.5 0 001.5-1.5v-15A1.5 1.5 0 0019.5 3zM12 6a3 3 0 110 6 3 3 0 010-6zm0 8c2.67 0 8 1.34 8 4v2H4v-2c0-2.66 5.33-4 8-4z"/>
+                </svg>
+                <span className="ml-3 font-bold text-lg text-blue-700">支付宝</span>
               </div>
             </div>
 
@@ -205,7 +180,7 @@ export default function SubscribePage() {
               <img src={showQRCode} alt="支付二维码" className="w-full" />
             </div>
             <p className="mt-4 text-center text-gray-600">
-              请使用{paymentMethod === 'alipay' ? '支付宝' : '微信'}扫描二维码完成支付
+              请使用支付宝扫描二维码完成支付
             </p>
             <button
               type="button"
