@@ -72,9 +72,16 @@ export const authOptions: NextAuthOptions = {
       return token;
     },
     async session({ session, token }) {
-      if (session.user) {
+      if (session.user && token.id) {
+        // 从数据库获取最新的用户信息，确保isAdmin字段始终存在
+        const dbUser = await prisma.user.findUnique({
+          where: { id: token.id as string },
+          select: { isAdmin: true },
+        });
+
         session.user.id = token.id as string;
-        session.user.isAdmin = token.isAdmin as boolean;
+        // 如果数据库中有用户信息，使用数据库的isAdmin，否则使用token的
+        session.user.isAdmin = dbUser?.isAdmin ?? (token.isAdmin as boolean);
       }
       return session;
     },
