@@ -6,7 +6,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { regenerateQuestion, validateGLMConfig, Question } from '@/lib/glm-api';
 
-export const runtime = 'nodejs';
+// 使用 Edge Runtime 以获得 30 秒超时（Vercel 免费计划）
+export const runtime = 'edge';
 
 export async function POST(request: NextRequest) {
   try {

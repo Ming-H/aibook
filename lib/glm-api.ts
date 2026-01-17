@@ -63,7 +63,7 @@ const MODELSCOPE_CONFIG = {
   baseURL: modelScopeBaseUrl,
   apiKey: modelScopeApiKey,
   defaultModel: 'ZhipuAI/GLM-4.7' as QuizModelId, // 默认使用 GLM-4.7
-  timeout: 8000, // 8 秒超时（Vercel 免费计划限制 10 秒）
+  timeout: 25000, // 25 秒超时（Edge Runtime 限制 30 秒）
 };
 
 /**
@@ -249,6 +249,10 @@ async function callModelScopeAPI(
     console.log('[ModelScope API] Model:', modelId);
     console.log('[ModelScope API] Has API Key:', !!MODELSCOPE_CONFIG.apiKey);
 
+    // 创建超时控制（兼容 Edge Runtime）
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), MODELSCOPE_CONFIG.timeout);
+
     const response = await fetch(url, {
       method: 'POST',
       headers: {
@@ -256,9 +260,10 @@ async function callModelScopeAPI(
         'Authorization': `Bearer ${MODELSCOPE_CONFIG.apiKey}`,
       },
       body: JSON.stringify(requestBody),
-      signal: AbortSignal.timeout(MODELSCOPE_CONFIG.timeout),
+      signal: controller.signal,
     });
 
+    clearTimeout(timeoutId);
     console.log('[ModelScope API] Response Status:', response.status);
 
     if (!response.ok) {
