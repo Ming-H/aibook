@@ -90,7 +90,12 @@ export default function CreativeWorkshopPage() {
         const statusResponse = await fetch(`/api/image/status/${taskId}`);
 
         if (!statusResponse.ok) {
-          throw new Error('查询任务状态失败');
+          let errorDetails = '查询任务状态失败';
+          try {
+            const errorData = await statusResponse.json();
+            errorDetails = errorData.details || errorData.error || errorDetails;
+          } catch {}
+          throw new Error(`${errorDetails} (HTTP ${statusResponse.status})`);
         }
 
         const statusData = await statusResponse.json();

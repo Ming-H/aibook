@@ -17,9 +17,12 @@ interface RouteParams {
 
 export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
+    console.log('[Image Status API] Request received');
+
     // 验证 ModelScope API 配置
     const configValidation = validateModelScopeConfig();
     if (!configValidation.valid) {
+      console.error('[Image Status API] Config validation failed:', configValidation.error);
       return NextResponse.json(
         { error: 'ModelScope API not configured', details: configValidation.error },
         { status: 500 }
@@ -28,6 +31,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
     // 获取任务 ID
     const { taskId } = await params;
+    console.log('[Image Status API] Checking task ID:', taskId);
 
     if (!taskId || typeof taskId !== 'string') {
       return NextResponse.json(
@@ -38,6 +42,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
     // 查询任务状态
     const result = await getTaskStatus(taskId);
+    console.log('[Image Status API] Task status:', result.status);
 
     // 返回结果
     return NextResponse.json(
@@ -51,7 +56,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       { status: 200 }
     );
   } catch (error) {
-    console.error('Task status check error:', error);
+    console.error('[Image Status API] Error:', error);
 
     return NextResponse.json(
       {
