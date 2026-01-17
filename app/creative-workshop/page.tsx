@@ -55,7 +55,7 @@ export default function CreativeWorkshopPage() {
     try {
       // 使用模板构建完整的提示词
       const template = PROMPT_TEMPLATES[selectedStyle];
-      const fullPrompt = `${template} ${prompt}, vibrant colors, highly detailed, 4k quality, professional`;
+      const fullPrompt = `${template} ${prompt}`.trim();
 
       const response = await fetch('/api/image/generate', {
         method: 'POST',
