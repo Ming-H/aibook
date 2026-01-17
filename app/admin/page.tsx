@@ -30,23 +30,36 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [initError, setInitError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (status === 'loading') return;
+    const initPage = async () => {
+      try {
+        if (status === 'loading') return;
 
-    if (!session) {
-      router.push('/auth/signin');
-      return;
-    }
+        if (!session || !session.user) {
+          router.push('/auth/signin');
+          return;
+        }
 
-    // 检查是否是管理员
-    if (!session.user.isAdmin) {
-      alert('您没有管理员权限');
-      router.push('/quiz-generator');
-      return;
-    }
+        // 安全检查管理员权限 - 确保 isAdmin 是 boolean 类型
+        const isAdmin = typeof session.user.isAdmin === 'boolean' ? session.user.isAdmin : false;
 
-    fetchUsers();
+        if (!isAdmin) {
+          alert('您没有管理员权限');
+          router.push('/quiz-generator');
+          return;
+        }
+
+        await fetchUsers();
+      } catch (err) {
+        console.error('[Admin Page] Init error:', err);
+        setInitError(err instanceof Error ? err.message : '加载失败，请刷新页面重试');
+        setLoading(false);
+      }
+    };
+
+    initPage();
   }, [session, status]);
 
   const fetchUsers = async () => {
@@ -60,6 +73,7 @@ export default function AdminPage() {
 
       setUsers(data);
     } catch (err) {
+      console.error('[Admin Page] Fetch users error:', err);
       setError(err instanceof Error ? err.message : '获取用户列表失败');
     } finally {
       setLoading(false);
@@ -97,6 +111,36 @@ export default function AdminPage() {
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
           <p className="mt-4 text-gray-600">加载中...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (initError) {
+    return (
+      <div className="min-h-screen flex items-center justify-center px-4">
+        <div className="max-w-md w-full bg-white rounded-xl shadow-lg p-8">
+          <div className="text-center">
+            <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-8 h-8 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <h2 className="text-xl font-bold text-gray-900 mb-2">加载失败</h2>
+            <p className="text-gray-600 mb-6">{initError}</p>
+            <button
+              onClick={() => window.location.reload()}
+              className="w-full bg-indigo-600 text-white py-3 px-6 rounded-xl font-medium hover:bg-indigo-700"
+            >
+              刷新页面
+            </button>
+            <button
+              onClick={() => router.push('/quiz-generator')}
+              className="mt-3 w-full text-gray-600 hover:text-gray-900"
+            >
+              返回首页
+            </button>
+          </div>
         </div>
       </div>
     );

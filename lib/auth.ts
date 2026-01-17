@@ -72,16 +72,30 @@ export const authOptions: NextAuthOptions = {
       return token;
     },
     async session({ session, token }) {
-      if (session.user && token.id) {
-        // 从数据库获取最新的用户信息，确保isAdmin字段始终存在
-        const dbUser = await prisma.user.findUnique({
-          where: { id: token.id as string },
-          select: { isAdmin: true },
-        });
-
+      if (session.user) {
         session.user.id = token.id as string;
-        // 如果数据库中有用户信息，使用数据库的isAdmin，否则使用token的
-        session.user.isAdmin = dbUser?.isAdmin ?? (token.isAdmin as boolean);
+
+        // 确保 isAdmin 始终是 boolean 类型
+        // 优先使用数据库中的值，如果失败则使用 token 中的值，最后默认为 false
+        let isAdmin = false;
+
+        if (token.id) {
+          try {
+            const dbUser = await prisma.user.findUnique({
+              where: { id: token.id as string },
+              select: { isAdmin: true },
+            });
+
+            isAdmin = dbUser?.isAdmin ?? false;
+          } catch (error) {
+            console.error('[Auth] Error fetching user from DB:', error);
+            isAdmin = token.isAdmin === true;
+          }
+        } else {
+          isAdmin = token.isAdmin === true;
+        }
+
+        session.user.isAdmin = isAdmin;
       }
       return session;
     },
