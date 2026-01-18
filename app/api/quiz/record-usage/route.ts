@@ -8,6 +8,9 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { recordQuizUsage } from '@/lib/subscription-check';
 
+// 强制动态渲染，因为使用了 headers
+export const dynamic = 'force-dynamic';
+
 export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);

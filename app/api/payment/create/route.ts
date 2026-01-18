@@ -13,6 +13,9 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 
+// 强制动态渲染，因为使用了 headers
+export const dynamic = 'force-dynamic';
+
 interface CreatePaymentRequest {
   paymentMethod: 'alipay' | 'wechat';
   amount: number;

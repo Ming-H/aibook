@@ -13,6 +13,9 @@ import { prisma } from '@/lib/prisma';
 import { setUserAsAdmin } from '@/lib/subscription-check';
 import bcrypt from 'bcryptjs';
 
+// 强制动态渲染，因为使用了 headers
+export const dynamic = 'force-dynamic';
+
 interface SetupAdminRequest {
   email: string;
   password: string;
