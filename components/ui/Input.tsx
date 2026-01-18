@@ -33,8 +33,8 @@ export function Input({
             leftIcon ? "pl-10" : ""
           } ${rightIcon ? "pr-10" : ""} ${
             error
-              ? "border-red-500/50 focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
-              : "border-slate-700 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+              ? "border-slate-500 focus:border-slate-400 focus:ring-2 focus:ring-slate-500/20"
+              : "border-slate-700 focus:border-slate-500 focus:ring-2 focus:ring-slate-500/20"
           } outline-none ${className}`}
           {...props}
         />
@@ -44,7 +44,7 @@ export function Input({
           </div>
         )}
       </div>
-      {error && <p className="text-xs text-red-400">{error}</p>}
+      {error && <p className="text-xs text-slate-400">{error}</p>}
       {helperText && !error && <p className="text-xs text-slate-500">{helperText}</p>}
     </div>
   );

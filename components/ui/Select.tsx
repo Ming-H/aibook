@@ -71,7 +71,7 @@ export function Select({
       {label && (
         <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">
           {label}
-          {required && <span className="text-[var(--color-red)] ml-1">*</span>}
+          {required && <span className="text-[var(--text-muted)] ml-1">*</span>}
         </label>
       )}
 
@@ -88,14 +88,14 @@ export function Select({
           transition-all
           flex items-center justify-between
           ${hasError
-            ? 'border-[var(--color-red)] focus:border-[var(--color-red)]'
-            : 'border-[var(--border-default)] focus:border-[var(--border-focus)]'
+            ? 'border-[var(--border-medium)] focus:border-[var(--border-medium)]'
+            : 'border-[var(--border-default)] focus:border-[var(--border-medium)]'
           }
           ${disabled
             ? 'opacity-50 cursor-not-allowed'
-            : 'cursor-pointer hover:border-[var(--border-strong)]'
+            : 'cursor-pointer hover:border-[var(--border-medium)]'
           }
-          ${isOpen ? 'ring-2 ring-[var(--color-brand)]/20' : ''}
+          ${isOpen ? 'ring-2 ring-[var(--border-medium)]/20' : ''}
         `}
         style={{
           fontFamily: 'var(--font-body)',
@@ -120,7 +120,7 @@ export function Select({
 
       {/* 错误提示 */}
       {hasError && (
-        <p className="mt-2 text-sm text-[var(--color-red)] flex items-center gap-1.5">
+        <p className="mt-2 text-sm text-[var(--text-secondary)] flex items-center gap-1.5">
           <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
             <path
               fillRule="evenodd"
@@ -176,7 +176,7 @@ export function Select({
                     <span>{option.label}</span>
                     {option.value === value && (
                       <svg
-                        className="w-5 h-5 text-[var(--color-brand)]"
+                        className="w-5 h-5 text-[var(--text-primary)]"
                         fill="currentColor"
                         viewBox="0 0 20 20"
                       >
