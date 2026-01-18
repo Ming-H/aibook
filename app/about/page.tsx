@@ -329,13 +329,39 @@ export default function AboutPage() {
 
             {/* 联系方式卡片 */}
             <div className="card p-6">
-              <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-3 font-mono">合作联系</h3>
+              <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-3 font-mono">联系方式</h3>
               <p className="text-[var(--text-secondary)] text-sm mb-4">
                 欢迎技术交流、项目合作或其他形式的沟通
               </p>
+
+              {/* 邮箱 */}
+              <div className="mb-4">
+                <a
+                  href={`mailto:${profile.email}`}
+                  className="flex items-center gap-2 p-3 bg-[var(--background-tertiary)] rounded-xl border border-[var(--border-subtle)] hover:border-[var(--border-medium)] transition-all duration-300 group"
+                >
+                  <svg className="w-5 h-5 text-[var(--text-secondary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  </svg>
+                  <span className="text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors text-sm font-mono">
+                    {profile.email}
+                  </span>
+                </a>
+              </div>
+
+              {/* 微信 */}
+              <div className="mb-4">
+                <div className="flex items-center gap-2 p-3 bg-[var(--background-tertiary)] rounded-xl border border-[var(--border-subtle)]">
+                  <svg className="w-5 h-5 text-[var(--text-secondary)]" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M8.5 10c-.828 0-1.5-.672-1.5-1.5S7.672 7 8.5 7s1.5.672 1.5 1.5S9.328 10 8.5 10zm7 0c-.828 0-1.5-.672-1.5-1.5S14.672 7 15.5 7s1.5.672 1.5 1.5-.672 1.5-1.5 1.5zm-3.5-8C5.467 2 2 5.467 2 9.5c0 2.687 1.12 5.083 2.883 6.758V19l2.96-1.963c.854.475 1.832.743 2.883.743 4.033 0 7.5-3.467 7.5-7.5S16.033 2 12 2zm0 13c-.85 0-1.735-.19-2.52-.54l-.23-.1-2.77 1.836v-2.32c-1.46-1.39-2.48-3.42-2.48-5.87 0-3.59 2.91-6.5 6.5-6.5s6.5 2.91 6.5 6.5-2.91 6.5-6.5 6.5z"/>
+                  </svg>
+                  <span className="text-[var(--text-secondary)] text-sm font-mono">DevFoxAI</span>
+                </div>
+              </div>
+
               <a
                 href={`mailto:${profile.email}`}
-                className="inline-flex items-center gap-2 px-4 py-2 btn-secondary font-mono"
+                className="w-full py-3 px-4 btn-primary font-bold flex items-center justify-center gap-2"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />

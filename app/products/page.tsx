@@ -28,8 +28,8 @@ export default function ProductsPage() {
       icon: '✨',
       gradient: '',
       features: [
-        '12+ 精选提示词',
-        '分类筛选（写作/编程/设计等）',
+        '46+ 精选提示词',
+        '分类筛选（写作/编程/设计/创意等）',
         '难度等级标注',
         '一键复制功能',
         '持续更新中',
@@ -200,10 +200,10 @@ export default function ProductsPage() {
               我正在不断探索 AI 技术的新应用场景，如果你有想法或建议，欢迎与我交流
             </p>
             <Link
-              href="/contact"
+              href="/about"
               className="btn-primary inline-flex items-center gap-2 px-6 py-3 rounded-xl font-bold font-mono"
             >
-              联系我
+              关于我
             </Link>
           </div>
         </div>

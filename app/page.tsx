@@ -13,15 +13,15 @@ export default async function HomePage() {
             {/* Left - Personal Introduction */}
             <div className="text-center lg:text-left">
               {/* Name and Title */}
-              <h1 className="mb-4 text-5xl md:text-6xl font-black tracking-tight font-mono">
+              <h1 className="mb-4 text-6xl md:text-7xl lg:text-8xl font-black tracking-tight font-mono">
                 <span className="border-b-4 border-[var(--border-medium)]">
                   极客狐DevFox
                 </span>
               </h1>
 
               <div className="mb-6 space-y-2">
-                <p className="text-2xl md:text-3xl font-bold text-[var(--text-primary)] font-mono">
-                  AI 工程师 / 独立开发者 / 技术作者
+                <p className="text-3xl md:text-4xl font-bold text-[var(--text-primary)] font-mono">
+                  AI工程师 / 独立开发者 / 技术作者
                 </p>
                 <p className="text-lg text-[var(--text-secondary)]">
                   专注 AI 领域探索与实践，构建智能产品，分享技术见解
@@ -52,10 +52,10 @@ export default async function HomePage() {
                   </svg>
                 </Link>
                 <Link
-                  href="/contact"
+                  href="/about"
                   className="btn-secondary px-8 py-4 font-mono"
                 >
-                  联系我
+                  关于我
                 </Link>
               </div>
 
@@ -315,10 +315,10 @@ export default async function HomePage() {
                 GitHub 主页
               </a>
               <Link
-                href="/contact"
+                href="/about"
                 className="btn-secondary px-8 py-4 font-mono"
               >
-                联系我
+                关于我
               </Link>
             </div>
           </div>

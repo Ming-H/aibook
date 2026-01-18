@@ -30,7 +30,6 @@ export function Navbar() {
     { href: '/projects', label: '作品', icon: '💼' },
     { href: '/blog', label: '博客', icon: '📝' },
     { href: '/about', label: '关于', icon: '👤' },
-    { href: '/contact', label: '联系', icon: '📧' },
   ];
 
   return (
@@ -56,7 +55,7 @@ export function Navbar() {
               极客狐 DevFox
             </span>
             <span className="text-xs text-[var(--text-muted)] font-mono">
-              AI 工程师 & 独立开发者
+              AI工程师 & 独立开发者
             </span>
           </div>
         </Link>
