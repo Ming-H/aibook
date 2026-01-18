@@ -4,20 +4,20 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import type { Metadata } from "next";
 
-export const dynamic = "force-static";
+// 临时改为 SSR 以加快构建速度
+export const dynamic = "force-dynamic";
 
-export async function generateStaticParams() {
-  const articles = await getAllArticles();
-
-  return articles.map((article) => {
-    // 从 fullPath 中提取 articleDir (格式: "20260114_133012_标题/filename.md")
-    const articleDir = article.fullPath.split("/")[0];
-    return {
-      date: articleDir, // 使用完整的目录名而不是日期
-      slug: article.slug,
-    };
-  });
-}
+// 暂时禁用 generateStaticParams 以加快构建
+// export async function generateStaticParams() {
+//   const articles = await getAllArticles();
+//   return articles.map((article) => {
+//     const articleDir = article.fullPath.split("/")[0];
+//     return {
+//       date: articleDir,
+//       slug: article.slug,
+//     };
+//   });
+// }
 
 export async function generateMetadata({ params }: { params: { date: string; slug: string } }): Promise<Metadata> {
   const article = await getArticle(params.date, params.slug);

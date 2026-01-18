@@ -4,14 +4,16 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import type { Metadata } from "next";
 
-export const dynamic = "force-static";
+// 临时改为 SSR 以加快构建速度
+export const dynamic = "force-dynamic";
 
-export async function generateStaticParams() {
-  const entries = await getAllDailyEntries();
-  return entries.map((entry) => ({
-    date: entry.date,
-  }));
-}
+// 暂时禁用 generateStaticParams 以加快构建
+// export async function generateStaticParams() {
+//   const entries = await getAllDailyEntries();
+//   return entries.map((entry) => ({
+//     date: entry.date,
+//   }));
+// }
 
 export async function generateMetadata({ params }: { params: { date: string } }): Promise<Metadata> {
   const entry = await getDailyEntry(params.date);
