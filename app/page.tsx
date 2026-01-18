@@ -7,9 +7,9 @@ export default async function HomePage() {
   return (
     <div className="min-h-screen bg-white dark:bg-[var(--background-primary)]">
       {/* Hero Section */}
-      <section className="relative px-6 py-20 md:py-32">
+      <section className="relative px-6 py-12 md:py-16">
         <div className="relative mx-auto max-w-7xl">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
+          <div className="grid lg:grid-cols-2 gap-8 items-start">
             {/* Left - Personal Introduction */}
             <div className="text-center lg:text-left">
               {/* Avatar */}
@@ -109,24 +109,24 @@ export default async function HomePage() {
             </div>
 
             {/* Right - Stats and Skills */}
-            <div className="space-y-6">
+            <div className="space-y-4">
               {/* Stats Card */}
-              <div className="card p-6">
-                <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-4 font-mono">核心成果</h3>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="text-center p-4 bg-[var(--background-tertiary)] border-2 border-[var(--border-subtle)] rounded-md">
+              <div className="card p-5">
+                <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-3 font-mono">核心成果</h3>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="text-center p-3 bg-[var(--background-tertiary)] border-2 border-[var(--border-subtle)] rounded-md">
                     <div className="text-3xl font-bold text-[var(--text-primary)] mb-1 font-mono">10+</div>
                     <div className="text-sm text-[var(--text-secondary)]">开源项目</div>
                   </div>
-                  <div className="text-center p-4 bg-[var(--background-tertiary)] border-2 border-[var(--border-subtle)] rounded-md">
+                  <div className="text-center p-3 bg-[var(--background-tertiary)] border-2 border-[var(--border-subtle)] rounded-md">
                     <div className="text-3xl font-bold text-[var(--text-primary)] mb-1 font-mono">50+</div>
                     <div className="text-sm text-[var(--text-secondary)]">技术文章</div>
                   </div>
-                  <div className="text-center p-4 bg-[var(--background-tertiary)] border-2 border-[var(--border-subtle)] rounded-md">
+                  <div className="text-center p-3 bg-[var(--background-tertiary)] border-2 border-[var(--border-subtle)] rounded-md">
                     <div className="text-3xl font-bold text-[var(--text-primary)] mb-1 font-mono">2</div>
                     <div className="text-sm text-[var(--text-secondary)]">AI 产品</div>
                   </div>
-                  <div className="text-center p-4 bg-[var(--background-tertiary)] border-2 border-[var(--border-subtle)] rounded-md">
+                  <div className="text-center p-3 bg-[var(--background-tertiary)] border-2 border-[var(--border-subtle)] rounded-md">
                     <div className="text-3xl font-bold text-[var(--text-primary)] mb-1 font-mono">1.1K</div>
                     <div className="text-sm text-[var(--text-secondary)]">社交关注</div>
                   </div>
@@ -134,8 +134,8 @@ export default async function HomePage() {
               </div>
 
               {/* Tech Stack Card */}
-              <div className="card p-6">
-                <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-4 font-mono">技术栈</h3>
+              <div className="card p-5">
+                <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-3 font-mono">技术栈</h3>
                 <div className="flex flex-wrap gap-2">
                   {['Python', 'TypeScript', 'Next.js', 'React', 'LLM', 'AI/ML', 'PostgreSQL', 'Vercel'].map((tech) => (
                     <span
@@ -153,7 +153,7 @@ export default async function HomePage() {
       </section>
 
       {/* Featured Works */}
-      <section className="relative px-6 py-20 bg-[var(--background-secondary)]">
+      <section className="relative px-6 py-16 bg-[var(--background-secondary)]">
         <div className="mx-auto max-w-7xl">
           <div className="flex items-center justify-between mb-12">
             <div>
@@ -242,7 +242,7 @@ export default async function HomePage() {
       </section>
 
       {/* Latest Articles */}
-      <section className="relative px-6 py-20">
+      <section className="relative px-6 py-16">
         <div className="mx-auto max-w-7xl">
           <div className="flex items-center justify-between mb-12">
             <div>
@@ -304,13 +304,13 @@ export default async function HomePage() {
       </section>
 
       {/* CTA Section */}
-      <section className="relative px-6 py-20 bg-[var(--background-secondary)]">
+      <section className="relative px-6 py-16 bg-[var(--background-secondary)]">
         <div className="mx-auto max-w-4xl text-center">
-          <div className="card p-12">
+          <div className="card p-10">
             <h2 className="text-3xl md:text-4xl font-bold text-[var(--text-primary)] mb-4 font-mono">
               对我的项目感兴趣？
             </h2>
-            <p className="text-lg text-[var(--text-secondary)] mb-8 max-w-2xl mx-auto">
+            <p className="text-lg text-[var(--text-secondary)] mb-6 max-w-2xl mx-auto">
               欢迎通过 GitHub 关注我的最新项目，或者直接联系我讨论合作机会
             </p>
             <div className="flex flex-wrap gap-4 justify-center">
