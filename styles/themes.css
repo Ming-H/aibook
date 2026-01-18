@@ -1,48 +1,57 @@
 /**
- * 极客狐 DevFox - 现代简约设计系统
- * Minimalist Design System inspired by Apple, Stripe, Vercel
- * 浅色/深色双主题支持
+ * 极客狐 DevFox - 极客风格设计系统
+ * Geek Style Design System - Pure Monochrome
+ * 纯黑白灰配色 + 等宽字体 + 网格边框 + 科技感元素
+ * Inspired by GitHub, Vercel, Linear, Terminal/IDE
  */
 
 /* ==================== 浅色模式 ==================== */
 
 :root {
-  /* 主色调 - 专业的靛蓝色系 */
-  --color-primary: #4F46E5;        /* Indigo 600 */
-  --color-primary-light: #6366F1;  /* Indigo 500 */
-  --color-primary-dark: #4338CA;   /* Indigo 700 */
+  /* 纯黑白灰配色系统 - 8级灰阶 */
+  --gray-50: #FAFAFA;
+  --gray-100: #F5F5F5;
+  --gray-200: #E5E5E5;
+  --gray-300: #D4D4D4;
+  --gray-400: #A3A3A3;
+  --gray-500: #737373;
+  --gray-600: #525252;
+  --gray-700: #404040;
+  --gray-800: #262626;
+  --gray-900: #171717;
+  --gray-950: #0A0A0A;
 
   /* 背景层次 */
-  --background-primary: #FFFFFF;   /* 纯白 */
-  --background-secondary: #F9FAFB; /* Gray 50 */
-  --background-tertiary: #F3F4F6;  /* Gray 100 */
-  --background-elevated: #FFFFFF;  /* 卡片背景 */
-  --background-floating: #FFFFFF;  /* 浮层背景 */
+  --background-primary: #FFFFFF;
+  --background-secondary: #F5F5F5;
+  --background-tertiary: #E5E5E5;
+  --background-elevated: #FFFFFF;
+  --background-floating: #FFFFFF;
 
   /* 文字层次 */
-  --text-primary: #111827;         /* Gray 900 */
-  --text-secondary: #4B5563;       /* Gray 600 */
-  --text-tertiary: #9CA3AF;        /* Gray 400 */
-  --text-muted: #D1D5DB;           /* Gray 300 */
-  --text-disabled: #E5E7EB;        /* Gray 200 */
+  --text-primary: #262626;
+  --text-secondary: #404040;
+  --text-tertiary: #525252;
+  --text-muted: #A3A3A3;
+  --text-disabled: #D4D4D4;
+  --text-strong: #171717;
 
   /* 边框 */
-  --border-subtle: #E5E7EB;        /* Gray 200 */
-  --border-default: #D1D5DB;       /* Gray 300 */
-  --border-medium: #9CA3AF;        /* Gray 400 */
-  --border-strong: #6B7280;        /* Gray 500 */
+  --border-subtle: #E5E5E5;
+  --border-default: #A3A3A3;
+  --border-medium: #737373;
+  --border-strong: #525252;
 
-  /* 阴影 - 细腻的多层阴影 */
+  /* 阴影 - 黑白阴影 */
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07), 0 2px 4px rgba(0, 0, 0, 0.05);
-  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.08), 0 4px 6px rgba(0, 0, 0, 0.05);
-  --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.08), 0 10px 10px rgba(0, 0, 0, 0.04);
-  --shadow-2xl: 0 25px 50px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 2px 4px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 4px 8px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 8px 16px rgba(0, 0, 0, 0.12);
 
-  /* 字体 */
-  --font-display: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  --font-heading: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  --font-body: 'Inter Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  /* 字体 - 标题使用等宽字体 */
+  --font-display: 'JetBrains Mono', 'Fira Code', 'SF Mono', 'Monaco', 'Consolas', monospace;
+  --font-heading: 'JetBrains Mono', 'Fira Code', 'SF Mono', 'Monaco', 'Consolas', monospace;
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --font-mono: 'JetBrains Mono', 'Fira Code', 'SF Mono', 'Monaco', 'Consolas', monospace;
 
   /* 过渡 */
@@ -51,127 +60,211 @@
   --transition-normal: 300ms cubic-bezier(0.4, 0, 0.2, 1);
 
   /* 圆角 */
-  --radius-sm: 0.375rem;   /* 6px */
-  --radius-md: 0.5rem;     /* 8px */
-  --radius-lg: 0.75rem;    /* 12px */
-  --radius-xl: 1rem;       /* 16px */
-  --radius-2xl: 1.25rem;   /* 20px */
+  --radius-sm: 0.25rem;   /* 4px */
+  --radius-md: 0.5rem;    /* 8px */
+  --radius-lg: 0.75rem;   /* 12px */
+  --radius-xl: 1rem;      /* 16px */
 }
 
 /* ==================== 深色模式 ==================== */
 
 .dark {
-  /* 主色调 - 明亮的靛蓝色 */
-  --color-primary: #6366F1;        /* Indigo 500 */
-  --color-primary-light: #818CF8;  /* Indigo 400 */
-  --color-primary-dark: #4F46E5;   /* Indigo 600 */
+  /* 背景层次 - 反转 */
+  --background-primary: #050505;
+  --background-secondary: #0A0A0A;
+  --background-tertiary: #171717;
+  --background-elevated: #0A0A0A;
+  --background-floating: #0A0A0A;
 
-  /* 背景层次 */
-  --background-primary: #0F0F11;   /* 深黑 */
-  --background-secondary: #18181B;  /* Zinc 900 */
-  --background-tertiary: #27272A;   /* Zinc 800 */
-  --background-elevated: #1C1C1F;  /* 卡片 */
-  --background-floating: #1C1C1F;  /* 浮层 */
-
-  /* 文字层次 */
-  --text-primary: #FAFAFA;         /* Zinc 50 */
-  --text-secondary: #A1A1AA;       /* Zinc 400 */
-  --text-tertiary: #71717A;        /* Zinc 500 */
-  --text-muted: #52525B;           /* Zinc 600 */
-  --text-disabled: #3F3F46;        /* Zinc 700 */
+  /* 文字层次 - 反转 */
+  --text-primary: #E5E5E5;
+  --text-secondary: #D4D4D4;
+  --text-tertiary: #A3A3A3;
+  --text-muted: #737373;
+  --text-disabled: #525252;
+  --text-strong: #FAFAFA;
 
   /* 边框 */
-  --border-subtle: #27272A;        /* Zinc 800 */
-  --border-default: #3F3F46;       /* Zinc 700 */
-  --border-medium: #52525B;        /* Zinc 600 */
-  --border-strong: #71717A;        /* Zinc 500 */
+  --border-subtle: #262626;
+  --border-default: #404040;
+  --border-medium: #525252;
+  --border-strong: #737373;
 
-  /* 阴影 - 深色模式使用更深的阴影 */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.5);
-  --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.6);
-  --shadow-2xl: 0 25px 50px rgba(0, 0, 0, 0.7);
+  /* 阴影 - 深色模式使用发光阴影 */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 2px 4px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 4px 8px rgba(0, 0, 0, 0.6);
+  --shadow-xl: 0 8px 16px rgba(0, 0, 0, 0.7);
 }
 
-/* ==================== 工具类 ==================== */
+/* ==================== 极客风格工具类 ==================== */
 
-/* 卡片样式 */
+/* 卡片样式 - 2px 边框 */
 .card {
   background-color: var(--background-elevated);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-md);
-  transition: box-shadow var(--transition-base), transform var(--transition-base);
+  border: 2px solid var(--border-default);
+  border-radius: var(--radius-md);
+  transition: border-color var(--transition-base);
 }
 
 .card:hover {
-  box-shadow: var(--shadow-lg);
+  border-color: var(--border-medium);
 }
 
 .card-interactive {
   cursor: pointer;
-  transition: box-shadow var(--transition-base), transform var(--transition-base);
+  transition: border-color var(--transition-base), transform var(--transition-base);
 }
 
 .card-interactive:hover {
+  border-color: var(--border-medium);
   transform: translateY(-2px);
-  box-shadow: var(--shadow-xl);
 }
 
-/* 文字渐变效果 */
-.text-gradient {
-  background: linear-gradient(135deg, var(--color-primary) 0%, #8B5CF6 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+/* 点阵背景 */
+.bg-dot-matrix {
+  background-image: radial-gradient(
+    circle,
+    var(--border-subtle) 1px,
+    transparent 1px
+  );
+  background-size: 20px 20px;
+  background-position: center center;
 }
 
-/* 按钮样式 */
+.bg-dot-matrix-dense {
+  background-image: radial-gradient(
+    circle,
+    var(--border-subtle) 1px,
+    transparent 1px
+  );
+  background-size: 10px 10px;
+  background-position: center center;
+}
+
+/* 按钮样式 - 等宽字体 + 黑白 */
 .btn-primary {
-  background-color: var(--color-primary);
-  color: white;
-  border-radius: var(--radius-lg);
+  background-color: var(--text-primary);
+  color: var(--background-primary);
+  border: 2px solid var(--text-primary);
+  border-radius: var(--radius-md);
+  font-family: var(--font-mono);
   font-weight: 600;
-  transition: background-color var(--transition-base), box-shadow var(--transition-base);
+  transition: background-color var(--transition-base), color var(--transition-base);
 }
 
 .btn-primary:hover {
-  background-color: var(--color-primary-dark);
-  box-shadow: var(--shadow-md);
+  background-color: var(--background-primary);
+  color: var(--text-primary);
 }
 
 .btn-secondary {
-  background-color: var(--background-tertiary);
+  background-color: transparent;
   color: var(--text-primary);
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-lg);
+  border: 2px solid var(--border-default);
+  border-radius: var(--radius-md);
+  font-family: var(--font-mono);
   font-weight: 600;
-  transition: background-color var(--transition-base), border-color var(--transition-base);
+  transition: border-color var(--transition-base);
 }
 
 .btn-secondary:hover {
-  background-color: var(--border-subtle);
   border-color: var(--border-medium);
+}
+
+/* 终端风格按钮 */
+.btn-terminal {
+  background-color: var(--background-tertiary);
+  color: var(--text-primary);
+  border: 2px solid var(--border-default);
+  border-radius: var(--radius-md);
+  font-family: var(--font-mono);
+  font-weight: 600;
+  padding-left: 1.5rem;
+  position: relative;
+  transition: background-color var(--transition-base);
+}
+
+.btn-terminal::before {
+  content: '> ';
+  color: var(--border-medium);
+  position: absolute;
+  left: 0.75rem;
+}
+
+.btn-terminal:hover {
+  background-color: var(--border-subtle);
 }
 
 /* 输入框样式 */
 .input {
   background-color: var(--background-primary);
-  border: 1px solid var(--border-default);
+  border: 2px solid var(--border-default);
   border-radius: var(--radius-md);
   color: var(--text-primary);
-  transition: border-color var(--transition-base), box-shadow var(--transition-base);
+  font-family: var(--font-mono);
+  transition: border-color var(--transition-base);
 }
 
 .input:focus {
   outline: none;
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+  border-color: var(--border-medium);
 }
 
 .input::placeholder {
   color: var(--text-muted);
+}
+
+/* 分割线 */
+.divider-horizontal {
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--border-default) 50%,
+    transparent 100%
+  );
+}
+
+.divider-dotted {
+  border-bottom: 2px dotted var(--border-medium);
+}
+
+/* 标签样式 - 等宽字体 + 边框 */
+.tag {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  font-weight: 500;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  background-color: transparent;
+  transition: border-color var(--transition-base);
+}
+
+.tag:hover {
+  border-color: var(--border-medium);
+}
+
+/* 代码显示样式 */
+.code-display {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+  color: var(--text-primary);
+  background-color: var(--background-tertiary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 0.125rem 0.375rem;
+}
+
+/* 标题等宽字体全局样式 */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
 }
 
 /* 主题平滑过渡 */
@@ -185,4 +278,50 @@
 .no-transition,
 .no-transition * {
   transition: none !important;
+}
+
+/* ==================== 极客风格动画 ==================== */
+
+/* 终端光标闪烁 */
+@keyframes cursorBlink {
+  0%, 50% { border-color: var(--text-primary); }
+  51%, 100% { border-color: transparent; }
+}
+
+.cursor-blink {
+  border-right: 2px solid var(--text-primary);
+  animation: cursorBlink 1s step-end infinite;
+}
+
+/* 终端打字效果 */
+@keyframes terminalType {
+  from { width: 0; }
+  to { width: 100%; }
+}
+
+.terminal-typing {
+  overflow: hidden;
+  white-space: nowrap;
+  animation: terminalType 2s steps(40, end);
+}
+
+/* 像素闪烁 */
+@keyframes pixelBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.pixel-blink {
+  animation: pixelBlink 1s step-end infinite;
+}
+
+/* 数据传输线 */
+@keyframes dataTransmit {
+  0% { transform: translateX(-100%); opacity: 0; }
+  50% { opacity: 1; }
+  100% { transform: translateX(100%); opacity: 0; }
+}
+
+.data-transmit {
+  animation: dataTransmit 2s linear infinite;
 }

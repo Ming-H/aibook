@@ -24,6 +24,13 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
+
+  /* 标题使用等宽字体 - 极客风格 */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
 }
 
 @layer utilities {
@@ -32,7 +39,7 @@
   }
 }
 
-/* ==================== 自定义滚动条 ==================== */
+/* ==================== 自定义滚动条（黑白） ==================== */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -48,10 +55,10 @@
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--border-strong);
+  background: var(--border-medium);
 }
 
-/* ==================== Markdown 内容样式 ==================== */
+/* ==================== Markdown 内容样式（黑白） ==================== */
 .prose {
   color: var(--text-secondary);
   max-width: none;
@@ -65,7 +72,8 @@
 .prose h5,
 .prose h6 {
   color: var(--text-primary);
-  font-weight: var(--font-bold);
+  font-weight: 600;
+  font-family: var(--font-heading);
   scroll-margin-top: 2rem;
 }
 
@@ -86,7 +94,7 @@
   margin-bottom: var(--space-5);
   margin-top: var(--space-10);
   padding-bottom: var(--space-3);
-  border-bottom: 1px solid var(--border-subtle);
+  border-bottom: 2px solid var(--border-subtle);
 }
 
 @media (min-width: 768px) {
@@ -112,18 +120,20 @@
 }
 
 .prose a {
-  color: var(--color-blue);
+  color: var(--text-primary);
   text-decoration: underline;
+  text-decoration-color: var(--border-default);
   text-underline-offset: 2px;
-  transition: color var(--transition-fast);
+  transition: color var(--transition-fast), text-decoration-color var(--transition-fast);
 }
 
 .prose a:hover {
-  color: var(--color-blue-light);
+  color: var(--text-strong);
+  text-decoration-color: var(--border-medium);
 }
 
 .prose strong {
-  font-weight: var(--font-semibold);
+  font-weight: 600;
   color: var(--text-primary);
 }
 
@@ -132,11 +142,12 @@
 }
 
 .prose code {
-  background: var(--background-secondary);
-  border-radius: var(--radius-lg);
+  background: var(--background-tertiary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
   padding: var(--space-1_5) var(--space-2);
   font-size: var(--text-sm);
-  font-weight: var(--font-medium);
+  font-weight: 500;
   color: var(--text-primary);
   font-family: var(--font-mono);
 }
@@ -144,14 +155,16 @@
 .prose pre {
   margin-bottom: var(--space-5);
   overflow-x: auto;
-  border-radius: var(--radius-xl);
-  background: var(--background-secondary);
+  border: 2px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  background: var(--background-tertiary);
   padding: var(--space-4);
   font-size: var(--text-sm);
 }
 
 .prose pre code {
   background: transparent;
+  border: none;
   padding: 0;
   color: var(--text-primary);
 }
@@ -172,22 +185,24 @@
 
 .prose blockquote {
   margin-bottom: var(--space-5);
-  border-left: 4px solid var(--color-brand);
+  border-left: 4px solid var(--border-medium);
   padding-left: var(--space-4);
   font-style: italic;
   color: var(--text-tertiary);
+  background: var(--background-secondary);
+  border-radius: var(--radius-sm);
 }
 
 .prose table {
   margin-bottom: var(--space-5);
   width: 100%;
   overflow: hidden;
-  border-radius: var(--radius-xl);
-  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  border: 2px solid var(--border-subtle);
 }
 
 .prose thead {
-  background: var(--background-secondary);
+  background: var(--background-tertiary);
 }
 
 .prose th {
@@ -195,8 +210,9 @@
   padding: var(--space-3) var(--space-4);
   text-align: left;
   font-size: var(--text-sm);
-  font-weight: var(--font-semibold);
+  font-weight: 600;
   color: var(--text-primary);
+  font-family: var(--font-mono);
 }
 
 .prose td {
@@ -209,31 +225,33 @@
 .prose img {
   margin-top: var(--space-6);
   margin-bottom: var(--space-6);
-  border-radius: var(--radius-xl);
+  border-radius: var(--radius-lg);
+  border: 2px solid var(--border-subtle);
 }
 
 .prose hr {
   margin: var(--space-10) 0;
   border: none;
-  border-top: 1px solid var(--border-subtle);
+  border-top: 2px solid var(--border-subtle);
 }
 
-/* ==================== 代码高亮主题 ==================== */
+/* ==================== 代码高亮主题（黑白单色） ==================== */
 .hljs {
   background: transparent !important;
-  color: rgb(203 213 225);
+  color: var(--text-primary);
 }
 
 .hljs-comment,
 .hljs-quote {
-  color: rgb(148 163 184);
+  color: var(--text-tertiary);
   font-style: italic;
 }
 
 .hljs-keyword,
 .hljs-selector-tag,
 .hljs-subst {
-  color: rgb(248 113 113);
+  color: var(--text-strong);
+  font-weight: 600;
 }
 
 .hljs-number,
@@ -241,58 +259,58 @@
 .hljs-variable,
 .hljs-template-variable,
 .hljs-tag .hljs-attr {
-  color: rgb(251 146 60);
+  color: var(--text-secondary);
 }
 
 .hljs-string,
 .hljs-doctag {
-  color: rgb(74 222 128);
+  color: var(--text-primary);
 }
 
 .hljs-title,
 .hljs-section,
 .hljs-selector-id {
-  color: rgb(96 165 250);
-  font-weight: bold;
+  color: var(--text-strong);
+  font-weight: 600;
 }
 
 .hljs-type,
 .hljs-class .hljs-title {
-  color: rgb(251 191 36);
+  color: var(--text-secondary);
 }
 
 .hljs-tag,
 .hljs-name,
 .hljs-attribute {
-  color: rgb(248 113 113);
+  color: var(--text-tertiary);
   font-weight: normal;
 }
 
 .hljs-regexp,
 .hljs-link {
-  color: rgb(251 146 60);
+  color: var(--text-secondary);
 }
 
 .hljs-symbol,
 .hljs-bullet {
-  color: rgb(74 222 128);
+  color: var(--text-primary);
 }
 
 .hljs-built_in,
 .hljs-builtin-name {
-  color: rgb(96 165 250);
+  color: var(--text-secondary);
 }
 
 .hljs-meta {
-  color: rgb(148 163 184);
+  color: var(--text-tertiary);
 }
 
 .hljs-deletion {
-  background: rgb(127 29 29);
+  background: rgba(127, 29, 29, 0.2);
 }
 
 .hljs-addition {
-  background: rgb(20 83 45);
+  background: rgba(20, 83, 45, 0.2);
 }
 
 .hljs-emphasis {
