@@ -134,7 +134,7 @@ export default function AboutPage() {
                   <p className="text-[var(--text-secondary)] text-lg mb-4">
                     {profile.title}
                   </p>
-                  <div className="flex flex-wrap gap-2 justify-center sm:justify-start">
+                  <div className="flex flex-wrap gap-2 justify-center sm:justify-start mb-3">
                     {profile.tags.map((tag, index) => (
                       <span
                         key={index}
@@ -144,6 +144,17 @@ export default function AboutPage() {
                       </span>
                     ))}
                   </div>
+                  <a
+                    href="https://dinq.me/devfoxai"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 text-purple-400 hover:text-purple-300 transition-colors text-sm font-medium"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                    </svg>
+                    DINQ: dinq.me/devfoxai
+                  </a>
                 </div>
               </div>
 
@@ -185,17 +196,6 @@ export default function AboutPage() {
                 <p className="text-[var(--text-secondary)] leading-relaxed">
                   {profile.bio}
                 </p>
-                <a
-                  href="https://dinq.me/devfoxai"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 mt-3 text-purple-400 hover:text-purple-300 transition-colors text-sm font-medium"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                  </svg>
-                  DINQ: dinq.me/devfoxai
-                </a>
               </div>
             </div>
 
