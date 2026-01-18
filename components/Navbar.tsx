@@ -28,12 +28,11 @@ export function Navbar() {
 
   const navItems = [
     { href: '/', label: '首页', icon: '🏠' },
-    { href: '/daily', label: '今日热点', icon: '🔥' },
-    { href: '/series', label: 'LLM系列', icon: '📚' },
-    { href: '/quiz-generator', label: '智能出题', icon: '✨' },
-    { href: '/creative-workshop', label: '创意工坊', icon: '🎨' },
+    { href: '/projects', label: '作品', icon: '💼' },
+    { href: '/blog', label: '博客', icon: '📝' },
+    { href: '/products', label: '产品', icon: '🚀' },
     { href: '/about', label: '关于', icon: '👤' },
-    { href: '/archive', label: '归档', icon: '📁' },
+    { href: '/contact', label: '联系', icon: '📧' },
   ];
 
   return (
