@@ -1,6 +1,9 @@
 import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 
+// 强制动态渲染，因为使用了 headers
+export const dynamic = 'force-dynamic';
+
 // 清理环境变量中的换行符和空格
 const cleanEnv = (value: string | undefined): string | undefined => {
   return value?.trim().replace(/\n/g, '');
