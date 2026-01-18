@@ -33,20 +33,16 @@ export default function AboutPage() {
     email: '1518246548@qq.com',
     location: '北京, 中国',
     timezone: 'UTC +08:00',
-    tags: [
-      { name: 'AI科技', color: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30' },
-      { name: '自媒体', color: 'bg-pink-500/20 text-pink-400 border-pink-500/30' },
-      { name: '独立开发者', color: 'bg-green-500/20 text-green-400 border-green-500/30' },
-    ],
+    tags: ['AI科技', '自媒体', '独立开发者'],
     bio: '热爱技术，专注于AI领域的探索与实践。分享最新的AI技术动态，开发实用的工具产品。',
   };
 
   const skills = [
-    { name: 'Python', level: 90, color: 'bg-blue-500' },
-    { name: 'TypeScript', level: 85, color: 'bg-cyan-500' },
-    { name: 'Kotlin', level: 80, color: 'bg-purple-500' },
-    { name: 'Next.js', level: 85, color: 'bg-white' },
-    { name: 'AI/ML', level: 75, color: 'bg-green-500' },
+    { name: 'Python', level: 90 },
+    { name: 'TypeScript', level: 85 },
+    { name: 'Kotlin', level: 80 },
+    { name: 'Next.js', level: 85 },
+    { name: 'AI/ML', level: 75 },
   ];
 
   const projects: Project[] = [
@@ -84,18 +80,11 @@ export default function AboutPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[var(--background-primary)] via-[var(--background-secondary)] to-[var(--background-tertiary)] py-12 px-4 sm:px-6 lg:px-8">
-      {/* 背景装饰 */}
-      <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-primary opacity-5 rounded-full blur-3xl" />
-      </div>
-
+    <div className="min-h-screen bg-white dark:bg-[var(--background-primary)] bg-dot-matrix py-12 px-4 sm:px-6 lg:px-8">
       <div className="relative max-w-6xl mx-auto">
         {/* 页面标题 */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent mb-4">
+          <h1 className="text-4xl sm:text-5xl font-bold text-[var(--text-primary)] mb-4 font-mono border-b-4 border-[var(--border-medium)] inline-block pb-2">
             关于我
           </h1>
           <p className="text-[var(--text-secondary)] text-lg">
@@ -107,11 +96,11 @@ export default function AboutPage() {
           {/* 左侧 - 个人信息卡片 */}
           <div className="lg:col-span-2 space-y-8">
             {/* 主资料卡 */}
-            <div className="glass-card rounded-2xl p-8 hover:shadow-glow-brand transition-all duration-300">
+            <div className="card p-8">
               {/* 头像和基本信息 */}
               <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 mb-8">
                 <div className="relative">
-                  <div className="w-32 h-32 rounded-full overflow-hidden shadow-2xl ring-4 ring-purple-500/30">
+                  <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-[var(--border-default)]">
                     <img
                       src="/avatar.png"
                       alt="极客狐DevFox"
@@ -119,8 +108,8 @@ export default function AboutPage() {
                     />
                   </div>
                   {profile.verified && (
-                    <div className="absolute -bottom-1 -right-1 w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center border-4 border-[var(--background-secondary)]">
-                      <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                    <div className="absolute -bottom-1 -right-1 w-8 h-8 bg-[var(--background-primary)] border-2 border-[var(--border-medium)] rounded-full flex items-center justify-center">
+                      <svg className="w-4 h-4 text-[var(--text-primary)]" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                       </svg>
                     </div>
@@ -128,19 +117,19 @@ export default function AboutPage() {
                 </div>
 
                 <div className="flex-1 text-center sm:text-left">
-                  <h2 className="text-3xl font-bold text-[var(--text-primary)] mb-2 flex items-center justify-center sm:justify-start gap-2">
+                  <h2 className="text-3xl font-bold text-[var(--text-primary)] mb-2 flex items-center justify-center sm:justify-start gap-2 font-mono">
                     {profile.name}
                   </h2>
-                  <p className="text-[var(--text-secondary)] text-lg mb-4">
+                  <p className="text-[var(--text-secondary)] text-lg mb-4 font-mono">
                     {profile.title}
                   </p>
                   <div className="flex flex-wrap gap-2 justify-center sm:justify-start mb-3">
                     {profile.tags.map((tag, index) => (
                       <span
                         key={index}
-                        className={`px-3 py-1 rounded-full text-sm font-medium border ${tag.color}`}
+                        className="tag font-mono"
                       >
-                        {tag.name}
+                        {tag}
                       </span>
                     ))}
                   </div>
@@ -148,7 +137,7 @@ export default function AboutPage() {
                     href="https://dinq.me/devfoxai"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 text-purple-400 hover:text-purple-300 transition-colors text-sm font-medium"
+                    className="inline-flex items-center gap-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors text-sm font-medium font-mono"
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
@@ -161,38 +150,38 @@ export default function AboutPage() {
               {/* 详细信息 */}
               <div className="space-y-4 mb-8">
                 <div className="flex items-center gap-3 text-[var(--text-secondary)]">
-                  <svg className="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5 text-[var(--text-tertiary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5z" />
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
                   </svg>
-                  <span>{profile.education}</span>
+                  <span className="font-mono">{profile.education}</span>
                 </div>
                 <div className="flex items-center gap-3 text-[var(--text-secondary)]">
-                  <svg className="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5 text-[var(--text-tertiary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                   </svg>
-                  <a href={`mailto:${profile.email}`} className="hover:text-blue-400 transition-colors">
+                  <a href={`mailto:${profile.email}`} className="hover:text-[var(--text-primary)] transition-colors font-mono">
                     {profile.email}
                   </a>
                 </div>
                 <div className="flex items-center gap-3 text-[var(--text-secondary)]">
-                  <svg className="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5 text-[var(--text-tertiary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
-                  <span>{profile.location}</span>
+                  <span className="font-mono">{profile.location}</span>
                 </div>
                 <div className="flex items-center gap-3 text-[var(--text-secondary)]">
-                  <svg className="w-5 h-5 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5 text-[var(--text-tertiary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
-                  <span>{profile.timezone}</span>
+                  <span className="font-mono">{profile.timezone}</span>
                 </div>
               </div>
 
               {/* 个人简介 */}
               <div className="bg-[var(--background-tertiary)] rounded-xl p-6 border border-[var(--border-subtle)]">
-                <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-3">个人简介</h3>
+                <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-3 font-mono">个人简介</h3>
                 <p className="text-[var(--text-secondary)] leading-relaxed">
                   {profile.bio}
                 </p>
@@ -200,18 +189,18 @@ export default function AboutPage() {
             </div>
 
             {/* 技能卡片 */}
-            <div className="glass-card rounded-2xl p-8">
-              <h3 className="text-xl font-semibold text-[var(--text-primary)] mb-6">技术栈</h3>
+            <div className="card p-8">
+              <h3 className="text-xl font-semibold text-[var(--text-primary)] mb-6 font-mono">技术栈</h3>
               <div className="space-y-4">
                 {skills.map((skill, index) => (
                   <div key={index}>
                     <div className="flex justify-between mb-2">
-                      <span className="text-[var(--text-secondary)]">{skill.name}</span>
-                      <span className="text-[var(--text-muted)]">{skill.level}%</span>
+                      <span className="text-[var(--text-secondary)] font-mono">{skill.name}</span>
+                      <span className="text-[var(--text-muted)] font-mono">{skill.level}%</span>
                     </div>
                     <div className="h-2 bg-[var(--background-tertiary)] rounded-full overflow-hidden">
                       <div
-                        className={`h-full ${skill.color} rounded-full transition-all duration-1000 ease-out`}
+                        className="h-full bg-[var(--text-primary)] rounded-full transition-all duration-1000 ease-out"
                         style={{ width: `${skill.level}%` }}
                       />
                     </div>
@@ -221,14 +210,14 @@ export default function AboutPage() {
             </div>
 
             {/* 项目卡片 */}
-            <div className="glass-card rounded-2xl p-8">
+            <div className="card p-8">
               <div className="flex items-center justify-between mb-6">
-                <h3 className="text-xl font-semibold text-[var(--text-primary)]">开源项目</h3>
+                <h3 className="text-xl font-semibold text-[var(--text-primary)] font-mono">开源项目</h3>
                 <a
                   href="https://github.com/devfoxaicn?tab=repositories"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-purple-400 hover:text-purple-300 text-sm flex items-center gap-1"
+                  className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] text-sm flex items-center gap-1 font-mono"
                 >
                   查看全部
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -246,7 +235,7 @@ export default function AboutPage() {
                     className="block bg-[var(--background-tertiary)] rounded-xl p-5 border border-[var(--border-subtle)] hover:border-[var(--border-medium)] transition-all duration-300 group"
                   >
                     <div className="flex items-start justify-between mb-2">
-                      <h4 className="text-[var(--text-primary)] font-semibold group-hover:text-purple-400 transition-colors">
+                      <h4 className="text-[var(--text-primary)] font-semibold group-hover:text-[var(--text-primary)] transition-colors font-mono">
                         {project.name}
                       </h4>
                       <div className="flex items-center gap-1 text-[var(--text-muted)]">
@@ -259,7 +248,7 @@ export default function AboutPage() {
                     <p className="text-[var(--text-secondary)] text-sm mb-3">
                       {project.description}
                     </p>
-                    <span className="inline-block px-2 py-1 bg-blue-500/20 text-blue-400 text-xs rounded-md border border-blue-500/30">
+                    <span className="tag text-xs font-mono">
                       {project.language}
                     </span>
                   </a>
@@ -271,8 +260,8 @@ export default function AboutPage() {
           {/* 右侧 - 社交链接和其他信息 */}
           <div className="space-y-8">
             {/* 社交链接卡片 */}
-            <div className="glass-card rounded-2xl p-6">
-              <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-4">社交媒体</h3>
+            <div className="card p-6">
+              <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-4 font-mono">社交媒体</h3>
               <div className="space-y-3">
                 {socialLinks.map((link, index) => (
                   <a
@@ -283,10 +272,10 @@ export default function AboutPage() {
                     className="flex items-center gap-3 p-3 bg-[var(--background-tertiary)] rounded-xl border border-[var(--border-subtle)] hover:border-[var(--border-medium)] hover:bg-[var(--background-elevated)] transition-all duration-300 group"
                   >
                     <span className="text-2xl">{link.icon}</span>
-                    <span className="text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors">
+                    <span className="text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors font-mono">
                       {link.platform}
                     </span>
-                    <svg className="w-4 h-4 ml-auto text-[var(--text-muted)] group-hover:text-purple-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4 ml-auto text-[var(--text-muted)] group-hover:text-[var(--text-primary)] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                     </svg>
                   </a>
@@ -295,30 +284,30 @@ export default function AboutPage() {
             </div>
 
             {/* 统计信息卡片 */}
-            <div className="glass-card rounded-2xl p-6">
-              <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-4">统计信息</h3>
+            <div className="card p-6">
+              <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-4 font-mono">统计信息</h3>
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <span className="text-[var(--text-secondary)]">GitHub Stars</span>
-                  <span className="text-2xl font-bold text-purple-400">3</span>
+                  <span className="text-[var(--text-secondary)] font-mono">GitHub Stars</span>
+                  <span className="text-2xl font-bold text-[var(--text-primary)] font-mono">3</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-[var(--text-secondary)]">公开项目</span>
-                  <span className="text-2xl font-bold text-blue-400">10+</span>
+                  <span className="text-[var(--text-secondary)] font-mono">公开项目</span>
+                  <span className="text-2xl font-bold text-[var(--text-primary)] font-mono">10+</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-[var(--text-secondary)]">技术文章</span>
-                  <span className="text-2xl font-bold text-green-400">50+</span>
+                  <span className="text-[var(--text-secondary)] font-mono">技术文章</span>
+                  <span className="text-2xl font-bold text-[var(--text-primary)] font-mono">50+</span>
                 </div>
               </div>
             </div>
 
             {/* 分享卡片 */}
-            <div className="glass-card rounded-2xl p-6">
-              <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-4">分享页面</h3>
+            <div className="card p-6">
+              <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-4 font-mono">分享页面</h3>
               <button
                 onClick={handleShare}
-                className="w-full py-3 px-4 bg-gradient-to-r from-purple-500 to-blue-500 rounded-xl text-white font-medium hover:from-purple-600 hover:to-blue-600 transition-all duration-300 flex items-center justify-center gap-2 shadow-lg hover:shadow-glow-brand"
+                className="w-full py-3 px-4 btn-primary font-bold flex items-center justify-center gap-2"
               >
                 {copied ? (
                   <>
@@ -339,14 +328,14 @@ export default function AboutPage() {
             </div>
 
             {/* 联系方式卡片 */}
-            <div className="glass-card rounded-2xl p-6 bg-gradient-to-br from-purple-500/10 to-blue-500/10">
-              <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-3">合作联系</h3>
+            <div className="card p-6">
+              <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-3 font-mono">合作联系</h3>
               <p className="text-[var(--text-secondary)] text-sm mb-4">
                 欢迎技术交流、项目合作或其他形式的沟通
               </p>
               <a
                 href={`mailto:${profile.email}`}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 rounded-lg text-white hover:bg-white/20 transition-colors"
+                className="inline-flex items-center gap-2 px-4 py-2 btn-secondary font-mono"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
