@@ -46,34 +46,11 @@ export default function ProjectsPage() {
       github: 'https://github.com/devfoxaicn/content-forge-ai',
       category: 'opensource',
     },
-    {
-      id: 'quiz-generator',
-      name: '智能出题系统',
-      description: 'AI 驱动的智能题目生成',
-      longDescription: '基于 GLM-4.7 的智能题目生成系统，支持选择题、填空题、简答题等多种题型，可导出多种格式',
-      image: '✨',
-      tags: ['Next.js', 'GLM-4.7', 'AI', 'Education'],
-      stars: 0,
-      url: '/quiz-generator',
-      category: 'product',
-    },
-    {
-      id: 'creative-workshop',
-      name: '创意工坊',
-      description: 'AI 图片生成工具',
-      longDescription: '基于 ModelScope API 的 AI 图片生成工具，支持多种风格和自定义模型',
-      image: '🎨',
-      tags: ['Next.js', 'ModelScope', 'AI', 'Image Gen'],
-      stars: 0,
-      url: '/creative-workshop',
-      category: 'product',
-    },
   ];
 
   const categories = [
     { id: 'all', name: '全部', icon: '📁' },
     { id: 'opensource', name: '开源项目', icon: '💻' },
-    { id: 'product', name: 'AI 产品', icon: '🚀' },
     { id: 'tool', name: '实用工具', icon: '🔧' },
   ];
 
@@ -92,7 +69,7 @@ export default function ProjectsPage() {
             作品集
           </h1>
           <p className="text-[var(--text-secondary)] text-lg max-w-2xl mx-auto">
-            我的项目和产品展示，涵盖开源项目、AI 产品和实用工具
+            我的开源项目和小作品展示，涵盖实验性项目和开发作品
           </p>
         </div>
 
@@ -202,10 +179,10 @@ export default function ProjectsPage() {
         <div className="mt-20 text-center">
           <div className="card p-8 max-w-2xl mx-auto">
             <h3 className="text-2xl font-bold text-[var(--text-primary)] mb-3 font-mono">
-              对我的项目感兴趣？
+              对我的开源项目感兴趣？
             </h3>
             <p className="text-[var(--text-secondary)] mb-6">
-              欢迎通过 GitHub 关注我的最新项目，或者直接联系我讨论合作机会
+              欢迎通过 GitHub 关注我的最新开源项目，或者直接联系我讨论合作机会
             </p>
             <div className="flex flex-wrap gap-4 justify-center">
               <a

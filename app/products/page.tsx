@@ -55,20 +55,20 @@ export default function ProductsPage() {
       status: 'live',
     },
     {
-      id: 'ai-hot-tech',
-      name: 'AI Hot Tech',
-      description: 'AI 技术热点平台',
-      longDescription: '每日更新的 AI 技术热点展示平台，包含今日热点、LLM 系列教程、文章归档等功能模块。汇聚最新的 AI 行业动态和深度技术文章。',
-      icon: '🤖',
+      id: 'content-forge-ai',
+      name: 'Content Forge AI',
+      description: 'AI 内容生成工具',
+      longDescription: '专注于 demos 和实用工具开发的 AI 内容生成工具，提供高效的 AI 内容生成解决方案。支持多种内容类型和自定义模型。',
+      icon: '🔧',
       gradient: '',
       features: [
-        '每日热点更新',
-        'LLM 系列教程',
-        '智能搜索',
-        '标签分类',
-        '响应式设计',
+        '智能内容生成',
+        '多种内容类型',
+        '自定义模型支持',
+        '高效批量处理',
+        '导出多种格式',
       ],
-      href: '/',
+      href: 'https://github.com/devfoxaicn/content-forge-ai',
       status: 'live',
     },
   ];
@@ -146,15 +146,29 @@ export default function ProductsPage() {
                   </div>
 
                   {/* CTA 按钮 */}
-                  <Link
-                    href={product.href}
-                    className="btn-primary inline-flex items-center gap-2 px-8 py-4 rounded-xl font-bold self-start font-mono"
-                  >
-                    {product.status === 'live' ? '立即体验' : '了解更多'}
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                    </svg>
-                  </Link>
+                  {product.href.startsWith('http') ? (
+                    <a
+                      href={product.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn-primary inline-flex items-center gap-2 px-8 py-4 rounded-xl font-bold self-start font-mono"
+                    >
+                      查看项目
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                      </svg>
+                    </a>
+                  ) : (
+                    <Link
+                      href={product.href}
+                      className="btn-primary inline-flex items-center gap-2 px-8 py-4 rounded-xl font-bold self-start font-mono"
+                    >
+                      {product.status === 'live' ? '立即体验' : '了解更多'}
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                      </svg>
+                    </Link>
+                  )}
                 </div>
 
                 {/* 右侧 - 功能演示图占位 */}
