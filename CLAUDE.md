@@ -39,6 +39,24 @@ vercel --prod
 
 # Check Vercel deployment logs
 vercel logs
+
+# Reset database (migrate dev)
+npx prisma migrate reset
+```
+
+### Database Management
+
+This project uses Prisma with PostgreSQL. The database schema is in `prisma/schema.prisma`.
+
+```bash
+# Generate Prisma client
+npx prisma generate
+
+# Run migrations in development
+npx prisma migrate dev
+
+# Open Prisma Studio (database GUI)
+npx prisma studio
 ```
 
 ## Architecture
@@ -65,6 +83,30 @@ The system has three parallel content loading paths:
    - Separate cache for digest content
 
 **Why separate loaders?** Daily articles, series content, and daily digests have different metadata structures and access patterns. Separating them allows for optimized caching and query strategies for each content type.
+
+### Authentication & Authorization
+
+The app uses **NextAuth.js v4** with a custom credentials provider and Prisma adapter for authentication:
+
+**Key Files:**
+- `lib/auth.ts` - NextAuth configuration with credentials provider
+- `lib/subscription-check.ts` - Subscription validation and admin checks
+- `app/api/auth/[...nextauth]/route.ts` - NextAuth API route
+
+**Auth Flow:**
+1. Users register/login via `/auth/signin` with email/password
+2. JWT strategy is used (sessions stored in JWT, not database)
+3. `session` callback fetches `isAdmin` from database for type safety
+4. Admin users bypass subscription checks (see `lib/subscription-check.ts`)
+
+**Important Pattern - Admin Type Safety:**
+The `isAdmin` field is fetched from the database in the session callback to ensure it's always a boolean type, not undefined. This prevents type issues throughout the app. See `lib/auth.ts:74-101`.
+
+**Subscription System:**
+- Users must have an active subscription to use quiz generation
+- Admin users bypass all subscription checks
+- Subscriptions have 1-year validity by default
+- Usage is tracked but not limited (admins excluded from tracking)
 
 ### Data Flow
 
@@ -137,6 +179,9 @@ Series use separate JSON metadata files instead of encoding everything in filena
 | `CRON_SECRET` | Yes | Secret for protecting ISR endpoint at `/api/revalidate` |
 | `GLM_API_KEY` | Optional | GLM-4.7 API key for quiz generation feature |
 | `MODELSCOPE_API_KEY` | Optional | ModelScope API key for image generation feature |
+| `DATABASE_URL` | Yes | PostgreSQL connection string for Prisma |
+| `NEXTAUTH_SECRET` | Yes | Secret for NextAuth.js JWT signing |
+| `NEXTAUTH_URL` | Yes | Your app's URL (e.g., `http://localhost:3000` in dev) |
 
 **Important**: Environment variables set via Vercel CLI may contain trailing newlines. Use `cleanEnv()` from `lib/github-api.ts` to strip them.
 
@@ -161,12 +206,48 @@ Series use separate JSON metadata files instead of encoding everything in filena
 | `lib/modelscope-api.ts` | ModelScope API integration for image generation |
 | `lib/markdown-parser.ts` | Markdown → HTML conversion with remark/rehype, heading extraction |
 | `lib/fs-utils.ts` | Filename parsing, slug generation, date formatting |
+| `lib/auth.ts` | NextAuth.js configuration with credentials provider |
+| `lib/subscription-check.ts` | Subscription validation, admin checks, usage recording |
+| `lib/prisma.ts` | Prisma client singleton |
 | `types/content.ts` | TypeScript interfaces for all content types |
+
+### Key Routes
+
+| Route | Purpose |
+|-------|---------|
+| `/` | Homepage with article timeline |
+| `/daily` | Daily digest browser |
+| `/series` | Series learning paths |
+| `/archive` | Historical content archive |
+| `/quiz-generator` | Quiz generation tool (requires subscription) |
+| `/creative-workshop` | AI image generation tool |
+| `/admin` | Admin dashboard (requires admin role) |
+| `/auth/signin` | Sign in page |
+| `/subscribe` | Subscription page |
+
+### API Routes
+
+| Route | Purpose |
+|-------|---------|
+| `/api/auth/[...nextauth]` | NextAuth.js handler |
+| `/api/revalidate` | ISR cache invalidation (protected by CRON_SECRET) |
+| `/api/quiz/generate` | Generate quiz from content |
+| `/api/quiz/regenerate` | Regenerate a quiz |
+| `/api/quiz/record-usage` | Record quiz usage (internal) |
+| `/api/image/generate` | Generate images via ModelScope |
+| `/api/image/status/[taskId]` | Check async image generation status |
+| `/api/subscription/check` | Check user subscription status |
+| `/api/payment/create` | Create payment (Alipay/WeChat) |
+| `/api/payment/callback` | Payment callback handler |
+| `/api/admin/users` | List all users (admin only) |
+| `/api/admin/subscription` | Create subscription for user (admin only) |
+| `/api/admin/setup` | Initial admin setup |
 
 ### Deployment
 
 - **Platform**: Vercel (configured in `vercel.json`)
 - **Region**: `hkg1` (Hong Kong)
+- **Database**: PostgreSQL (requires external database service for production)
 - **Cron Schedule**: Daily at 2 AM UTC
 - **Image Optimization**: Disabled (`unoptimized: true` in next.config.mjs)
 
@@ -177,6 +258,11 @@ echo "your-token" | vercel env add GITHUB_TOKEN production
 echo "your-token" | vercel env add GITHUB_TOKEN preview
 echo "your-token" | vercel env add GITHUB_TOKEN development
 ```
+
+**Required Environment Variables for Production:**
+- `DATABASE_URL` - PostgreSQL connection string (e.g., from Vercel Postgres, Supabase, or Neon)
+- `NEXTAUTH_SECRET` - Generate with `openssl rand -base64 32`
+- `NEXTAUTH_URL` - Your production domain URL
 
 ### Content Format
 
@@ -314,3 +400,12 @@ The `app/sitemap.ts` generates dynamic sitemaps. Date strings in `YYYYMMDD` form
 - The GitHub API has rate limits (5000 requests/hour for authenticated requests)
 - During builds, pagination is handled automatically by lib/github-api.ts
 - If hitting limits, consider implementing request caching or using a personal access token with higher limits
+
+**Database connection issues in production:**
+- Vercel serverless functions may have connection pooling issues
+- Use connection pooling with Prisma (e.g., Prisma Accelerator or pg-bouncer)
+- The `lib/prisma.ts` file exports a singleton Prisma client to prevent multiple instances
+
+**TypeScript types for session.user:**
+- Extend the NextAuth types to include `isAdmin` in your type definitions
+- See `lib/auth.ts` for the session callback that adds `isAdmin`
