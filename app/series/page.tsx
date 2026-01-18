@@ -2,8 +2,9 @@ import { getAllSeries, getTotalEpisodes } from "@/lib/series-loader";
 import Link from "next/link";
 import type { SeriesMetadata } from "@/types/content";
 
-export const dynamic = "force-static";
-export const revalidate = 3600;
+// 临时改为 SSR 以加快构建速度
+export const dynamic = "force-dynamic";
+// export const revalidate = 3600;
 
 export default async function SeriesPage() {
   let allSeries: SeriesMetadata[] = [];
