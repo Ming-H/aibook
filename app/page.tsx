@@ -13,14 +13,14 @@ export default async function HomePage() {
             {/* Left - Personal Introduction */}
             <div className="text-center lg:text-left">
               {/* Name and Title */}
-              <h1 className="mb-4 text-6xl md:text-7xl lg:text-8xl font-black tracking-tight font-mono">
+              <h1 className="mb-4 text-5xl md:text-6xl lg:text-7xl font-black tracking-tight font-mono">
                 <span className="border-b-4 border-[var(--border-medium)]">
                   极客狐DevFox
                 </span>
               </h1>
 
               <div className="mb-6 space-y-2">
-                <p className="text-3xl md:text-4xl font-bold text-[var(--text-primary)] font-mono">
+                <p className="text-xl md:text-2xl font-bold text-[var(--text-primary)] font-mono">
                   AI工程师 / 独立开发者 / 技术作者
                 </p>
                 <p className="text-lg text-[var(--text-secondary)]">
