@@ -25,7 +25,7 @@ AI Hot Tech is a static site generator that displays AI technology news articles
 # Start development server
 npm run dev
 
-# Build for production
+# Build for production (includes Prisma client generation)
 npm run build
 
 # Start production server locally
@@ -60,6 +60,26 @@ npx prisma studio
 ```
 
 ## Architecture
+
+### Key Patterns
+
+**Admin Type Safety Pattern:**
+The `isAdmin` field in user sessions requires special handling to ensure type safety:
+- In `lib/auth.ts:74-101`, the session callback fetches `isAdmin` from the database
+- This ensures `isAdmin` is always a boolean, not undefined
+- Throughout the app, you can safely check `session.user.isAdmin` without type guards
+- Admin users bypass subscription checks and usage tracking
+
+**Environment Variable Sanitization:**
+- Always use `cleanEnv()` from `lib/github-api.ts` when reading environment variables
+- Vercel CLI adds trailing newlines to env vars, which can break GitHub API authentication
+- Pattern: `const token = cleanEnv(process.env.GITHUB_TOKEN)`
+
+**Content Loader Pattern:**
+- Three separate loaders (`content-loader.ts`, `series-loader.ts`, `daily-loader.ts`) for different content types
+- Each loader maintains its own in-memory Map cache
+- Caches are cleared via `/api/revalidate` endpoint for ISR refresh
+- Do not mix content types in a single loader - metadata structures differ significantly
 
 ### Content Loading Architecture
 
@@ -98,9 +118,6 @@ The app uses **NextAuth.js v4** with a custom credentials provider and Prisma ad
 2. JWT strategy is used (sessions stored in JWT, not database)
 3. `session` callback fetches `isAdmin` from database for type safety
 4. Admin users bypass subscription checks (see `lib/subscription-check.ts`)
-
-**Important Pattern - Admin Type Safety:**
-The `isAdmin` field is fetched from the database in the session callback to ensure it's always a boolean type, not undefined. This prevents type issues throughout the app. See `lib/auth.ts:74-101`.
 
 **Subscription System:**
 - Users must have an active subscription to use quiz generation
@@ -381,6 +398,20 @@ The site uses a custom dark theme design system with glass morphism effects:
 ### Sitemap Generation
 
 The `app/sitemap.ts` generates dynamic sitemaps. Date strings in `YYYYMMDD` format must be converted to `YYYY-MM-DD` for `new Date()` to work correctly.
+
+### Payment System
+
+The `/api/payment` routes handle payment processing for subscription purchases:
+
+**Architecture:**
+- **Payment Creation** (`/api/payment/create`) - Creates payment orders with Alipay or WeChat Pay
+- **Payment Callback** (`/api/payment/callback`) - Handles async payment notifications from payment providers
+- **Subscription Activation** - Automatically activates 1-year subscription upon successful payment
+
+**Key Implementation Notes:**
+- Payment callbacks are verified for authenticity (signature verification)
+- Subscription start dates are set to payment completion time
+- Admin users can manually create subscriptions via `/api/admin/subscription`
 
 ### Common Issues
 
