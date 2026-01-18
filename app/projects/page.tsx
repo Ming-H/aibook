@@ -23,6 +23,18 @@ interface Project {
 export default function ProjectsPage() {
   const projects: Project[] = [
     {
+      id: 'skillset',
+      name: 'Skillset',
+      description: 'AI 技能聚合平台',
+      longDescription: '一个聚合 AI 技能的平台，提供丰富的 AI 功能和工具，帮助用户更高效地使用 AI 技术',
+      image: '🚀',
+      tags: ['Next.js', 'TypeScript', 'AI', 'React'],
+      stars: 0,
+      url: 'https://github.com/devfoxaicn/skillset',
+      github: 'https://github.com/devfoxaicn/skillset',
+      category: 'opensource',
+    },
+    {
       id: 'pixel-factory',
       name: 'Pixel Factory',
       description: '像素艺术创作工厂',
