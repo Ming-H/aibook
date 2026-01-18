@@ -12,17 +12,6 @@ export default async function HomePage() {
           <div className="grid lg:grid-cols-2 gap-8 items-start">
             {/* Left - Personal Introduction */}
             <div className="text-center lg:text-left">
-              {/* Avatar */}
-              <div className="mb-8 inline-block">
-                <div className="relative w-32 h-32 mx-auto lg:mx-0 rounded-full overflow-hidden border-4 border-[var(--border-default)] shadow-lg">
-                  <img
-                    src="/avatar.png"
-                    alt="极客狐DevFox"
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              </div>
-
               {/* Name and Title */}
               <h1 className="mb-4 text-5xl md:text-6xl font-black tracking-tight font-mono">
                 <span className="border-b-4 border-[var(--border-medium)]">
@@ -109,38 +98,38 @@ export default async function HomePage() {
             </div>
 
             {/* Right - Stats and Skills */}
-            <div className="space-y-4">
+            <div className="space-y-3">
               {/* Stats Card */}
-              <div className="card p-5">
-                <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-3 font-mono">核心成果</h3>
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="text-center p-3 bg-[var(--background-tertiary)] border-2 border-[var(--border-subtle)] rounded-md">
-                    <div className="text-3xl font-bold text-[var(--text-primary)] mb-1 font-mono">10+</div>
-                    <div className="text-sm text-[var(--text-secondary)]">开源项目</div>
+              <div className="card p-4">
+                <h3 className="text-base font-semibold text-[var(--text-primary)] mb-2 font-mono">核心成果</h3>
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="text-center p-2 bg-[var(--background-tertiary)] border-2 border-[var(--border-subtle)] rounded-md">
+                    <div className="text-2xl font-bold text-[var(--text-primary)] mb-1 font-mono">10+</div>
+                    <div className="text-xs text-[var(--text-secondary)]">开源项目</div>
                   </div>
-                  <div className="text-center p-3 bg-[var(--background-tertiary)] border-2 border-[var(--border-subtle)] rounded-md">
-                    <div className="text-3xl font-bold text-[var(--text-primary)] mb-1 font-mono">50+</div>
-                    <div className="text-sm text-[var(--text-secondary)]">技术文章</div>
+                  <div className="text-center p-2 bg-[var(--background-tertiary)] border-2 border-[var(--border-subtle)] rounded-md">
+                    <div className="text-2xl font-bold text-[var(--text-primary)] mb-1 font-mono">50+</div>
+                    <div className="text-xs text-[var(--text-secondary)]">技术文章</div>
                   </div>
-                  <div className="text-center p-3 bg-[var(--background-tertiary)] border-2 border-[var(--border-subtle)] rounded-md">
-                    <div className="text-3xl font-bold text-[var(--text-primary)] mb-1 font-mono">2</div>
-                    <div className="text-sm text-[var(--text-secondary)]">AI 产品</div>
+                  <div className="text-center p-2 bg-[var(--background-tertiary)] border-2 border-[var(--border-subtle)] rounded-md">
+                    <div className="text-2xl font-bold text-[var(--text-primary)] mb-1 font-mono">2</div>
+                    <div className="text-xs text-[var(--text-secondary)]">AI 产品</div>
                   </div>
-                  <div className="text-center p-3 bg-[var(--background-tertiary)] border-2 border-[var(--border-subtle)] rounded-md">
-                    <div className="text-3xl font-bold text-[var(--text-primary)] mb-1 font-mono">1.1K</div>
-                    <div className="text-sm text-[var(--text-secondary)]">社交关注</div>
+                  <div className="text-center p-2 bg-[var(--background-tertiary)] border-2 border-[var(--border-subtle)] rounded-md">
+                    <div className="text-2xl font-bold text-[var(--text-primary)] mb-1 font-mono">1.1K</div>
+                    <div className="text-xs text-[var(--text-secondary)]">社交关注</div>
                   </div>
                 </div>
               </div>
 
               {/* Tech Stack Card */}
-              <div className="card p-5">
-                <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-3 font-mono">技术栈</h3>
+              <div className="card p-4">
+                <h3 className="text-base font-semibold text-[var(--text-primary)] mb-2 font-mono">技术栈</h3>
                 <div className="flex flex-wrap gap-2">
                   {['Python', 'TypeScript', 'Next.js', 'React', 'LLM', 'AI/ML', 'PostgreSQL', 'Vercel'].map((tech) => (
                     <span
                       key={tech}
-                      className="tag font-mono"
+                      className="tag font-mono text-sm"
                     >
                       {tech}
                     </span>
@@ -153,7 +142,7 @@ export default async function HomePage() {
       </section>
 
       {/* Featured Works */}
-      <section className="relative px-6 py-16 bg-[var(--background-secondary)]">
+      <section className="relative px-6 py-12 bg-[var(--background-secondary)]">
         <div className="mx-auto max-w-7xl">
           <div className="flex items-center justify-between mb-12">
             <div>
@@ -242,7 +231,7 @@ export default async function HomePage() {
       </section>
 
       {/* Latest Articles */}
-      <section className="relative px-6 py-16">
+      <section className="relative px-6 py-12">
         <div className="mx-auto max-w-7xl">
           <div className="flex items-center justify-between mb-12">
             <div>
@@ -304,9 +293,9 @@ export default async function HomePage() {
       </section>
 
       {/* CTA Section */}
-      <section className="relative px-6 py-16 bg-[var(--background-secondary)]">
+      <section className="relative px-6 py-12 bg-[var(--background-secondary)]">
         <div className="mx-auto max-w-4xl text-center">
-          <div className="card p-10">
+          <div className="card p-8">
             <h2 className="text-3xl md:text-4xl font-bold text-[var(--text-primary)] mb-4 font-mono">
               对我的项目感兴趣？
             </h2>

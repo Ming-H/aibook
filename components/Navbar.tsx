@@ -45,7 +45,11 @@ export function Navbar() {
         {/* Logo - 边框样式 */}
         <Link href="/" className="flex items-center gap-3 group">
           <div className="relative flex h-12 w-12 items-center justify-center overflow-hidden rounded-md border-2 border-[var(--border-default)] transition-all duration-300 group-hover:border-[var(--border-medium)] group-hover:-translate-y-0.5">
-            <span className="text-2xl">🦊</span>
+            <img
+              src="/avatar.png"
+              alt="极客狐DevFox"
+              className="w-full h-full object-cover"
+            />
           </div>
           <div className="flex flex-col">
             <span className="text-lg font-bold tracking-tight text-[var(--text-primary)] transition-colors font-mono">
