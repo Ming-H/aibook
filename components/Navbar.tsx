@@ -27,7 +27,6 @@ export function Navbar() {
   const navItems = [
     { href: '/', label: '首页', icon: '🏠' },
     { href: '/products', label: '产品', icon: '🚀' },
-    { href: '/prompts', label: '提示词', icon: '✨' },
     { href: '/projects', label: '作品', icon: '💼' },
     { href: '/blog', label: '博客', icon: '📝' },
     { href: '/about', label: '关于', icon: '👤' },
