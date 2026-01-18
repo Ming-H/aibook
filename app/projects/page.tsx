@@ -24,7 +24,7 @@ export default function ProjectsPage() {
   const projects: Project[] = [
     {
       id: 'aibook',
-      name: 'AI Hot Tech',
+      name: '极客狐 DevFox',
       description: 'AI 技术热点展示平台',
       longDescription: '每日呈现最新的 AI 技术话题和深度文章，包含今日热点、LLM系列教程、智能出题、创意工坊等功能模块',
       image: '🤖',

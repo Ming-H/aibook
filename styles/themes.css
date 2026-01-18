@@ -1,359 +1,188 @@
 /**
- * AI Hot Tech - 超现代科技感设计系统
- * Inspired by Linear, Vercel, Framer, Stripe
- * 世界级科技感界面设计
+ * 极客狐 DevFox - 现代简约设计系统
+ * Minimalist Design System inspired by Apple, Stripe, Vercel
+ * 浅色/深色双主题支持
  */
 
+/* ==================== 浅色模式 ==================== */
+
 :root {
-  /* ==================== 赛博霓虹渐变系统 ==================== */
+  /* 主色调 - 专业的靛蓝色系 */
+  --color-primary: #4F46E5;        /* Indigo 600 */
+  --color-primary-light: #6366F1;  /* Indigo 500 */
+  --color-primary-dark: #4338CA;   /* Indigo 700 */
 
-  /* 主品牌渐变 - 电光青紫 */
-  --gradient-brand: linear-gradient(135deg, #06b6d4 0%, #8b5cf6 50%, #ec4899 100%);
-  --gradient-brand-alt: linear-gradient(135deg, #ec4899 0%, #8b5cf6 50%, #06b6d4 100%);
-  --gradient-brand-subtle: linear-gradient(135deg, rgba(6, 182, 212, 0.15) 0%, rgba(139, 92, 246, 0.15) 50%, rgba(236, 72, 153, 0.15) 100%);
+  /* 背景层次 */
+  --background-primary: #FFFFFF;   /* 纯白 */
+  --background-secondary: #F9FAFB; /* Gray 50 */
+  --background-tertiary: #F3F4F6;  /* Gray 100 */
+  --background-elevated: #FFFFFF;  /* 卡片背景 */
+  --background-floating: #FFFFFF;  /* 浮层背景 */
 
-  /* 科技蓝渐变 */
-  --gradient-tech-blue: linear-gradient(135deg, #0ea5e9 0%, #6366f1 100%);
-  --gradient-cyan-purple: linear-gradient(135deg, #06b6d4 0%, #8b5cf6 100%);
+  /* 文字层次 */
+  --text-primary: #111827;         /* Gray 900 */
+  --text-secondary: #4B5563;       /* Gray 600 */
+  --text-tertiary: #9CA3AF;        /* Gray 400 */
+  --text-muted: #D1D5DB;           /* Gray 300 */
+  --text-disabled: #E5E7EB;        /* Gray 200 */
 
-  /* 霓虹渐变 */
-  --gradient-neon-cyan: linear-gradient(135deg, #06b6d4 0%, #22d3ee 50%, #67e8f9 100%);
-  --gradient-neon-purple: linear-gradient(135deg, #a855f7 0%, #c084fc 50%, #e879f9 100%);
-  --gradient-neon-pink: linear-gradient(135deg, #ec4899 0%, #f472b6 50%, #fb7185 100%);
-  --gradient-neon-green: linear-gradient(135deg, #10b981 0%, #34d399 50%, #6ee7b7 100%);
+  /* 边框 */
+  --border-subtle: #E5E7EB;        /* Gray 200 */
+  --border-default: #D1D5DB;       /* Gray 300 */
+  --border-medium: #9CA3AF;        /* Gray 400 */
+  --border-strong: #6B7280;        /* Gray 500 */
 
-  /* 赛博朋克 */
-  --gradient-cyber: linear-gradient(135deg, #00ffff 0%, #ff00ff 50%, #00ffff 100%);
-  --gradient-cyber-warm: linear-gradient(135deg, #ff6b6b 0%, #feca57 50%, #48dbfb 100%);
+  /* 阴影 - 细腻的多层阴影 */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07), 0 2px 4px rgba(0, 0, 0, 0.05);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.08), 0 4px 6px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.08), 0 10px 10px rgba(0, 0, 0, 0.04);
+  --shadow-2xl: 0 25px 50px rgba(0, 0, 0, 0.1);
 
-  /* 极光渐变 */
-  --gradient-aurora: linear-gradient(135deg, #06b6d4 0%, #8b5cf6 25%, #ec4899 50%, #f97316 75%, #eab308 100%);
-  --gradient-aurora-cool: linear-gradient(135deg, #0ea5e9 0%, #6366f1 33%, #8b5cf6 66%, #ec4899 100%);
-
-  /* 文字渐变 */
-  --gradient-text-brand: linear-gradient(135deg, #06b6d4 0%, #8b5cf6 100%);
-  --gradient-text-hot: linear-gradient(135deg, #f97316 0%, #ec4899 50%, #8b5cf6 100%);
-  --gradient-text-cool: linear-gradient(135deg, #06b6d4 0%, #3b82f6 50%, #6366f1 100%);
-
-  /* ==================== 深邃背景系统 ==================== */
-
-  /* 主背景层 - 更深邃的黑 */
-  --background-primary: #000000;
-  --background-secondary: #030305;
-  --background-tertiary: #0a0a0f;
-  --background-elevated: #12121a;
-  --background-floating: #1a1a24;
-
-  /* 科技网格 */
-  --background-grid: rgba(6, 182, 212, 0.03);
-  --background-grid-strong: rgba(6, 182, 212, 0.06);
-
-  /* 粒子效果 */
-  --background-particles: rgba(139, 92, 246, 0.04);
-
-  /* ==================== 精细边框系统 ==================== */
-
-  /* 透明度层级 */
-  --border-subtle: rgba(255, 255, 255, 0.03);
-  --border-default: rgba(255, 255, 255, 0.06);
-  --border-medium: rgba(255, 255, 255, 0.1);
-  --border-strong: rgba(255, 255, 255, 0.15);
-  --border-heavy: rgba(255, 255, 255, 0.2);
-
-  /* 霓虹边框 */
-  --border-cyan: rgba(6, 182, 212, 0.5);
-  --border-purple: rgba(139, 92, 246, 0.5);
-  --border-pink: rgba(236, 72, 153, 0.5);
-
-  /* 渐变边框 */
-  --border-gradient: linear-gradient(135deg, rgba(6, 182, 212, 0.4), rgba(139, 92, 246, 0.4));
-
-  /* ==================== 高级文字系统 ==================== */
-
-  /* 主文字 */
-  --text-primary: #ffffff;
-  --text-secondary: rgba(255, 255, 255, 0.7);
-  --text-tertiary: rgba(255, 255, 255, 0.5);
-  --text-muted: rgba(255, 255, 255, 0.35);
-  --text-disabled: rgba(255, 255, 255, 0.2);
-
-  /* 霓虹文字 */
-  --text-cyan: #22d3ee;
-  --text-purple: #c084fc;
-  --text-pink: #f472b6;
-  --text-blue: #60a5fa;
-  --text-green: #4ade80;
-
-  /* ==================== 赛博霓虹色彩系统 ==================== */
-
-  /* 电光青 */
-  --neon-cyan: #06b6d4;
-  --neon-cyan-light: #22d3ee;
-  --neon-cyan-glow: 0 0 20px rgba(6, 182, 212, 0.6), 0 0 40px rgba(6, 182, 212, 0.4), 0 0 60px rgba(6, 182, 212, 0.2);
-
-  /* 霓虹紫 */
-  --neon-purple: #8b5cf6;
-  --neon-purple-light: #a78bfa;
-  --neon-purple-glow: 0 0 20px rgba(139, 92, 246, 0.6), 0 0 40px rgba(139, 92, 246, 0.4), 0 0 60px rgba(139, 92, 246, 0.2);
-
-  /* 电光粉 */
-  --neon-pink: #ec4899;
-  --neon-pink-light: #f472b6;
-  --neon-pink-glow: 0 0 20px rgba(236, 72, 153, 0.6), 0 0 40px rgba(236, 72, 153, 0.4);
-
-  /* 科技蓝 */
-  --neon-blue: #3b82f6;
-  --neon-blue-light: #60a5fa;
-  --neon-blue-glow: 0 0 20px rgba(59, 130, 246, 0.6), 0 0 40px rgba(59, 130, 246, 0.4);
-
-  /* 霓虹绿 */
-  --neon-green: #10b981;
-  --neon-green-light: #34d399;
-  --neon-green-glow: 0 0 20px rgba(16, 185, 129, 0.6), 0 0 40px rgba(16, 185, 129, 0.4);
-
-  /* ==================== 功能色系统 ==================== */
-
-  /* 品牌色 - 电光青 */
-  --color-brand: #06b6d4;
-  --color-brand-light: #22d3ee;
-  --color-brand-dark: #0891b2;
-
-  /* 辅助色 */
-  --color-accent-cyan: #06b6d4;
-  --color-accent-purple: #8b5cf6;
-  --color-accent-pink: #ec4899;
-  --color-accent-blue: #3b82f6;
-  --color-accent-green: #10b981;
-  --color-accent-orange: #f97316;
-
-  /* ==================== 字体系统 ==================== */
-
+  /* 字体 */
   --font-display: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --font-heading: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --font-body: 'Inter Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --font-mono: 'JetBrains Mono', 'Fira Code', 'SF Mono', 'Monaco', 'Consolas', monospace;
 
-  /* 字号尺度 */
-  --text-xs: 0.75rem;
-  --text-sm: 0.875rem;
-  --text-base: 1rem;
-  --text-lg: 1.125rem;
-  --text-xl: 1.25rem;
-  --text-2xl: 1.5rem;
-  --text-3xl: 1.875rem;
-  --text-4xl: 2.25rem;
-  --text-5xl: 3rem;
-  --text-6xl: 3.75rem;
-  --text-7xl: 4.5rem;
-  --text-8xl: 6rem;
-
-  /* 字重 */
-  --font-thin: 100;
-  --font-extralight: 200;
-  --font-light: 300;
-  --font-normal: 400;
-  --font-medium: 500;
-  --font-semibold: 600;
-  --font-bold: 700;
-  --font-extrabold: 800;
-  --font-black: 900;
-
-  /* 行高 */
-  --leading-tight: 1.2;
-  --leading-snug: 1.35;
-  --leading-normal: 1.5;
-  --leading-relaxed: 1.65;
-
-  /* ==================== 间距系统 ==================== */
-  --space-1: 0.25rem;
-  --space-2: 0.5rem;
-  --space-3: 0.75rem;
-  --space-4: 1rem;
-  --space-5: 1.25rem;
-  --space-6: 1.5rem;
-  --space-8: 2rem;
-  --space-10: 2.5rem;
-  --space-12: 3rem;
-  --space-16: 4rem;
-  --space-20: 5rem;
-  --space-24: 6rem;
-
-  /* ==================== 圆角系统 ==================== */
-  --radius-sm: 0.375rem;
-  --radius-md: 0.5rem;
-  --radius-lg: 0.75rem;
-  --radius-xl: 1rem;
-  --radius-2xl: 1.25rem;
-  --radius-3xl: 1.5rem;
-  --radius-4xl: 2rem;
-  --radius-full: 9999px;
-
-  /* ==================== 阴影系统 ==================== */
-
-  /* 基础阴影 */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.5);
-  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.3);
-  --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.3);
-  --shadow-2xl: 0 25px 50px rgba(0, 0, 0, 0.4);
-
-  /* 霓虹发光阴影 */
-  --shadow-glow-cyan: 0 0 20px rgba(6, 182, 212, 0.4), 0 0 40px rgba(6, 182, 212, 0.2);
-  --shadow-glow-purple: 0 0 20px rgba(139, 92, 246, 0.4), 0 0 40px rgba(139, 92, 246, 0.2);
-  --shadow-glow-pink: 0 0 20px rgba(236, 72, 153, 0.4), 0 0 40px rgba(236, 72, 153, 0.2);
-
-  /* 内阴影 */
-  --shadow-inner: inset 0 2px 4px rgba(0, 0, 0, 0.5);
-
-  /* ==================== 过渡系统 ==================== */
+  /* 过渡 */
   --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
   --transition-base: 200ms cubic-bezier(0.4, 0, 0.2, 1);
   --transition-normal: 300ms cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-slow: 500ms cubic-bezier(0.4, 0, 0.2, 1);
 
-  /* ==================== Z-index 系统 ==================== */
-  --z-dropdown: 1000;
-  --z-sticky: 1020;
-  --z-fixed: 1030;
-  --z-modal: 1050;
-  --z-tooltip: 1070;
+  /* 圆角 */
+  --radius-sm: 0.375rem;   /* 6px */
+  --radius-md: 0.5rem;     /* 8px */
+  --radius-lg: 0.75rem;    /* 12px */
+  --radius-xl: 1rem;       /* 16px */
+  --radius-2xl: 1.25rem;   /* 20px */
 }
 
-/* ==================== 毛玻璃效果 ==================== */
+/* ==================== 深色模式 ==================== */
 
-.glass {
-  background: rgba(3, 3, 5, 0.7);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid var(--border-subtle);
-}
+.dark {
+  /* 主色调 - 明亮的靛蓝色 */
+  --color-primary: #6366F1;        /* Indigo 500 */
+  --color-primary-light: #818CF8;  /* Indigo 400 */
+  --color-primary-dark: #4F46E5;   /* Indigo 600 */
 
-.glass-card {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.01) 100%);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid var(--border-default);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-}
+  /* 背景层次 */
+  --background-primary: #0F0F11;   /* 深黑 */
+  --background-secondary: #18181B;  /* Zinc 900 */
+  --background-tertiary: #27272A;   /* Zinc 800 */
+  --background-elevated: #1C1C1F;  /* 卡片 */
+  --background-floating: #1C1C1F;  /* 浮层 */
 
-.glass-strong {
-  background: rgba(10, 10, 15, 0.8);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border: 1px solid var(--border-medium);
-}
+  /* 文字层次 */
+  --text-primary: #FAFAFA;         /* Zinc 50 */
+  --text-secondary: #A1A1AA;       /* Zinc 400 */
+  --text-tertiary: #71717A;        /* Zinc 500 */
+  --text-muted: #52525B;           /* Zinc 600 */
+  --text-disabled: #3F3F46;        /* Zinc 700 */
 
-/* ==================== 霓虹发光效果 ==================== */
+  /* 边框 */
+  --border-subtle: #27272A;        /* Zinc 800 */
+  --border-default: #3F3F46;       /* Zinc 700 */
+  --border-medium: #52525B;        /* Zinc 600 */
+  --border-strong: #71717A;        /* Zinc 500 */
 
-.glow-cyan {
-  box-shadow: var(--neon-cyan-glow);
-}
-
-.glow-purple {
-  box-shadow: var(--neon-purple-glow);
-}
-
-.glow-pink {
-  box-shadow: var(--neon-pink-glow);
-}
-
-.glow-brand {
-  box-shadow: 0 0 20px rgba(6, 182, 212, 0.5), 0 0 40px rgba(6, 182, 212, 0.3);
-}
-
-/* ==================== 渐变边框 ==================== */
-
-.gradient-border {
-  position: relative;
-  background: var(--background-secondary);
-  border-radius: var(--radius-xl);
-}
-
-.gradient-border::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  padding: 1px;
-  background: var(--gradient-brand);
-  -webkit-mask: linear-gradient(#fff 0 0) content-box,
-              linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  pointer-events: none;
-}
-
-.gradient-border-animated::before {
-  background: var(--gradient-aurora);
-  background-size: 200% 200%;
-  animation: gradientShift 3s ease infinite;
-}
-
-/* ==================== 网格背景 ==================== */
-
-.bg-grid {
-  background-image:
-    linear-gradient(rgba(6, 182, 212, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(6, 182, 212, 0.03) 1px, transparent 1px);
-  background-size: 60px 60px;
-}
-
-.bg-grid-strong {
-  background-image:
-    linear-gradient(rgba(6, 182, 212, 0.06) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(6, 182, 212, 0.06) 1px, transparent 1px);
-  background-size: 60px 60px;
-}
-
-/* ==================== 动画定义 ==================== */
-
-@keyframes gradientShift {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-}
-
-@keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-20px); }
-}
-
-@keyframes pulse-glow {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.8; }
-}
-
-@keyframes shimmer {
-  0% { background-position: -1000px 0; }
-  100% { background-position: 1000px 0; }
+  /* 阴影 - 深色模式使用更深的阴影 */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.5);
+  --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.6);
+  --shadow-2xl: 0 25px 50px rgba(0, 0, 0, 0.7);
 }
 
 /* ==================== 工具类 ==================== */
 
+/* 卡片样式 */
+.card {
+  background-color: var(--background-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-md);
+  transition: box-shadow var(--transition-base), transform var(--transition-base);
+}
+
+.card:hover {
+  box-shadow: var(--shadow-lg);
+}
+
+.card-interactive {
+  cursor: pointer;
+  transition: box-shadow var(--transition-base), transform var(--transition-base);
+}
+
+.card-interactive:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-xl);
+}
+
+/* 文字渐变效果 */
 .text-gradient {
-  background: var(--gradient-text-brand);
+  background: linear-gradient(135deg, var(--color-primary) 0%, #8B5CF6 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
-.border-gradient {
-  border: 1px solid;
-  border-image: var(--gradient-brand) 1;
+/* 按钮样式 */
+.btn-primary {
+  background-color: var(--color-primary);
+  color: white;
+  border-radius: var(--radius-lg);
+  font-weight: 600;
+  transition: background-color var(--transition-base), box-shadow var(--transition-base);
 }
 
-/* 扫描线效果 */
-.scanline::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent);
-  animation: scanline 3s linear infinite;
+.btn-primary:hover {
+  background-color: var(--color-primary-dark);
+  box-shadow: var(--shadow-md);
 }
 
-@keyframes scanline {
-  0% { top: 0; }
-  100% { top: 100%; }
+.btn-secondary {
+  background-color: var(--background-tertiary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  font-weight: 600;
+  transition: background-color var(--transition-base), border-color var(--transition-base);
+}
+
+.btn-secondary:hover {
+  background-color: var(--border-subtle);
+  border-color: var(--border-medium);
+}
+
+/* 输入框样式 */
+.input {
+  background-color: var(--background-primary);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  transition: border-color var(--transition-base), box-shadow var(--transition-base);
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.input::placeholder {
+  color: var(--text-muted);
+}
+
+/* 主题平滑过渡 */
+* {
+  transition-property: background-color, border-color, color, fill, stroke;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 200ms;
+}
+
+/* 禁用过渡的元素 */
+.no-transition,
+.no-transition * {
+  transition: none !important;
 }
