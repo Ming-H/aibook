@@ -54,23 +54,6 @@ export default function ProductsPage() {
       href: '/creative-workshop',
       status: 'live',
     },
-    {
-      id: 'content-forge-ai',
-      name: 'Content Forge AI',
-      description: 'AI 内容生成工具',
-      longDescription: '专注于 demos 和实用工具开发的 AI 内容生成工具，提供高效的 AI 内容生成解决方案。支持多种内容类型和自定义模型。',
-      icon: '🔧',
-      gradient: '',
-      features: [
-        '智能内容生成',
-        '多种内容类型',
-        '自定义模型支持',
-        '高效批量处理',
-        '导出多种格式',
-      ],
-      href: 'https://github.com/devfoxaicn/content-forge-ai',
-      status: 'live',
-    },
   ];
 
   const getStatusBadge = (status: Product['status']) => {
