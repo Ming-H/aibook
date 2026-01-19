@@ -1,11 +1,11 @@
 /**
  * 图片工具箱 - 图片转换工具
- * 支持尺寸调整、比例裁剪、格式转换、质量控制
+ * 支持手动裁剪选择、尺寸调整、格式转换、质量控制
  */
 
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import { Select } from '@/components/ui/Select';
 
 interface ConversionSettings {
@@ -15,6 +15,13 @@ interface ConversionSettings {
   aspectRatio: string;
   outputFormat: 'png' | 'jpeg' | 'webp';
   quality: number;
+}
+
+interface CropArea {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
 }
 
 interface ProcessedImage {
@@ -30,6 +37,7 @@ interface ProcessedImage {
 }
 
 const ASPECT_RATIO_OPTIONS = [
+  { value: 'free', label: '✋ 自由选择', description: '手动选择裁剪区域' },
   { value: 'original', label: '📐 原始比例', description: '保持原始图片比例' },
   { value: '1:1', label: '⬜ 正方形 (1:1)', description: '适合社交媒体头像' },
   { value: '16:9', label: '🖥️ 宽屏 (16:9)', description: '适合视频缩略图' },
@@ -51,14 +59,212 @@ export default function ImageToolsPage() {
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // 图片预览和裁剪相关状态
+  const [imagePreviews, setImagePreviews] = useState<Array<{
+    file: File;
+    url: string;
+    width: number;
+    height: number;
+    cropArea: CropArea;
+  }>>([]);
+
+  const [currentPreviewIndex, setCurrentPreviewIndex] = useState<number>(0);
+
   const [settings, setSettings] = useState<ConversionSettings>({
     width: 1920,
     height: 1080,
     maintainAspectRatio: true,
-    aspectRatio: 'original',
+    aspectRatio: 'free',
     outputFormat: 'png',
     quality: 90,
   });
+
+  // 裁剪相关状态
+  const [isDragging, setIsDragging] = useState(false);
+  const [isResizing, setIsResizing] = useState(false);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const [resizeHandle, setResizeHandle] = useState<'tl' | 'tr' | 'bl' | 'br' | null>(null);
+  const cropContainerRef = useRef<HTMLDivElement>(null);
+
+  // 加载图片并获取尺寸
+  const loadImage = useCallback((file: File): Promise<{ url: string; width: number; height: number }> => {
+    return new Promise((resolve, reject) => {
+      const url = URL.createObjectURL(file);
+      const img = new Image();
+      img.onload = () => {
+        resolve({ url, width: img.width, height: img.height });
+      };
+      img.onerror = reject;
+      img.src = url;
+    });
+  }, []);
+
+  // 当文件被选择时，创建预览
+  useEffect(() => {
+    const loadPreviews = async () => {
+      const previews = await Promise.all(
+        selectedFiles.map(async (file) => {
+          const { url, width, height } = await loadImage(file);
+          // 默认裁剪区域为整个图片
+          const initialCrop: CropArea = { x: 0, y: 0, width, height };
+          return { file, url, width, height, cropArea: initialCrop };
+        })
+      );
+      setImagePreviews(previews);
+      if (previews.length > 0) {
+        setCurrentPreviewIndex(0);
+      }
+    };
+
+    if (selectedFiles.length > 0) {
+      loadPreviews();
+    } else {
+      setImagePreviews([]);
+    }
+  }, [selectedFiles, loadImage]);
+
+  // 当比例改变时，更新裁剪区域
+  useEffect(() => {
+    if (imagePreviews.length === 0) return;
+
+    const preview = imagePreviews[currentPreviewIndex];
+    if (!preview) return;
+
+    const { width, height } = preview;
+    let newCrop: CropArea;
+
+    if (settings.aspectRatio === 'free') {
+      // 自由模式，保持当前裁剪
+      newCrop = preview.cropArea;
+    } else if (settings.aspectRatio === 'original') {
+      newCrop = { x: 0, y: 0, width, height };
+    } else {
+      // 计算指定比例的裁剪区域
+      const [ratioW, ratioH] = settings.aspectRatio.split(':').map(Number);
+      const targetRatio = ratioW / ratioH;
+      const originalRatio = width / height;
+
+      let cropWidth: number;
+      let cropHeight: number;
+
+      if (originalRatio > targetRatio) {
+        cropHeight = height;
+        cropWidth = Math.round(height * targetRatio);
+      } else {
+        cropWidth = width;
+        cropHeight = Math.round(width / targetRatio);
+      }
+
+      const x = Math.round((width - cropWidth) / 2);
+      const y = Math.round((height - cropHeight) / 2);
+
+      newCrop = { x, y, width: cropWidth, height: cropHeight };
+    }
+
+    setImagePreviews(prev => prev.map((p, i) =>
+      i === currentPreviewIndex ? { ...p, cropArea: newCrop } : p
+    ));
+  }, [settings.aspectRatio, currentPreviewIndex, imagePreviews]);
+
+  // 计算裁剪区域在容器中的显示位置
+  const getCropStyle = (preview: typeof imagePreviews[0]) => {
+    if (!preview || !cropContainerRef.current) return {};
+
+    const containerRect = cropContainerRef.current.getBoundingClientRect();
+    const scaleX = containerRect.width / preview.width;
+    const scaleY = containerRect.height / preview.height;
+
+    return {
+      left: `${preview.cropArea.x * scaleX}px`,
+      top: `${preview.cropArea.y * scaleY}px`,
+      width: `${preview.cropArea.width * scaleX}px`,
+      height: `${preview.cropArea.height * scaleY}px`,
+    };
+  };
+
+  // 处理鼠标事件 - 裁剪框拖拽
+  const handleMouseDown = (e: React.MouseEvent, handle?: 'tl' | 'tr' | 'bl' | 'br') => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (handle) {
+      setIsResizing(true);
+      setResizeHandle(handle);
+    } else {
+      setIsDragging(true);
+    }
+
+    setDragStart({ x: e.clientX, y: e.clientY });
+  };
+
+  const handleMouseMove = useCallback((e: MouseEvent) => {
+    if (!imagePreviews[currentPreviewIndex]) return;
+
+    const preview = imagePreviews[currentPreviewIndex];
+    const containerRect = cropContainerRef.current?.getBoundingClientRect();
+    if (!containerRect) return;
+
+    const scaleX = preview.width / containerRect.width;
+    const scaleY = preview.height / containerRect.height;
+    const deltaX = (e.clientX - dragStart.x) * scaleX;
+    const deltaY = (e.clientY - dragStart.y) * scaleY;
+
+    let newCrop = { ...preview.cropArea };
+
+    if (isResizing && resizeHandle) {
+      // 调整大小
+      const minSize = 50;
+
+      if (resizeHandle === 'br') {
+        newCrop.width = Math.max(minSize, preview.cropArea.width + deltaX);
+        newCrop.height = Math.max(minSize, preview.cropArea.height + deltaY);
+      } else if (resizeHandle === 'bl') {
+        newCrop.x = Math.min(preview.cropArea.x + preview.cropArea.width - minSize, preview.cropArea.x + deltaX);
+        newCrop.width = Math.max(minSize, preview.cropArea.width - deltaX);
+        newCrop.height = Math.max(minSize, preview.cropArea.height + deltaY);
+      } else if (resizeHandle === 'tr') {
+        newCrop.y = Math.min(preview.cropArea.y + preview.cropArea.height - minSize, preview.cropArea.y + deltaY);
+        newCrop.width = Math.max(minSize, preview.cropArea.width + deltaX);
+        newCrop.height = Math.max(minSize, preview.cropArea.height - deltaY);
+      } else if (resizeHandle === 'tl') {
+        newCrop.x = Math.min(preview.cropArea.x + preview.cropArea.width - minSize, preview.cropArea.x + deltaX);
+        newCrop.y = Math.min(preview.cropArea.y + preview.cropArea.height - minSize, preview.cropArea.y + deltaY);
+        newCrop.width = Math.max(minSize, preview.cropArea.width - deltaX);
+        newCrop.height = Math.max(minSize, preview.cropArea.height - deltaY);
+      }
+
+      // 边界检查
+      newCrop.x = Math.max(0, Math.min(newCrop.x, preview.width - newCrop.width));
+      newCrop.y = Math.max(0, Math.min(newCrop.y, preview.height - newCrop.height));
+    } else if (isDragging) {
+      // 移动位置
+      newCrop.x = Math.max(0, Math.min(preview.cropArea.x + deltaX, preview.width - preview.cropArea.width));
+      newCrop.y = Math.max(0, Math.min(preview.cropArea.y + deltaY, preview.height - preview.cropArea.height));
+    }
+
+    setImagePreviews(prev => prev.map((p, i) =>
+      i === currentPreviewIndex ? { ...p, cropArea: newCrop } : p
+    ));
+
+    setDragStart({ x: e.clientX, y: e.clientY });
+  }, [imagePreviews, currentPreviewIndex, isDragging, isResizing, resizeHandle, dragStart]);
+
+  const handleMouseUp = useCallback(() => {
+    setIsDragging(false);
+    setIsResizing(false);
+    setResizeHandle(null);
+  }, []);
+
+  useEffect(() => {
+    if (isDragging || isResizing) {
+      window.addEventListener('mousemove', handleMouseMove);
+      window.addEventListener('mouseup', handleMouseUp);
+      return () => {
+        window.removeEventListener('mousemove', handleMouseMove);
+        window.removeEventListener('mouseup', handleMouseUp);
+      };
+    }
+  }, [isDragging, isResizing, handleMouseMove, handleMouseUp]);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
@@ -69,6 +275,8 @@ export default function ImageToolsPage() {
       setError(null);
     }
     setSelectedFiles(prev => [...prev, ...imageFiles]);
+    // 重置预览
+    setImagePreviews([]);
   };
 
   const handleDrop = (e: React.DragEvent) => {
@@ -76,6 +284,7 @@ export default function ImageToolsPage() {
     const files = Array.from(e.dataTransfer.files);
     const imageFiles = files.filter(file => file.type.startsWith('image/'));
     setSelectedFiles(prev => [...prev, ...imageFiles]);
+    setImagePreviews([]);
   };
 
   const handleDragOver = (e: React.DragEvent) => {
@@ -84,6 +293,10 @@ export default function ImageToolsPage() {
 
   const removeFile = (index: number) => {
     setSelectedFiles(prev => prev.filter((_, i) => i !== index));
+    setImagePreviews(prev => prev.filter((_, i) => i !== index));
+    if (currentPreviewIndex >= imagePreviews.length - 1) {
+      setCurrentPreviewIndex(Math.max(0, imagePreviews.length - 2));
+    }
   };
 
   const formatFileSize = (bytes: number): string => {
@@ -92,46 +305,31 @@ export default function ImageToolsPage() {
     return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
   };
 
-  const processImage = async (file: File, index: number): Promise<ProcessedImage | null> => {
+  const processImage = async (file: File, cropArea: CropArea, index: number): Promise<ProcessedImage | null> => {
     try {
       // 纯前端处理 - 使用 Canvas API
       const img = new Image();
       const originalUrl = URL.createObjectURL(file);
 
-      // 加载原始图片
       await new Promise((resolve, reject) => {
         img.onload = resolve;
         img.onerror = reject;
         img.src = originalUrl;
       });
 
-      const originalWidth = img.width;
-      const originalHeight = img.height;
-
       // 计算目标尺寸
       let targetWidth = settings.width;
       let targetHeight = settings.height;
 
+      const cropRatio = cropArea.width / cropArea.height;
+
       if (settings.maintainAspectRatio) {
-        if (settings.aspectRatio !== 'original') {
-          const [ratioW, ratioH] = settings.aspectRatio.split(':').map(Number);
-          const targetRatio = ratioW / ratioH;
-          const originalRatio = originalWidth / originalHeight;
+        const targetRatio = targetWidth / targetHeight;
 
-          if (originalRatio > targetRatio) {
-            targetHeight = Math.round(targetWidth / targetRatio);
-          } else {
-            targetWidth = Math.round(targetHeight * targetRatio);
-          }
+        if (targetRatio > cropRatio) {
+          targetWidth = Math.round(targetHeight * cropRatio);
         } else {
-          const originalRatio = originalWidth / originalHeight;
-          const targetRatio = targetWidth / targetHeight;
-
-          if (targetRatio > originalRatio) {
-            targetWidth = Math.round(targetHeight * originalRatio);
-          } else {
-            targetHeight = Math.round(targetWidth / originalRatio);
-          }
+          targetHeight = Math.round(targetWidth / cropRatio);
         }
       }
 
@@ -145,25 +343,12 @@ export default function ImageToolsPage() {
         throw new Error('无法创建 Canvas 上下文');
       }
 
-      // 计算裁剪区域（如果需要）
-      let sx = 0, sy = 0, sWidth = originalWidth, sHeight = originalHeight;
-
-      if (settings.aspectRatio !== 'original') {
-        const [ratioW, ratioH] = settings.aspectRatio.split(':').map(Number);
-        const targetRatio = ratioW / ratioH;
-        const originalRatio = originalWidth / originalHeight;
-
-        if (originalRatio > targetRatio) {
-          sWidth = Math.round(originalHeight * targetRatio);
-          sx = Math.round((originalWidth - sWidth) / 2);
-        } else {
-          sHeight = Math.round(originalWidth / targetRatio);
-          sy = Math.round((originalHeight - sHeight) / 2);
-        }
-      }
-
-      // 绘制图片到 Canvas
-      ctx.drawImage(img, sx, sy, sWidth, sHeight, 0, 0, targetWidth, targetHeight);
+      // 使用用户选择的裁剪区域
+      ctx.drawImage(
+        img,
+        cropArea.x, cropArea.y, cropArea.width, cropArea.height,
+        0, 0, targetWidth, targetHeight
+      );
 
       // 转换为目标格式
       const mimeType = settings.outputFormat === 'png' ? 'image/png' :
@@ -172,7 +357,6 @@ export default function ImageToolsPage() {
       const quality = settings.outputFormat === 'png' ? undefined : settings.quality / 100;
       const processedUrl = canvas.toDataURL(mimeType, quality);
 
-      // 计算文件大小
       const base64Data = processedUrl.split(',')[1];
       const fileSize = Math.round(base64Data.length * 0.75);
 
@@ -181,7 +365,7 @@ export default function ImageToolsPage() {
         originalUrl,
         processedUrl,
         originalName: file.name,
-        originalSize: { width: originalWidth, height: originalHeight },
+        originalSize: { width: img.width, height: img.height },
         processedSize: { width: targetWidth, height: targetHeight },
         originalFormat: file.type.split('/')[1] || 'unknown',
         outputFormat: settings.outputFormat,
@@ -206,7 +390,9 @@ export default function ImageToolsPage() {
 
     try {
       const results = await Promise.all(
-        selectedFiles.map((file, index) => processImage(file, index))
+        imagePreviews.map((preview, index) =>
+          processImage(preview.file, preview.cropArea, index)
+        )
       );
 
       const successfulResults = results.filter((r): r is ProcessedImage => r !== null);
@@ -221,6 +407,7 @@ export default function ImageToolsPage() {
 
       setProcessedImages(prev => [...successfulResults, ...prev]);
       setSelectedFiles([]);
+      setImagePreviews([]);
     } catch (err) {
       setError(err instanceof Error ? err.message : '处理失败，请重试');
     } finally {
@@ -245,6 +432,8 @@ export default function ImageToolsPage() {
     });
   };
 
+  const currentPreview = imagePreviews[currentPreviewIndex];
+
   return (
     <div className="min-h-screen bg-[var(--background-primary)] bg-noise">
       {/* 动态背景 */}
@@ -268,10 +457,9 @@ export default function ImageToolsPage() {
 
       {/* Hero Section */}
       <section className="relative overflow-hidden">
-        <div className="relative max-w-7xl mx-auto px-6 py-32 sm:px-8 lg:px-12">
+        <div className="relative max-w-7xl mx-auto px-6 py-20 sm:px-8 lg:px-12">
           <div className="text-center">
-            {/* 顶部徽章 */}
-            <div className="mb-10 flex justify-center animate-fade-in-down">
+            <div className="mb-8 flex justify-center">
               <div className="inline-flex items-center gap-3 rounded-full glass-card px-6 py-3 pulse-ring">
                 <div className="relative flex h-2 w-2">
                   <div className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[var(--neon-cyan)] opacity-75" />
@@ -288,215 +476,292 @@ export default function ImageToolsPage() {
               </div>
             </div>
 
-            {/* 标题 */}
-            <h1 className="mb-8 text-6xl sm:text-7xl lg:text-8xl font-black animate-fade-in-up" style={{ fontFamily: 'var(--font-display)' }}>
+            <h1 className="mb-6 text-5xl sm:text-6xl lg:text-7xl font-black animate-fade-in-up" style={{ fontFamily: 'var(--font-display)' }}>
               <span className="block animate-gradient bg-gradient-to-r from-[var(--color-brand)] via-[var(--color-purple)] to-[var(--color-pink)] bg-clip-text text-transparent"
                 style={{ backgroundSize: '200% 200%' }}>
                 图片工具箱
               </span>
-              <span className="block mt-4 text-[var(--text-primary)]" style={{ fontSize: '0.5em' }}>
-                专业图片转换与处理工具
-              </span>
             </h1>
 
-            <p className="text-xl sm:text-2xl text-[var(--text-secondary)] mb-16 max-w-3xl mx-auto leading-relaxed">
-              调整尺寸、裁剪比例、转换格式，一站式图片处理方案
+            <p className="text-xl sm:text-2xl text-[var(--text-secondary)] mb-8 max-w-3xl mx-auto leading-relaxed">
+              手动选择裁剪区域，精确控制输出效果
             </p>
           </div>
         </div>
       </section>
 
       {/* 工具界面 */}
-      <section className="max-w-6xl mx-auto px-6 pb-24 sm:px-8 lg:px-12">
-        <div className="glass-card border border-[var(--border-default)] rounded-3xl p-8 md:p-12">
-          <h2 className="text-3xl font-bold mb-8 text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-display)' }}>
-            开始处理
-          </h2>
+      <section className="max-w-7xl mx-auto px-6 pb-24 sm:px-8 lg:px-12">
+        <div className="grid lg:grid-cols-3 gap-8">
+          {/* 左侧 - 设置面板 */}
+          <div className="lg:col-span-1 space-y-6">
+            {/* 设置卡片 */}
+            <div className="glass-card border border-[var(--border-default)] rounded-3xl p-6">
+              <h3 className="text-xl font-bold mb-6 text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-display)' }}>
+                输出设置
+              </h3>
 
-          {/* 设置区域 */}
-          <div className="space-y-6 mb-8">
-            {/* 输出格式选择 */}
-            <Select
-              label="输出格式"
-              options={FORMAT_OPTIONS}
-              value={settings.outputFormat}
-              onChange={(value) => setSettings(prev => ({ ...prev, outputFormat: value as any }))}
-              placeholder="选择输出格式"
-            />
-
-            {/* 比例裁剪 */}
-            <Select
-              label="比例裁剪"
-              options={ASPECT_RATIO_OPTIONS}
-              value={settings.aspectRatio}
-              onChange={(value) => setSettings(prev => ({ ...prev, aspectRatio: value }))}
-              placeholder="选择裁剪比例"
-            />
-
-            {/* 尺寸设置 */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">
-                  宽度 (像素)
-                </label>
-                <input
-                  type="number"
-                  value={settings.width}
-                  onChange={(e) => setSettings(prev => ({ ...prev, width: parseInt(e.target.value) || 0 }))}
-                  className="w-full px-4 py-3 rounded-xl bg-[var(--background-secondary)] border border-[var(--border-default)] text-[var(--text-primary)] focus:border-[var(--border-focus)] focus:ring-2 focus:ring-[var(--color-brand)]/20 outline-none transition-all"
-                  min="1"
-                  max="4096"
+              <div className="space-y-5">
+                {/* 输出格式 */}
+                <Select
+                  label="输出格式"
+                  options={FORMAT_OPTIONS}
+                  value={settings.outputFormat}
+                  onChange={(value) => setSettings(prev => ({ ...prev, outputFormat: value as any }))}
+                  placeholder="选择输出格式"
                 />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">
-                  高度 (像素)
-                </label>
-                <input
-                  type="number"
-                  value={settings.height}
-                  onChange={(e) => setSettings(prev => ({ ...prev, height: parseInt(e.target.value) || 0 }))}
-                  className="w-full px-4 py-3 rounded-xl bg-[var(--background-secondary)] border border-[var(--border-default)] text-[var(--text-primary)] focus:border-[var(--border-focus)] focus:ring-2 focus:ring-[var(--color-brand)]/20 outline-none transition-all"
-                  min="1"
-                  max="4096"
+
+                {/* 裁剪比例 */}
+                <Select
+                  label="裁剪模式"
+                  options={ASPECT_RATIO_OPTIONS}
+                  value={settings.aspectRatio}
+                  onChange={(value) => setSettings(prev => ({ ...prev, aspectRatio: value }))}
+                  placeholder="选择裁剪模式"
                 />
+
+                {/* 输出尺寸 */}
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">
+                      宽度
+                    </label>
+                    <input
+                      type="number"
+                      value={settings.width}
+                      onChange={(e) => setSettings(prev => ({ ...prev, width: parseInt(e.target.value) || 0 }))}
+                      className="w-full px-3 py-2 rounded-lg bg-[var(--background-secondary)] border border-[var(--border-default)] text-[var(--text-primary)] focus:border-[var(--border-focus)] focus:ring-2 focus:ring-[var(--color-brand)]/20 outline-none transition-all text-sm"
+                      min="1"
+                      max="4096"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">
+                      高度
+                    </label>
+                    <input
+                      type="number"
+                      value={settings.height}
+                      onChange={(e) => setSettings(prev => ({ ...prev, height: parseInt(e.target.value) || 0 }))}
+                      className="w-full px-3 py-2 rounded-lg bg-[var(--background-secondary)] border border-[var(--border-default)] text-[var(--text-primary)] focus:border-[var(--border-focus)] focus:ring-2 focus:ring-[var(--color-brand)]/20 outline-none transition-all text-sm"
+                      min="1"
+                      max="4096"
+                    />
+                  </div>
+                </div>
+
+                {/* 保持宽高比 */}
+                <div className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    id="maintainAspectRatio"
+                    checked={settings.maintainAspectRatio}
+                    onChange={(e) => setSettings(prev => ({ ...prev, maintainAspectRatio: e.target.checked }))}
+                    className="w-4 h-4 rounded border-[var(--border-default)] bg-[var(--background-secondary)] text-[var(--color-brand)] focus:ring-2 focus:ring-[var(--color-brand)]/20"
+                  />
+                  <label htmlFor="maintainAspectRatio" className="text-sm text-[var(--text-secondary)]">
+                    保持裁剪区域比例
+                  </label>
+                </div>
+
+                {/* 质量控制 */}
+                {settings.outputFormat !== 'png' && (
+                  <div>
+                    <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">
+                      质量: {settings.quality}%
+                    </label>
+                    <input
+                      type="range"
+                      min="10"
+                      max="100"
+                      value={settings.quality}
+                      onChange={(e) => setSettings(prev => ({ ...prev, quality: parseInt(e.target.value) }))}
+                      className="w-full h-2 bg-[var(--background-secondary)] rounded-lg appearance-none cursor-pointer accent-[var(--color-brand)]"
+                    />
+                  </div>
+                )}
               </div>
             </div>
 
-            {/* 保持宽高比 */}
-            <div className="flex items-center gap-3">
+            {/* 文件上传 */}
+            <div
+              onDrop={handleDrop}
+              onDragOver={handleDragOver}
+              className={`
+                border-2 border-dashed rounded-2xl p-6 text-center transition-all cursor-pointer
+                ${error && selectedFiles.length === 0
+                  ? 'border-[var(--color-red)] bg-[var(--color-red)]/5'
+                  : 'border-[var(--border-default)] hover:border-[var(--border-strong)] bg-[var(--background-secondary)]'
+                }
+              `}
+              onClick={() => fileInputRef.current?.click()}
+            >
               <input
-                type="checkbox"
-                id="maintainAspectRatio"
-                checked={settings.maintainAspectRatio}
-                onChange={(e) => setSettings(prev => ({ ...prev, maintainAspectRatio: e.target.checked }))}
-                className="w-5 h-5 rounded border-[var(--border-default)] bg-[var(--background-secondary)] text-[var(--color-brand)] focus:ring-2 focus:ring-[var(--color-brand)]/20"
+                ref={fileInputRef}
+                type="file"
+                onChange={handleFileSelect}
+                accept="image/*"
+                multiple
+                className="hidden"
               />
-              <label htmlFor="maintainAspectRatio" className="text-sm text-[var(--text-secondary)]">
-                保持宽高比 (根据比例自动调整)
-              </label>
+              <div className="mb-3">
+                <svg className="w-12 h-12 mx-auto text-[var(--text-muted)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <p className="text-sm text-[var(--text-primary)] mb-1">
+                点击或拖拽上传图片
+              </p>
+              <p className="text-xs text-[var(--text-muted)]">
+                支持 PNG、JPEG、WebP 等格式
+              </p>
             </div>
 
-            {/* 质量控制 (仅 JPEG/WebP) */}
-            {settings.outputFormat !== 'png' && (
-              <div>
-                <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">
-                  压缩质量: {settings.quality}%
-                </label>
-                <input
-                  type="range"
-                  min="10"
-                  max="100"
-                  value={settings.quality}
-                  onChange={(e) => setSettings(prev => ({ ...prev, quality: parseInt(e.target.value) }))}
-                  className="w-full h-2 bg-[var(--background-secondary)] rounded-lg appearance-none cursor-pointer accent-[var(--color-brand)]"
-                />
-                <div className="flex justify-between text-xs text-[var(--text-muted)] mt-1">
-                  <span>更小文件</span>
-                  <span>更高质量</span>
+            {/* 已选择的文件 */}
+            {selectedFiles.length > 0 && (
+              <div className="glass-card border border-[var(--border-default)] rounded-3xl p-4">
+                <div className="flex items-center justify-between mb-3">
+                  <h4 className="text-sm font-semibold text-[var(--text-primary)]">
+                    已选择 {selectedFiles.length} 张
+                  </h4>
+                  <button
+                    onClick={() => {
+                      setSelectedFiles([]);
+                      setImagePreviews([]);
+                    }}
+                    className="text-xs text-[var(--color-red)] hover:underline"
+                  >
+                    清空
+                  </button>
+                </div>
+                <div className="space-y-2 max-h-40 overflow-y-auto">
+                  {selectedFiles.map((file, index) => (
+                    <div
+                      key={index}
+                      onClick={() => setCurrentPreviewIndex(index)}
+                      className={`
+                        flex items-center gap-2 p-2 rounded-lg cursor-pointer transition-all
+                        ${currentPreviewIndex === index
+                          ? 'bg-[var(--color-brand)]/20 border border-[var(--color-brand)]'
+                          : 'bg-[var(--background-secondary)] border border-transparent hover:border-[var(--border-subtle]'
+                        }
+                      `}
+                    >
+                      <svg className="w-5 h-5 text-[var(--text-muted)] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                      <span className="text-xs text-[var(--text-primary)] truncate flex-1">{file.name}</span>
+                    </div>
+                  ))}
                 </div>
               </div>
             )}
           </div>
 
-          {/* 文件上传区域 */}
-          <div
-            onDrop={handleDrop}
-            onDragOver={handleDragOver}
-            className={`
-              border-2 border-dashed rounded-2xl p-8 text-center transition-all
-              ${error && selectedFiles.length === 0
-                ? 'border-[var(--color-red)] bg-[var(--color-red)]/5'
-                : 'border-[var(--border-default)] hover:border-[var(--border-strong)] bg-[var(--background-secondary)]'
-              }
-            `}
-          >
-            <input
-              ref={fileInputRef}
-              type="file"
-              onChange={handleFileSelect}
-              accept="image/*"
-              multiple
-              className="hidden"
-            />
-            <div className="mb-4">
-              <svg className="w-16 h-16 mx-auto text-[var(--text-muted)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
-            </div>
-            <p className="text-[var(--text-primary)] mb-2">
-              拖拽图片到这里，或
-              <button
-                onClick={() => fileInputRef.current?.click()}
-                className="text-[var(--color-brand)] hover:underline ml-1"
-              >
-                点击选择
-              </button>
-            </p>
-            <p className="text-sm text-[var(--text-muted)]">
-              支持 PNG、JPEG、WebP 等常见格式，可多选
-            </p>
-          </div>
+          {/* 右侧 - 裁剪预览 */}
+          <div className="lg:col-span-2">
+            {currentPreview ? (
+              <div className="glass-card border border-[var(--border-default)] rounded-3xl p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-bold text-[var(--text-primary)]">
+                    调整裁剪区域
+                  </h3>
+                  {settings.aspectRatio === 'free' && (
+                    <span className="text-xs text-[var(--text-muted)]">
+                      拖拽移动 · 拖拽边角调整大小
+                    </span>
+                  )}
+                </div>
 
-          {/* 已选择的文件列表 */}
-          {selectedFiles.length > 0 && (
-            <div className="mt-6 space-y-3">
-              <div className="flex items-center justify-between">
-                <h3 className="text-sm font-semibold text-[var(--text-primary)] font-mono">
-                  已选择 {selectedFiles.length} 张图片
-                </h3>
-                <button
-                  onClick={() => setSelectedFiles([])}
-                  className="text-sm text-[var(--color-red)] hover:underline"
+                {/* 图片预览和裁剪框 */}
+                <div
+                  ref={cropContainerRef}
+                  className="relative bg-[var(--background-secondary)] rounded-xl overflow-hidden"
+                  style={{
+                    aspectRatio: `${currentPreview.width}/${currentPreview.height}`,
+                    maxHeight: '500px'
+                  }}
                 >
-                  清空全部
-                </button>
-              </div>
-              <div className="space-y-2 max-h-48 overflow-y-auto">
-                {selectedFiles.map((file, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center justify-between p-3 rounded-xl bg-[var(--background-secondary)] border border-[var(--border-subtle)]"
-                  >
-                    <div className="flex items-center gap-3 flex-1 min-w-0">
-                      <svg className="w-8 h-8 text-[var(--text-muted)] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                      </svg>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm text-[var(--text-primary)] truncate">{file.name}</p>
-                        <p className="text-xs text-[var(--text-muted)]">{formatFileSize(file.size)}</p>
-                      </div>
-                    </div>
-                    <button
-                      onClick={() => removeFile(index)}
-                      className="p-2 text-[var(--text-muted)] hover:text-[var(--color-red)] transition-colors"
-                    >
-                      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                      </svg>
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
+                  <img
+                    src={currentPreview.url}
+                    alt="Preview"
+                    className="w-full h-full object-contain"
+                    draggable={false}
+                  />
 
-          {/* 错误提示 */}
-          {error && (
-            <div className="mt-6 flex items-center gap-2 px-4 py-3 rounded-xl bg-[var(--color-red)]/10 border border-[var(--color-red)]/20 text-[var(--color-red)]">
-              <svg className="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-              </svg>
-              <span className="text-sm">{error}</span>
-            </div>
-          )}
+                  {/* 裁剪框 */}
+                  <div
+                    className="absolute border-2 border-[var(--color-brand)] bg-[var(--color-brand)]/10"
+                    style={getCropStyle(currentPreview)}
+                    onMouseDown={(e) => handleMouseDown(e)}
+                  >
+                    {/* 裁剪框信息 */}
+                    <div className="absolute -top-6 left-0 text-xs text-[var(--text-primary)] bg-[var(--background-secondary)] px-2 py-1 rounded">
+                      {Math.round(currentPreview.cropArea.width)} × {Math.round(currentPreview.cropArea.height)}
+                    </div>
+
+                    {/* 调整大小的手柄 */}
+                    {settings.aspectRatio === 'free' && (
+                      <>
+                        <div
+                          className="absolute -top-1 -left-1 w-3 h-3 bg-[var(--color-brand)] cursor-tl-resize"
+                          onMouseDown={(e) => handleMouseDown(e, 'tl')}
+                        />
+                        <div
+                          className="absolute -top-1 -right-1 w-3 h-3 bg-[var(--color-brand)] cursor-tr-resize"
+                          onMouseDown={(e) => handleMouseDown(e, 'tr')}
+                        />
+                        <div
+                          className="absolute -bottom-1 -left-1 w-3 h-3 bg-[var(--color-brand)] cursor-bl-resize"
+                          onMouseDown={(e) => handleMouseDown(e, 'bl')}
+                        />
+                        <div
+                          className="absolute -bottom-1 -right-1 w-3 h-3 bg-[var(--color-brand)] cursor-br-resize"
+                          onMouseDown={(e) => handleMouseDown(e, 'br')}
+                        />
+                      </>
+                    )}
+                  </div>
+                </div>
+
+                {/* 提示信息 */}
+                <div className="mt-4 p-3 bg-[var(--background-secondary)] rounded-lg">
+                  <p className="text-sm text-[var(--text-secondary)]">
+                    {settings.aspectRatio === 'free'
+                      ? '✋ 拖拽裁剪框移动位置，拖拽四角调整大小'
+                      : '📐 当前使用预设比例，切换到"自由选择"可手动调整'
+                    }
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <div className="glass-card border border-[var(--border-default)] rounded-3xl p-12 text-center">
+                <div className="w-16 h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center text-3xl bg-[var(--background-tertiary)]">
+                  🖼️
+                </div>
+                <p className="text-[var(--text-secondary)]">
+                  上传图片后可调整裁剪区域
+                </p>
+              </div>
+            )}
+          </div>
         </div>
 
-        {/* 处理按钮 - 独立的固定区域 */}
-        <div className="mt-8 glass-card border border-[var(--border-default)] rounded-2xl p-6">
+        {/* 错误提示 */}
+        {error && (
+          <div className="mt-6 flex items-center gap-2 px-4 py-3 rounded-xl bg-[var(--color-red)]/10 border border-[var(--color-red)]/20 text-[var(--color-red)]">
+            <svg className="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+            </svg>
+            <span className="text-sm">{error}</span>
+          </div>
+        )}
+
+        {/* 处理按钮 */}
+        <div className="mt-6 glass-card border border-[var(--border-default)] rounded-2xl p-6">
           <button
             onClick={handleProcess}
-            disabled={selectedFiles.length === 0 || isProcessing}
+            disabled={imagePreviews.length === 0 || isProcessing}
             className="w-full px-8 py-5 bg-[var(--gradient-primary)] text-white font-bold rounded-xl shadow-2xl transition-all duration-300 hover:scale-105 hover-glow-brand-strong hover:shadow-3d-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-3 relative z-10 text-lg"
           >
             {isProcessing ? (
@@ -504,7 +769,7 @@ export default function ImageToolsPage() {
                 <div className="w-6 h-6 border-3 border-white/30 border-t-white rounded-full animate-spin" />
                 <span>处理中...</span>
               </>
-            ) : selectedFiles.length === 0 ? (
+            ) : imagePreviews.length === 0 ? (
               <>
                 <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -516,13 +781,13 @@ export default function ImageToolsPage() {
                 <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                 </svg>
-                <span>开始处理 {selectedFiles.length > 0 && `(${selectedFiles.length}张)`}</span>
+                <span>开始处理 {imagePreviews.length > 0 && `(${imagePreviews.length}张)`}</span>
               </>
             )}
           </button>
-          {selectedFiles.length === 0 && (
+          {imagePreviews.length === 0 && (
             <p className="text-center text-sm text-[var(--text-muted)] mt-3">
-              上传图片后点击按钮开始处理
+              上传图片后，调整裁剪区域，然后点击按钮开始处理
             </p>
           )}
         </div>
@@ -551,7 +816,6 @@ export default function ImageToolsPage() {
                   className="glass-card border border-[var(--border-default)] rounded-2xl overflow-hidden group"
                 >
                   <div className="grid grid-cols-2 gap-0">
-                    {/* 原始图片 */}
                     <div className="relative aspect-square bg-[var(--background-secondary)]">
                       <img
                         src={image.originalUrl}
@@ -563,7 +827,6 @@ export default function ImageToolsPage() {
                         <p className="text-xs text-white/70">{image.originalSize.width} × {image.originalSize.height}</p>
                       </div>
                     </div>
-                    {/* 处理后图片 */}
                     <div className="relative aspect-square bg-[var(--background-secondary)]">
                       <img
                         src={image.processedUrl}
@@ -574,18 +837,8 @@ export default function ImageToolsPage() {
                         <p className="text-xs text-white font-medium">处理后</p>
                         <p className="text-xs text-white/70">{image.processedSize.width} × {image.processedSize.height}</p>
                       </div>
-                      {/* 下载按钮 */}
-                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
-                        <button
-                          onClick={() => handleDownload(image)}
-                          className="px-4 py-2 bg-[var(--gradient-primary)] text-white font-bold rounded-lg shadow-lg hover:scale-105 transition-transform"
-                        >
-                          下载
-                        </button>
-                      </div>
                     </div>
                   </div>
-                  {/* 文件信息和操作按钮 */}
                   <div className="p-4 border-t border-[var(--border-subtle)]">
                     <p className="text-sm text-[var(--text-primary)] truncate mb-2">{image.originalName}</p>
                     <div className="flex items-center justify-between">
@@ -609,77 +862,6 @@ export default function ImageToolsPage() {
             </div>
           </div>
         )}
-      </section>
-
-      {/* Features Section */}
-      <section className="max-w-7xl mx-auto px-6 py-24 sm:px-8 lg:px-12">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-black mb-4 text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-display)' }}>
-            核心功能
-          </h2>
-          <p className="text-lg text-[var(--text-muted)]">
-            简单易用，功能强大
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {[
-            {
-              icon: '📐',
-              title: '尺寸调整',
-              desc: '自由指定输出宽度与高度，支持 1-4096 像素范围',
-              gradient: 'var(--gradient-primary)',
-            },
-            {
-              icon: '✂️',
-              title: '比例裁剪',
-              desc: '支持正方形、宽屏、竖屏等多种常用比例，智能居中裁剪',
-              gradient: 'var(--gradient-neon-purple)',
-            },
-            {
-              icon: '⚡',
-              title: '即时处理',
-              desc: '浏览器本地处理，秒级响应，无需等待服务器',
-              gradient: 'var(--gradient-neon-blue)',
-            },
-            {
-              icon: '💎',
-              title: '质量控制',
-              desc: 'JPEG/WebP 格式支持 10-100% 质量精确调节',
-              gradient: 'var(--gradient-neon-pink)',
-            },
-            {
-              icon: '📦',
-              title: '批量处理',
-              desc: '一次选择多张图片，统一处理并快速下载',
-              gradient: 'var(--gradient-neon-green)',
-            },
-            {
-              icon: '🔒',
-              title: '隐私安全',
-              desc: '图片完全在浏览器本地处理，绝不上传任何服务器',
-              gradient: 'var(--gradient-gold)',
-            },
-          ].map((feature, index) => (
-            <div
-              key={feature.title}
-              className="card-3d-interactive group p-8 glass-card border border-[var(--border-default)] rounded-3xl transition-all duration-500 hover:border-[var(--border-strong)] hover-glow"
-            >
-              <div
-                className="w-16 h-16 mb-6 rounded-2xl flex items-center justify-center text-3xl shadow-lg group-hover:scale-110 transition-transform"
-                style={{ background: feature.gradient }}
-              >
-                {feature.icon}
-              </div>
-              <h3 className="text-2xl font-bold mb-3 text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-heading)' }}>
-                {feature.title}
-              </h3>
-              <p className="text-[var(--text-secondary)] leading-relaxed">
-                {feature.desc}
-              </p>
-            </div>
-          ))}
-        </div>
       </section>
     </div>
   );
