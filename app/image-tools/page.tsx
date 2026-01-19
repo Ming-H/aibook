@@ -110,8 +110,15 @@ export default function ImageToolsPage() {
       });
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || `处理失败 (HTTP ${response.status})`);
+        let errorDetails = `HTTP ${response.status}`;
+        try {
+          const errorData = await response.json();
+          errorDetails = errorData.details || errorData.error || errorDetails;
+          console.error('API Error:', errorData);
+        } catch (e) {
+          console.error('Failed to parse error response:', e);
+        }
+        throw new Error(`处理失败: ${errorDetails}`);
       }
 
       const data = await response.json();
@@ -131,7 +138,10 @@ export default function ImageToolsPage() {
         fileSize: formatFileSize(data.fileSize),
       };
     } catch (err) {
-      console.error(`Error processing ${file.name}:`, err);
+      const errorMessage = err instanceof Error ? err.message : '未知错误';
+      console.error(`Error processing ${file.name}:`, errorMessage);
+      // 将错误信息设置到 state，这样用户可以看到具体错误
+      setError(`"${file.name}" 处理失败: ${errorMessage}`);
       return null;
     }
   };

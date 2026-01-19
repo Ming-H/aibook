@@ -1,4 +1,15 @@
 {
   "buildCommand": "npm run build",
-  "framework": "nextjs"
+  "framework": "nextjs",
+  "functions": {
+    "app/api/**/*.ts": {
+      "maxDuration": 30,
+      "memory": 1024
+    }
+  },
+  "build": {
+    "env": {
+      "SHARP_IGNORE_GLOBAL_LIBVIPS": "1"
+    }
+  }
 }
