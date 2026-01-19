@@ -71,6 +71,23 @@ export default function ProductsPage() {
       href: '/quiz-generator',
       status: 'live',
     },
+    {
+      id: 'image-tools',
+      name: '图片工具箱',
+      description: '专业图片转换与处理工具',
+      longDescription: '一站式图片处理工具，支持尺寸调整、比例裁剪、格式转换等功能。支持 PNG、JPEG、WebP 三种主流格式互转，可批量处理多张图片，纯前端处理保障隐私安全。',
+      icon: '🛠️',
+      gradient: '',
+      features: [
+        '尺寸调整（1-4096像素）',
+        '比例裁剪（1:1、16:9、4:3、9:16等）',
+        '格式转换（PNG/JPEG/WebP）',
+        '质量控制（10-100%）',
+        '批量处理',
+      ],
+      href: '/image-tools',
+      status: 'live',
+    },
   ];
 
   const getStatusBadge = (status: Product['status']) => {
