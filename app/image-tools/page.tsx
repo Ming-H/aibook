@@ -94,53 +94,102 @@ export default function ImageToolsPage() {
 
   const processImage = async (file: File, index: number): Promise<ProcessedImage | null> => {
     try {
-      // 创建 FormData
-      const formData = new FormData();
-      formData.append('image', file);
-      formData.append('width', settings.width.toString());
-      formData.append('height', settings.height.toString());
-      formData.append('maintainAspectRatio', settings.maintainAspectRatio.toString());
-      formData.append('aspectRatio', settings.aspectRatio);
-      formData.append('outputFormat', settings.outputFormat);
-      formData.append('quality', settings.quality.toString());
+      // 纯前端处理 - 使用 Canvas API
+      const img = new Image();
+      const originalUrl = URL.createObjectURL(file);
 
-      const response = await fetch('/api/image/convert', {
-        method: 'POST',
-        body: formData,
+      // 加载原始图片
+      await new Promise((resolve, reject) => {
+        img.onload = resolve;
+        img.onerror = reject;
+        img.src = originalUrl;
       });
 
-      if (!response.ok) {
-        let errorDetails = `HTTP ${response.status}`;
-        try {
-          const errorData = await response.json();
-          errorDetails = errorData.details || errorData.error || errorDetails;
-          console.error('API Error:', errorData);
-        } catch (e) {
-          console.error('Failed to parse error response:', e);
+      const originalWidth = img.width;
+      const originalHeight = img.height;
+
+      // 计算目标尺寸
+      let targetWidth = settings.width;
+      let targetHeight = settings.height;
+
+      if (settings.maintainAspectRatio) {
+        if (settings.aspectRatio !== 'original') {
+          const [ratioW, ratioH] = settings.aspectRatio.split(':').map(Number);
+          const targetRatio = ratioW / ratioH;
+          const originalRatio = originalWidth / originalHeight;
+
+          if (originalRatio > targetRatio) {
+            targetHeight = Math.round(targetWidth / targetRatio);
+          } else {
+            targetWidth = Math.round(targetHeight * targetRatio);
+          }
+        } else {
+          const originalRatio = originalWidth / originalHeight;
+          const targetRatio = targetWidth / targetHeight;
+
+          if (targetRatio > originalRatio) {
+            targetWidth = Math.round(targetHeight * originalRatio);
+          } else {
+            targetHeight = Math.round(targetWidth / originalRatio);
+          }
         }
-        throw new Error(`处理失败: ${errorDetails}`);
       }
 
-      const data = await response.json();
+      // 创建 Canvas
+      const canvas = document.createElement('canvas');
+      canvas.width = targetWidth;
+      canvas.height = targetHeight;
+      const ctx = canvas.getContext('2d');
 
-      // 创建处理后的图片 URL
-      const processedUrl = `data:${data.mimeType};base64,${data.base64}`;
+      if (!ctx) {
+        throw new Error('无法创建 Canvas 上下文');
+      }
+
+      // 计算裁剪区域（如果需要）
+      let sx = 0, sy = 0, sWidth = originalWidth, sHeight = originalHeight;
+
+      if (settings.aspectRatio !== 'original') {
+        const [ratioW, ratioH] = settings.aspectRatio.split(':').map(Number);
+        const targetRatio = ratioW / ratioH;
+        const originalRatio = originalWidth / originalHeight;
+
+        if (originalRatio > targetRatio) {
+          sWidth = Math.round(originalHeight * targetRatio);
+          sx = Math.round((originalWidth - sWidth) / 2);
+        } else {
+          sHeight = Math.round(originalWidth / targetRatio);
+          sy = Math.round((originalHeight - sHeight) / 2);
+        }
+      }
+
+      // 绘制图片到 Canvas
+      ctx.drawImage(img, sx, sy, sWidth, sHeight, 0, 0, targetWidth, targetHeight);
+
+      // 转换为目标格式
+      const mimeType = settings.outputFormat === 'png' ? 'image/png' :
+                       settings.outputFormat === 'jpeg' ? 'image/jpeg' : 'image/webp';
+
+      const quality = settings.outputFormat === 'png' ? undefined : settings.quality / 100;
+      const processedUrl = canvas.toDataURL(mimeType, quality);
+
+      // 计算文件大小
+      const base64Data = processedUrl.split(',')[1];
+      const fileSize = Math.round(base64Data.length * 0.75);
 
       return {
         id: `${Date.now()}-${index}`,
-        originalUrl: URL.createObjectURL(file),
+        originalUrl,
         processedUrl,
         originalName: file.name,
-        originalSize: data.originalSize,
-        processedSize: data.processedSize,
-        originalFormat: data.originalFormat,
-        outputFormat: data.outputFormat,
-        fileSize: formatFileSize(data.fileSize),
+        originalSize: { width: originalWidth, height: originalHeight },
+        processedSize: { width: targetWidth, height: targetHeight },
+        originalFormat: file.type.split('/')[1] || 'unknown',
+        outputFormat: settings.outputFormat,
+        fileSize: formatFileSize(fileSize),
       };
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : '未知错误';
       console.error(`Error processing ${file.name}:`, errorMessage);
-      // 将错误信息设置到 state，这样用户可以看到具体错误
       setError(`"${file.name}" 处理失败: ${errorMessage}`);
       return null;
     }
@@ -234,7 +283,7 @@ export default function ImageToolsPage() {
                   WebkitTextFillColor: 'transparent',
                   backgroundClip: 'text'
                 }}>
-                  纯前端处理
+                  纯前端处理 · 本地运行
                 </span>
               </div>
             </div>
@@ -584,31 +633,31 @@ export default function ImageToolsPage() {
             {
               icon: '✂️',
               title: '比例裁剪',
-              desc: '支持正方形、宽屏、竖屏等多种常用比例',
+              desc: '支持正方形、宽屏、竖屏等多种常用比例，智能居中裁剪',
               gradient: 'var(--gradient-neon-purple)',
             },
             {
-              icon: '🔄',
-              title: '格式转换',
-              desc: '支持 PNG、JPEG、WebP 三种主流格式互转',
+              icon: '⚡',
+              title: '即时处理',
+              desc: '浏览器本地处理，秒级响应，无需等待服务器',
               gradient: 'var(--gradient-neon-blue)',
             },
             {
               icon: '💎',
               title: '质量控制',
-              desc: 'JPEG/WebP 格式支持 10-100% 质量调节',
+              desc: 'JPEG/WebP 格式支持 10-100% 质量精确调节',
               gradient: 'var(--gradient-neon-pink)',
             },
             {
               icon: '📦',
               title: '批量处理',
-              desc: '一次选择多张图片，统一处理并下载',
+              desc: '一次选择多张图片，统一处理并快速下载',
               gradient: 'var(--gradient-neon-green)',
             },
             {
               icon: '🔒',
               title: '隐私安全',
-              desc: '纯前端处理，图片不上传服务器',
+              desc: '图片完全在浏览器本地处理，绝不上传任何服务器',
               gradient: 'var(--gradient-gold)',
             },
           ].map((feature, index) => (
