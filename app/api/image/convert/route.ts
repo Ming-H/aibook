@@ -6,7 +6,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 export const runtime = 'nodejs';
-export const dynamic = 'force-static';
 
 interface ConvertRequest {
   width: number;
@@ -133,7 +132,23 @@ export async function POST(request: NextRequest) {
     let processedHeight: number;
 
     // 检测原始图片尺寸
-    const originalSize = await getImageSize(buffer);
+    let originalSize: { width: number; height: number };
+    try {
+      originalSize = await getImageSize(buffer);
+      if (originalSize.width === 0 || originalSize.height === 0) {
+        throw new Error('无法读取图片尺寸');
+      }
+    } catch (sizeError) {
+      console.error('Get image size error:', sizeError);
+      return NextResponse.json(
+        {
+          error: '无法读取图片信息',
+          details: sizeError instanceof Error ? sizeError.message : '未知错误',
+        },
+        { status: 400 }
+      );
+    }
+
     const originalFormat = getImageFormat(image.type);
 
     // 计算目标尺寸
@@ -142,7 +157,7 @@ export async function POST(request: NextRequest) {
     try {
       // 尝试使用 sharp
       const sharp = (await import('sharp')).default;
-      let processor = sharp(buffer);
+      let processor = sharp(buffer, { failOnError: false });
 
       // 如果需要比例裁剪
       if (settings.aspectRatio !== 'original') {
@@ -153,15 +168,16 @@ export async function POST(request: NextRequest) {
       // 调整尺寸
       processor = processor.resize(targetSize.width, targetSize.height, {
         fit: settings.maintainAspectRatio ? 'inside' : 'fill',
+        withoutEnlargement: false,
       });
 
       // 设置输出格式和质量
       switch (settings.outputFormat) {
         case 'jpeg':
-          processor = processor.jpeg({ quality: settings.quality });
+          processor = processor.jpeg({ quality: settings.quality, mozjpeg: true });
           break;
         case 'png':
-          processor = processor.png();
+          processor = processor.png({ compressionLevel: 9 });
           break;
         case 'webp':
           processor = processor.webp({ quality: settings.quality });
@@ -173,11 +189,13 @@ export async function POST(request: NextRequest) {
       processedWidth = targetSize.width;
       processedHeight = targetSize.height;
     } catch (sharpError) {
-      // sharp 不可用，使用纯 Node.js 方案
-      // 这里使用简单的 Canvas 实现
-      // 注意：这需要额外的依赖
+      console.error('Sharp processing error:', sharpError);
+      // 返回更详细的错误信息
       return NextResponse.json(
-        { error: '图片处理功能需要安装 sharp 库。请运行: npm install sharp' },
+        {
+          error: '图片处理失败',
+          details: sharpError instanceof Error ? sharpError.message : '未知错误',
+        },
         { status: 500 }
       );
     }
@@ -212,17 +230,17 @@ export async function POST(request: NextRequest) {
 
 // 获取图片尺寸
 async function getImageSize(buffer: Buffer): Promise<{ width: number; height: number }> {
-  try {
-    const sharp = (await import('sharp')).default;
-    const metadata = await sharp(buffer).metadata();
-    return {
-      width: metadata.width || 0,
-      height: metadata.height || 0,
-    };
-  } catch {
-    // 如果 sharp 不可用，返回默认值
-    return { width: 1920, height: 1080 };
+  const sharp = (await import('sharp')).default;
+  const metadata = await sharp(buffer).metadata();
+
+  if (!metadata.width || !metadata.height) {
+    throw new Error('无效的图片尺寸');
   }
+
+  return {
+    width: metadata.width,
+    height: metadata.height,
+  };
 }
 
 // 获取图片格式
