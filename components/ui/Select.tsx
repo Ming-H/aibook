@@ -135,7 +135,7 @@ export function Select({
       {/* 下拉选项 */}
       {isOpen && !disabled && (
         <div
-          className="absolute z-[var(--z-dropdown)] w-full mt-2 overflow-hidden rounded-xl border shadow-xl animate-fade-in-down"
+          className="absolute z-50 w-full mt-2 overflow-hidden rounded-xl border shadow-xl animate-fade-in-down"
           style={{
             backgroundColor: 'var(--background-secondary)',
             borderColor: 'var(--border-default)',

@@ -436,19 +436,26 @@ export default function ImageToolsPage() {
           <button
             onClick={handleProcess}
             disabled={selectedFiles.length === 0 || isProcessing}
-            className="w-full mt-6 px-8 py-5 bg-[var(--gradient-primary)] text-white font-bold rounded-2xl shadow-2xl transition-all duration-300 hover:scale-105 hover-glow-brand-strong hover:shadow-3d-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-3"
+            className="w-full mt-6 px-8 py-5 bg-[var(--gradient-primary)] text-white font-bold rounded-2xl shadow-2xl transition-all duration-300 hover:scale-105 hover-glow-brand-strong hover:shadow-3d-xl disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-3 relative z-10"
           >
             {isProcessing ? (
               <>
                 <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                 <span>处理中...</span>
               </>
+            ) : selectedFiles.length === 0 ? (
+              <>
+                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                <span>请先选择图片</span>
+              </>
             ) : (
               <>
                 <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                 </svg>
-                <span>开始处理</span>
+                <span>开始处理 ({selectedFiles.length}张)</span>
               </>
             )}
           </button>
