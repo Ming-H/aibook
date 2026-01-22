@@ -2,9 +2,9 @@ import { getAllDailyEntries, getLatestDailyEntry } from "@/lib/daily-loader";
 import { parseMarkdown } from "@/lib/markdown-parser";
 import Link from "next/link";
 
-// 临时改为 SSR 以加快构建速度
+// 强制动态渲染，禁用所有缓存
 export const dynamic = "force-dynamic";
-// export const revalidate = 3600;
+export const revalidate = 0;
 
 export default async function DailyPage() {
   const entries = await getAllDailyEntries();

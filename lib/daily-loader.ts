@@ -9,21 +9,26 @@ const cleanEnv = (value: string | undefined): string | undefined => {
   return value?.trim().replace(/\n/g, '');
 };
 
-// 环境变量验证
-const githubToken = cleanEnv(process.env.GITHUB_TOKEN);
-const githubDataRepo = cleanEnv(process.env.GITHUB_DATA_REPO);
+// 环境变量验证（运行时读取）
+function getGithubConfig() {
+  const githubToken = cleanEnv(process.env.GITHUB_TOKEN);
+  const githubDataRepo = cleanEnv(process.env.GITHUB_DATA_REPO);
 
-if (!githubToken || !githubDataRepo) {
-  throw new Error("Missing GitHub credentials");
+  if (!githubToken || !githubDataRepo) {
+    throw new Error("Missing GitHub credentials");
+  }
+
+  const [owner, repo] = githubDataRepo.split("/");
+  return { githubToken, owner, repo };
 }
 
-// 初始化 Octokit 实例
-const octokit = new Octokit({
-  auth: githubToken,
-});
-
-// 解析仓库所有者和名称
-const [owner, repo] = githubDataRepo.split("/");
+// 初始化 Octokit 实例（运行时创建）
+function getOctokit() {
+  const { githubToken } = getGithubConfig();
+  return new Octokit({
+    auth: githubToken,
+  });
+}
 
 /**
  * 每日热点条目接口
@@ -51,6 +56,9 @@ export function clearDailyCache(): void {
  * 获取所有每日热点日期
  */
 export async function listDailyDates(): Promise<string[]> {
+  const { owner, repo } = getGithubConfig();
+  const octokit = getOctokit();
+
   const allDates: string[] = [];
   let page = 1;
   let hasMore = true;
@@ -94,6 +102,9 @@ export async function getDailyEntry(date: string): Promise<DailyEntry | null> {
   if (dailyCache.has(cacheKey)) {
     return dailyCache.get(cacheKey)!;
   }
+
+  const { owner, repo } = getGithubConfig();
+  const octokit = getOctokit();
 
   try {
     const { data } = await octokit.rest.repos.getContent({
