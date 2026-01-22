@@ -156,7 +156,7 @@ export default async function DailyPage() {
                     <span className="text-sm text-[var(--text-secondary)]">条前沿动态</span>
                   </div>
 
-                  {latestMetrics.categories.map((cat, i) => (
+                  {latestMetrics.categories?.map((cat, i) => (
                     <div key={i} className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[var(--background-secondary)] border border-[var(--border-subtle)]">
                       <span className="text-lg">{cat === '行业动态' ? '📈' : cat === '学术突破' ? '🎓' : cat === '技术创新' ? '🔬' : '🛠️'}</span>
                       <span className="text-sm text-[var(--text-secondary)]">{cat}</span>
@@ -335,7 +335,7 @@ export default async function DailyPage() {
                               <span className="text-xs text-[var(--text-muted)]">条</span>
                             </div>
 
-                            {metrics.categories.slice(0, 2).map((cat, i) => (
+                            {metrics.categories?.slice(0, 2).map((cat, i) => (
                               <div key={i} className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-[var(--background-tertiary)]">
                                 <span className="text-xs">
                                   {cat === '行业动态' ? '📈' : cat === '学术突破' ? '🎓' : cat === '技术创新' ? '🔬' : '🛠️'}
