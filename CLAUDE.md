@@ -10,8 +10,17 @@ AI Hot Tech is a static site generator that displays AI technology news articles
 - **Daily Hot Tech** (`/daily`) - Daily AI industry news digests from `data/daily/{YYYYMMDD}/digest/`
 - **Series Learning** (`/series`) - Structured learning paths from `data/series/`
 - **Archive** (`/archive`) - Historical content browser
+- **Blog** (`/blog`) - Content aggregation page showcasing all content types
+- **Prompts Library** (`/prompts`) - AI prompt inspiration showcase with curated prompts from `awesome-prompt` and `wonderful-prompts` repositories
+
+**Interactive Tools:**
 - **Quiz Generator** (`/quiz-generator`) - Interactive quiz creation tool powered by GLM-4.7 API
 - **Creative Workshop** (`/creative-workshop`) - AI-powered image generation tool using ModelScope API
+- **Image Tools** (`/image-tools`) - Pure frontend image processing with crop selection and format conversion
+
+**Portfolio Pages:**
+- **About** (`/about`) - Personal introduction with skills, GitHub repos, and social links
+- **Projects** (`/projects`) - Project showcase (Skillset, Pixel Factory, Dating Spot Finder, etc.)
 
 **Content Sources:**
 - Daily digests: `data/daily/{YYYYMMDD}/digest/digest_*.md`
@@ -76,14 +85,14 @@ The `isAdmin` field in user sessions requires special handling to ensure type sa
 - Pattern: `const token = cleanEnv(process.env.GITHUB_TOKEN)`
 
 **Content Loader Pattern:**
-- Three separate loaders (`content-loader.ts`, `series-loader.ts`, `daily-loader.ts`) for different content types
+- Four separate loaders (`content-loader.ts`, `series-loader.ts`, `daily-loader.ts`, `prompt-loader.ts`) for different content types
 - Each loader maintains its own in-memory Map cache
 - Caches are cleared via `/api/revalidate` endpoint for ISR refresh
 - Do not mix content types in a single loader - metadata structures differ significantly
 
 ### Content Loading Architecture
 
-The system has three parallel content loading paths:
+The system has four parallel content loading paths:
 
 1. **Daily Articles** (`lib/content-loader.ts`)
    - Fetches from `data/{YYYYMMDD}/longform/` structure
@@ -102,7 +111,13 @@ The system has three parallel content loading paths:
    - Optimized for daily news digest format
    - Separate cache for digest content
 
-**Why separate loaders?** Daily articles, series content, and daily digests have different metadata structures and access patterns. Separating them allows for optimized caching and query strategies for each content type.
+4. **Prompts Library** (`lib/prompt-loader.ts`)
+   - Fetches prompts from GitHub repositories
+   - Sources from `awesome-prompt` and `wonderful-prompts`
+   - Caches in `promptsCache` Map
+   - Supports categories, difficulty levels, and tags
+
+**Why separate loaders?** Daily articles, series content, daily digests, and prompts have different metadata structures and access patterns. Separating them allows for optimized caching and query strategies for each content type.
 
 ### Authentication & Authorization
 
@@ -208,6 +223,11 @@ Series use separate JSON metadata files instead of encoding everything in filena
 - **unified** + **remark** + **rehype** - Markdown processing pipeline
 - **gray-matter** - Frontmatter parsing
 - **reading-time** - Read time calculation
+- **sharp** - Server-side image processing
+- **docx** - Document generation
+- **html2canvas** + **html2pdf.js** - PDF generation
+- **file-saver** - File download utilities
+- **zod** - Schema validation
 - **GLM-4.7 API** - Quiz generation via `lib/glm-api.ts`
 - **ModelScope API** - Image generation via `lib/modelscope-api.ts`
 
@@ -219,6 +239,7 @@ Series use separate JSON metadata files instead of encoding everything in filena
 | `lib/content-loader.ts` | Daily article caching, metadata, search/filter, related articles |
 | `lib/series-loader.ts` | Series/episode caching, metadata extraction, episode ordering |
 | `lib/daily-loader.ts` | Daily digest caching and content loading |
+| `lib/prompt-loader.ts` | Prompts library caching from external repositories |
 | `lib/glm-api.ts` | GLM-4.7 API integration for quiz generation |
 | `lib/modelscope-api.ts` | ModelScope API integration for image generation |
 | `lib/markdown-parser.ts` | Markdown → HTML conversion with remark/rehype, heading extraction |
@@ -232,12 +253,18 @@ Series use separate JSON metadata files instead of encoding everything in filena
 
 | Route | Purpose |
 |-------|---------|
-| `/` | Homepage with article timeline |
+| `/` | Homepage portfolio with article timeline |
 | `/daily` | Daily digest browser |
 | `/series` | Series learning paths |
 | `/archive` | Historical content archive |
+| `/blog` | Content aggregation page |
+| `/prompts` | AI prompt inspiration showcase |
 | `/quiz-generator` | Quiz generation tool (requires subscription) |
+| `/quiz-generator/create` | Multi-step quiz creation workflow |
 | `/creative-workshop` | AI image generation tool |
+| `/image-tools` | Image processing with crop selection |
+| `/projects` | Project showcase portfolio |
+| `/about` | Personal introduction page |
 | `/admin` | Admin dashboard (requires admin role) |
 | `/auth/signin` | Sign in page |
 | `/subscribe` | Subscription page |
@@ -253,6 +280,7 @@ Series use separate JSON metadata files instead of encoding everything in filena
 | `/api/quiz/record-usage` | Record quiz usage (internal) |
 | `/api/image/generate` | Generate images via ModelScope |
 | `/api/image/status/[taskId]` | Check async image generation status |
+| `/api/image/convert` | Image format conversion and processing |
 | `/api/subscription/check` | Check user subscription status |
 | `/api/payment/create` | Create payment (Alipay/WeChat) |
 | `/api/payment/callback` | Payment callback handler |
@@ -332,6 +360,26 @@ The markdown parser (lib/markdown-parser.ts) processes:
 
 The series loader (lib/series-loader.ts) reads these JSON files to build the series structure, then combines with article content from the longform/ subdirectories.
 
+### Prompts Library
+
+The `/prompts` route provides an AI prompt inspiration showcase:
+
+**Architecture:**
+- Fetches prompts from external GitHub repositories (`awesome-prompt`, `wonderful-prompts`)
+- Caches prompts in-memory for performance
+- Category-based organization with difficulty levels
+
+**Key Features:**
+- Categories: writing, coding, design, productivity, creative, education
+- Difficulty levels: beginner, intermediate, advanced
+- One-click copy to clipboard
+- Tag-based filtering
+- Search functionality
+
+**Key Components:**
+- `lib/prompt-loader.ts` - Prompts fetching and caching
+- `app/prompts/page.tsx` - Prompts showcase interface
+
 ### Creative Workshop
 
 The `/creative-workshop` route provides an AI-powered image generation tool using ModelScope API:
@@ -372,6 +420,32 @@ The `/quiz-generator` route provides an interactive quiz creation tool powered b
 - Context-aware prompts for different question types
 - Support for multiple choice, true/false, fill-in-blank, and short answer questions
 
+### Image Tools
+
+The `/image-tools` route provides pure frontend image processing capabilities:
+
+**Architecture:**
+- Client-side Canvas API for image processing (no server required)
+- Interactive crop selection with drag-and-drop interface
+- Server-side fallback using Sharp for complex operations
+
+**Key Features:**
+- Multiple aspect ratio presets (1:1, 16:9, 9:16, 4:3, 3:4, 21:9, freeform)
+- Format conversion (PNG, JPEG, WebP)
+- Quality control slider
+- Batch processing support
+- Download functionality
+
+**Key Components:**
+- `app/image-tools/page.tsx` - Main image processing interface
+- `app/api/image/convert/route.ts` - Server-side fallback API
+- Canvas-based crop selection with visual feedback
+
+**Dual Processing Strategy:**
+- Client-side processing using Canvas API for basic operations
+- Server-side processing using Sharp when client-side is insufficient
+- Fallback mechanism ensures reliability across different scenarios
+
 ### Design System
 
 The site uses a custom dark theme design system with glass morphism effects:
@@ -394,6 +468,7 @@ The site uses a custom dark theme design system with glass morphism effects:
 - Theme-aware form controls
 - Navigation system
 - Reusable button and input components
+- Custom Select component with search and keyboard navigation
 
 ### Sitemap Generation
 
