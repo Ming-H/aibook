@@ -10,53 +10,16 @@ const cleanEnv = (value: string | undefined): string | undefined => {
 };
 
 /**
- * 获取存储的最新日期
- */
-async function getStoredLatestDate(): Promise<string | null> {
-  try {
-    const response = await fetch(`${process.env.VERCEL_URL || 'http://localhost:3000'}/api/latest-date`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      cache: 'no-store',
-    });
-
-    if (response.ok) {
-      const data = await response.json();
-      return data.date;
-    }
-    return null;
-  } catch {
-    return null;
-  }
-}
-
-/**
- * 更新存储的最新日期
- */
-async function updateStoredLatestDate(date: string): Promise<void> {
-  // 这里可以使用 KV 存储、数据库或其他持久化方案
-  // 目前使用 Next.js revalidate tag 来触发更新
-  revalidateTag('latest-daily-date');
-}
-
-/**
- * Vercel Cron Job - 每2小时检查一次 GitHub 仓库是否有新的每日热点
+ * Vercel Cron Job - 每天检查 GitHub 仓库是否有新的每日热点
  *
- * Cron 表达式: 0 */2 * * * (每2小时执行一次)
+ * Cron 表达式: 0 2 * * * (每天凌晨 2 点执行)
  *
- * 功能:
- * 1. 检查 GitHub API 获取最新的 daily 目录
- * 2. 对比当前存储的最新日期
- * 3. 如果有新数据，触发页面重新验证
+ * 功能: 检查 GitHub API 获取最新的 daily 目录，如果有新数据则触发页面重新验证
  */
 export async function GET(request: Request) {
   // 验证 cron secret（Vercel 自动添加）
   const authHeader = request.headers.get("authorization");
   const cronSecret = cleanEnv(process.env.CRON_SECRET);
-
-  // Vercel Cron Jobs 会自动在 Authorization header 中提供 CRON_SECRET
   const expectedAuth = `Bearer ${cronSecret}`;
 
   if (authHeader !== expectedAuth) {
@@ -89,7 +52,6 @@ export async function GET(request: Request) {
           'Accept': 'application/vnd.github.v3+json',
           'User-Agent': 'AI-Hot-Tech-Cron-Job',
         },
-        // 使用 etag 和 if-none-match 进行条件请求，减少 API 调用
       }
     );
 
@@ -119,41 +81,24 @@ export async function GET(request: Request) {
     }
 
     const latestGithubDate = dateDirectories[0];
-    const storedLatestDate = await getStoredLatestDate();
 
-    // 检查是否有新数据
-    const hasUpdate = !storedLatestDate || latestGithubDate > storedLatestDate;
+    console.log(`[Cron Job] Latest GitHub date: ${latestGithubDate}`);
 
-    if (hasUpdate) {
-      console.log(`[Cron Job] New daily content detected: ${latestGithubDate} (previous: ${storedLatestDate})`);
+    // 清除所有相关页面的缓存
+    revalidatePath("/daily");
+    revalidatePath("/daily/[date]");
+    revalidatePath("/");
+    revalidateTag('daily-content');
 
-      // 清除所有相关页面的缓存
-      revalidatePath("/daily");
-      revalidatePath("/daily/[date]");
-      revalidatePath("/");
-      revalidateTag('daily-content');
-
-      // 清除 daily loader 缓存
-      const { clearDailyCache } = await import("@/lib/daily-loader");
-      clearDailyCache();
-
-      return NextResponse.json({
-        checked: true,
-        hasUpdate: true,
-        latestDate: latestGithubDate,
-        previousDate: storedLatestDate,
-        message: "New content detected and cache cleared",
-        revalidated: true,
-      });
-    }
-
-    console.log(`[Cron Job] No new content. Latest: ${latestGithubDate}`);
+    // 清除 daily loader 缓存
+    const { clearDailyCache } = await import("@/lib/daily-loader");
+    clearDailyCache();
 
     return NextResponse.json({
       checked: true,
-      hasUpdate: false,
       latestDate: latestGithubDate,
-      message: "No new content since last check",
+      message: "Cache cleared successfully",
+      revalidated: true,
     });
 
   } catch (error) {

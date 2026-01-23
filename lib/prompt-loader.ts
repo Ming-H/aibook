@@ -1,5 +1,3 @@
-import { useState, useEffect } from 'react';
-
 export interface Prompt {
   id: string;
   title: string;
@@ -108,20 +106,3 @@ export async function searchPrompts(query: string): Promise<Prompt[]> {
   );
 }
 
-/**
- * React hook for loading prompts
- */
-export function usePrompts() {
-  const [prompts, setPrompts] = useState<Prompt[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
-
-  useEffect(() => {
-    loadPrompts()
-      .then(setPrompts)
-      .catch(err => setError(err))
-      .finally(() => setLoading(false));
-  }, []);
-
-  return { prompts, loading, error };
-}

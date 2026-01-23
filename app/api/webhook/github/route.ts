@@ -102,7 +102,7 @@ export async function POST(request: Request) {
     const { clearCache } = await import("@/lib/content-loader");
     clearCache();
 
-    const { clearCache: clearSeriesCache } = await import("@/lib/series-loader");
+    const { clearSeriesCache } = await import("@/lib/series-loader");
     clearSeriesCache();
 
     const { clearDailyCache } = await import("@/lib/daily-loader");
