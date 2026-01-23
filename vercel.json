@@ -11,5 +11,11 @@
     "env": {
       "SHARP_IGNORE_GLOBAL_LIBVIPS": "1"
     }
-  }
+  },
+  "crons": [
+    {
+      "path": "/api/cron/check-updates",
+      "schedule": "0 */2 * * *"
+    }
+  ]
 }

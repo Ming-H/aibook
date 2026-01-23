@@ -12,6 +12,11 @@ const cleanEnv = (value: string | undefined): string | undefined => {
 /**
  * ISR 重新验证 API 路由
  * 由 Vercel Cron Jobs 每天调用，用于刷新内容
+ *
+ * 支持的触发方式:
+ * 1. Vercel Cron Jobs (自动)
+ * 2. 手动调用 (需要 CRON_SECRET)
+ * 3. GitHub Webhooks
  */
 export async function GET(request: Request) {
   // 验证 cron secret
@@ -27,19 +32,31 @@ export async function GET(request: Request) {
   }
 
   try {
-    // 重新验证所有页面
+    // 清除所有相关页面的缓存
     revalidatePath("/");
+    revalidatePath("/daily");
+    revalidatePath("/daily/[date]");
     revalidatePath("/archive");
-    revalidatePath("/articles/[date]/[slug]");
+    revalidatePath("/series");
+    revalidatePath("/blog");
 
-    // 清除内容缓存
+    // 清除所有内容缓存
     const { clearCache } = await import("@/lib/content-loader");
     clearCache();
+
+    const { clearCache: clearSeriesCache } = await import("@/lib/series-loader");
+    clearSeriesCache();
+
+    const { clearDailyCache } = await import("@/lib/daily-loader");
+    clearDailyCache();
+
+    const { clearPromptsCache } = await import("@/lib/prompt-loader");
+    clearPromptsCache();
 
     return NextResponse.json({
       revalidated: true,
       now: Date.now(),
-      message: "Revalidation successful",
+      message: "Revalidation successful - all caches cleared",
     });
   } catch (err) {
     return NextResponse.json(
