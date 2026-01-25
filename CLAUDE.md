@@ -515,3 +515,5 @@ The `/api/payment` routes handle payment processing for subscription purchases:
 **TypeScript types for session.user:**
 - Extend the NextAuth types to include `isAdmin` in your type definitions
 - See `lib/auth.ts` for the session callback that adds `isAdmin`
+
+
