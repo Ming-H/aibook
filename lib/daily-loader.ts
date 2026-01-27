@@ -149,19 +149,28 @@ export async function getDailyEntry(date: string): Promise<DailyEntry | null> {
                       file.name.endsWith(".md")
           );
 
-          if (mdFile && "content" in mdFile && mdFile.content) {
-            const content = Buffer.from(mdFile.content, "base64").toString("utf-8");
-            const titleMatch = content.match(/^#\s+(.+)$/m);
-            const title = titleMatch ? titleMatch[1].trim() : `AI Daily · ${date}`;
+          if (mdFile && mdFile.type === "file") {
+            // Fetch the actual file content (directory listing doesn't include content)
+            const { data: fileData } = await octokit.rest.repos.getContent({
+              owner,
+              repo,
+              path: `data/daily/${date}/digest/${mdFile.name}`,
+            });
 
-            const entry: DailyEntry = {
-              date,
-              title,
-              content,
-            };
+            if ("content" in fileData && fileData.content) {
+              const content = Buffer.from(fileData.content, "base64").toString("utf-8");
+              const titleMatch = content.match(/^#\s+(.+)$/m);
+              const title = titleMatch ? titleMatch[1].trim() : `AI Daily · ${date}`;
 
-            dailyCache.set(cacheKey, entry);
-            return entry;
+              const entry: DailyEntry = {
+                date,
+                title,
+                content,
+              };
+
+              dailyCache.set(cacheKey, entry);
+              return entry;
+            }
           }
         }
       }
