@@ -149,7 +149,7 @@ export async function getDailyEntry(date: string): Promise<DailyEntry | null> {
                       file.name.endsWith(".md")
           );
 
-          if (mdFile && "content" in mdFile) {
+          if (mdFile && "content" in mdFile && mdFile.content) {
             const content = Buffer.from(mdFile.content, "base64").toString("utf-8");
             const titleMatch = content.match(/^#\s+(.+)$/m);
             const title = titleMatch ? titleMatch[1].trim() : `AI Daily · ${date}`;
