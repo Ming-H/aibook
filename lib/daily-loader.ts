@@ -95,6 +95,9 @@ export async function listDailyDates(): Promise<string[]> {
 
 /**
  * 获取每日热点内容
+ * 支持两种文件名格式：
+ * - digest_YYYYMMDD.md
+ * - digest_YYYYMMDD_HHMMSS.md
  */
 export async function getDailyEntry(date: string): Promise<DailyEntry | null> {
   const cacheKey = `daily:${date}`;
@@ -107,30 +110,65 @@ export async function getDailyEntry(date: string): Promise<DailyEntry | null> {
   const octokit = getOctokit();
 
   try {
-    const { data } = await octokit.rest.repos.getContent({
-      owner,
-      repo,
-      path: `data/daily/${date}/digest/digest_${date}.md`,
-    });
+    // 首先尝试标准文件名 digest_YYYYMMDD.md
+    try {
+      const { data } = await octokit.rest.repos.getContent({
+        owner,
+        repo,
+        path: `data/daily/${date}/digest/digest_${date}.md`,
+      });
 
-    if (!("content" in data) || data.type !== "file") {
-      return null;
+      if ("content" in data && data.type === "file") {
+        const content = Buffer.from(data.content, "base64").toString("utf-8");
+        const titleMatch = content.match(/^#\s+(.+)$/m);
+        const title = titleMatch ? titleMatch[1].trim() : `AI Daily · ${date}`;
+
+        const entry: DailyEntry = {
+          date,
+          title,
+          content,
+        };
+
+        dailyCache.set(cacheKey, entry);
+        return entry;
+      }
+    } catch (tryError: any) {
+      // 如果标准文件名不存在（404），尝试查找带时间戳的文件
+      if (tryError.status === 404) {
+        const { data: digestData } = await octokit.rest.repos.getContent({
+          owner,
+          repo,
+          path: `data/daily/${date}/digest`,
+        });
+
+        if (Array.isArray(digestData)) {
+          // 查找匹配日期的 .md 文件（支持 digest_YYYYMMDD_HHMMSS.md 格式）
+          const mdFile = digestData.find(
+            (file) => file.type === "file" &&
+                      file.name.startsWith(`digest_${date}_`) &&
+                      file.name.endsWith(".md")
+          );
+
+          if (mdFile && "content" in mdFile) {
+            const content = Buffer.from(mdFile.content, "base64").toString("utf-8");
+            const titleMatch = content.match(/^#\s+(.+)$/m);
+            const title = titleMatch ? titleMatch[1].trim() : `AI Daily · ${date}`;
+
+            const entry: DailyEntry = {
+              date,
+              title,
+              content,
+            };
+
+            dailyCache.set(cacheKey, entry);
+            return entry;
+          }
+        }
+      }
+      throw tryError;
     }
 
-    const content = Buffer.from(data.content, "base64").toString("utf-8");
-
-    // 提取标题（第一行 # 标题）
-    const titleMatch = content.match(/^#\s+(.+)$/m);
-    const title = titleMatch ? titleMatch[1].trim() : `AI Daily · ${date}`;
-
-    const entry: DailyEntry = {
-      date,
-      title,
-      content,
-    };
-
-    dailyCache.set(cacheKey, entry);
-    return entry;
+    return null;
   } catch (error) {
     console.error(`Failed to fetch daily entry for ${date}:`, error);
     return null;
