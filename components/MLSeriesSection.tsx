@@ -1,5 +1,5 @@
 /**
- * ML 系列板块组件
+ * ML 系列板块组件 - 极客风格
  * 展示机器学习相关系列
  */
 
@@ -21,53 +21,55 @@ export async function MLSeriesSection() {
   }
 
   return (
-    <section className="mb-16">
-      <div className="flex items-center justify-between mb-8">
+    <section className="mb-12">
+      <div className="flex items-center justify-between mb-6">
         <div>
-          <h2 className="text-3xl font-black text-white mb-2">ML 系列教程</h2>
-          <p className="text-slate-400">机器学习基础 · 深度学习 · 计算机视觉 · NLP · 强化学习</p>
+          <h2 className="text-2xl md:text-3xl font-bold text-[var(--text-primary)] mb-2 font-mono">
+            ML 系列教程
+          </h2>
+          <p className="text-[var(--text-secondary)]">
+            机器学习基础 · 深度学习 · 计算机视觉 · NLP · 强化学习
+          </p>
         </div>
-        <div className="hidden sm:block px-4 py-2 rounded-lg bg-purple-500/20 border border-purple-500/30">
-          <span className="text-2xl font-bold text-purple-400">{mlSeries.length}</span>
-          <span className="text-xs text-purple-300 ml-2">个系列</span>
+        <div className="hidden sm:block card px-4 py-2">
+          <span className="text-2xl font-bold text-[var(--text-primary)] mr-2 font-mono">{mlSeries.length}</span>
+          <span className="text-sm text-[var(--text-muted)] font-mono">个系列</span>
         </div>
       </div>
 
-      <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-5">
+      <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-6">
         {mlSeries.map((series) => (
           <Link
             key={series.id}
             href={`/series/${series.id}`}
-            className="group"
+            className="card-interactive card p-5 group"
           >
-            <div className="relative p-6 rounded-xl bg-gradient-to-br from-purple-500/10 to-pink-500/10 backdrop-blur border border-purple-500/20 hover:border-purple-400/50 transition-all duration-300 hover:-translate-y-1 h-full">
-              {/* 序号 */}
-              <div className="absolute top-4 right-4 w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center">
-                <span className="text-sm font-bold text-purple-400">{String(series.order).padStart(2, '0')}</span>
-              </div>
-
-              {/* Emoji */}
+            {/* 序号 */}
+            <div className="mb-3 flex items-center justify-between">
               {series.emoji && (
-                <div className="text-4xl mb-4">{series.emoji}</div>
+                <div className="text-3xl">{series.emoji}</div>
               )}
+              <span className="tag text-xs font-mono">
+                {String(series.order).padStart(2, '0')}
+              </span>
+            </div>
 
-              {/* 标题 */}
-              <h3 className="font-bold text-white mb-2 group-hover:text-purple-300 transition-colors line-clamp-2">
-                {series.title}
-              </h3>
+            {/* 标题 */}
+            <h3 className="text-sm font-bold text-[var(--text-primary)] mb-2 group-hover:text-[var(--text-primary)] transition-colors font-mono line-clamp-2">
+              {series.title}
+            </h3>
 
-              {/* 描述 */}
-              <p className="text-xs text-slate-500 mb-4 line-clamp-2">
-                {series.description}
-              </p>
+            {/* 描述 */}
+            <p className="text-xs text-[var(--text-secondary)] mb-3 line-clamp-2">
+              {series.description}
+            </p>
 
-              {/* 底部信息 */}
-              <div className="flex items-center justify-between pt-4 border-t border-purple-500/20">
-                <span className="text-xs text-slate-500 font-mono">{series.totalEpisodes} 期</span>
-                <svg className="w-4 h-4 text-slate-600 group-hover:text-purple-400 group-hover:translate-x-1 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </div>
+            {/* 底部信息 */}
+            <div className="flex items-center justify-between pt-3 border-t-2 border-[var(--border-subtle)]">
+              <span className="text-xs text-[var(--text-muted)] font-mono">{series.totalEpisodes} 期</span>
+              <svg className="w-4 h-4 text-[var(--text-muted)] group-hover:text-[var(--text-primary)] group-hover:translate-x-1 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
             </div>
           </Link>
         ))}
