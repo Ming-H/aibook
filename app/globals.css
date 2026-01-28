@@ -321,90 +321,66 @@
   font-weight: bold;
 }
 
-/* ==================== 每日简报专用样式（极简风格） ==================== */
+/* ==================== 每日简报专用样式（极简美观） ==================== */
 .prose-digest {
-  /* 基础设置 */
   color: var(--text-secondary);
   max-width: none;
-  line-height: 1.9;
+  line-height: 1.8;
   font-size: 1rem;
 }
 
-/* 标题 - 极简风格 */
-.prose-digest h1 {
-  font-size: var(--text-3xl);
-  margin-top: var(--space-12);
-  margin-bottom: var(--space-8);
-  color: var(--text-primary);
-  font-weight: 600;
-  line-height: 1.3;
-}
-
-@media (min-width: 768px) {
-  .prose-digest h1 {
-    font-size: var(--text-4xl);
-  }
-}
-
+/* 标题 */
 .prose-digest h2 {
-  font-size: var(--text-2xl);
-  margin-top: var(--space-16);
-  margin-bottom: var(--space-10);
-  padding-bottom: var(--space-4);
+  font-size: 1.5rem;
+  margin-top: 3rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.75rem;
   color: var(--text-primary);
   font-weight: 600;
   line-height: 1.3;
-  border-bottom: 1px solid var(--border-subtle);
+  border-bottom: 2px solid var(--border-subtle);
+  font-family: var(--font-mono);
 }
 
 @media (min-width: 768px) {
   .prose-digest h2 {
-    font-size: var(--text-3xl);
+    font-size: 1.75rem;
   }
 }
 
 .prose-digest h3 {
-  font-size: var(--text-xl);
-  margin-top: var(--space-12);
-  margin-bottom: var(--space-6);
+  font-size: 1.25rem;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
   color: var(--text-primary);
   font-weight: 600;
   line-height: 1.4;
+  font-family: var(--font-mono);
 }
 
 @media (min-width: 768px) {
   .prose-digest h3 {
-    font-size: var(--text-2xl);
+    font-size: 1.5rem;
   }
 }
 
-.prose-digest h4 {
-  font-size: var(--text-lg);
-  margin-top: var(--space-10);
-  margin-bottom: var(--space-5);
-  color: var(--text-primary);
-  font-weight: 600;
-  line-height: 1.5;
-}
-
-/* 段落 - 极简间距 */
+/* 段落 */
 .prose-digest p {
-  margin-bottom: var(--space-6);
-  line-height: 1.9;
+  margin-bottom: 1.25rem;
+  line-height: 1.8;
 }
 
-/* 列表 - 极简风格，无卡片 */
+/* 列表 */
 .prose-digest ul,
 .prose-digest ol {
-  margin-bottom: var(--space-10);
-  margin-left: var(--space-6);
+  margin-bottom: 2rem;
+  margin-left: 1.5rem;
 }
 
 .prose-digest li {
-  margin-bottom: var(--space-6);
-  line-height: 1.9;
+  margin-bottom: 1rem;
+  line-height: 1.8;
   color: var(--text-secondary);
-  padding-left: var(--space-2);
 }
 
 .prose-digest li::marker {
@@ -412,21 +388,21 @@
   font-weight: 400;
 }
 
-/* 引用块 - 极简风格 */
+/* 引用块 */
 .prose-digest blockquote {
-  margin: var(--space-10) 0;
-  padding: var(--space-5) var(--space-6);
+  margin: 2rem 0;
+  padding: 1rem 1.25rem;
   background: var(--background-tertiary);
-  border-left: 2px solid var(--border-default);
+  border-left: 3px solid var(--border-default);
   color: var(--text-secondary);
-  line-height: 1.8;
+  line-height: 1.7;
 }
 
 .prose-digest blockquote p {
   margin-bottom: 0;
 }
 
-/* 链接 - 极简风格 */
+/* 链接 */
 .prose-digest a {
   color: var(--text-primary);
   text-decoration: underline;
@@ -439,39 +415,12 @@
   text-decoration-color: var(--border-medium);
 }
 
-/* 分隔线 - 极简风格 */
+/* 分隔线 */
 .prose-digest hr {
-  margin: var(--space-16) 0;
+  margin: 3rem 0;
   border: none;
-  height: 1px;
+  height: 2px;
   background: var(--border-subtle);
-}
-
-/* 表格优化 */
-.prose-digest table {
-  margin: var(--space-8) 0;
-  width: 100%;
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-}
-
-.prose-digest thead {
-  background: var(--background-tertiary);
-}
-
-.prose-digest th {
-  padding: var(--space-4) var(--space-5);
-  font-size: var(--text-sm);
-  font-weight: 600;
-  color: var(--text-primary);
-}
-
-.prose-digest td {
-  padding: var(--space-4) var(--space-5);
-  font-size: var(--text-sm);
-  color: var(--text-secondary);
-  border-top: 1px solid var(--border-subtle);
 }
 
 /* 强调文本 */
@@ -484,33 +433,54 @@
 .prose-digest code {
   background: var(--background-tertiary);
   border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-sm);
-  padding: var(--space-1) var(--space-2);
-  font-size: var(--text-sm);
+  border-radius: 3px;
+  padding: 0.15rem 0.4rem;
+  font-size: 0.875rem;
   color: var(--text-primary);
+  font-family: var(--font-mono);
 }
 
 .prose-digest pre {
-  margin: var(--space-8) 0;
-  padding: var(--space-5);
+  margin: 1.5rem 0;
+  padding: 1rem;
   background: var(--background-tertiary);
   border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-md);
   overflow-x: auto;
 }
 
-/* Anchor links */
-.prose-digest .anchor {
-  opacity: 0;
-  margin-left: var(--space-2);
-  transition: opacity var(--transition-fast);
+.prose-digest pre code {
+  background: transparent;
+  border: none;
+  padding: 0;
 }
 
-.prose-digest h1:hover .anchor,
-.prose-digest h2:hover .anchor,
-.prose-digest h3:hover .anchor,
-.prose-digest h4:hover .anchor {
-  opacity: 1;
+/* 表格 */
+.prose-digest table {
+  margin: 1.5rem 0;
+  width: 100%;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.prose-digest thead {
+  background: var(--background-tertiary);
+}
+
+.prose-digest th {
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+}
+
+.prose-digest td {
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  border-top: 1px solid var(--border-subtle);
 }
 
 /* ==================== 工具类 ==================== */
