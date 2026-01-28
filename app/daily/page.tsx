@@ -25,7 +25,6 @@ function formatDate(dateStr: string): string {
 
 // 提取内容摘要
 function extractExcerpt(content: string, maxLength = 200): string {
-  // 移除 markdown 语法
   let clean = content
     .replace(/^#{1,6}\s+/gm, '')
     .replace(/\*\*([^*]+)\*\*/g, '$1')
@@ -68,10 +67,10 @@ export default async function DailyPage() {
   return (
     <div className="min-h-screen bg-[var(--background-primary)]">
       {/* Header */}
-      <div className="border-b-2 border-[var(--border-subtle)]">
-        <div className="px-6 py-4">
-          <div className="mx-auto max-w-5xl">
-            <h1 className="text-2xl md:text-3xl font-bold text-[var(--text-primary)] font-mono">
+      <div className="border-b border-[var(--border-subtle)]">
+        <div className="px-6 py-6">
+          <div className="mx-auto max-w-4xl">
+            <h1 className="text-2xl md:text-3xl font-semibold text-[var(--text-primary)] font-mono tracking-tight">
               今日 AI 热点
             </h1>
           </div>
@@ -79,25 +78,25 @@ export default async function DailyPage() {
       </div>
 
       {/* Main Content */}
-      <section className="px-6 py-12">
-        <div className="mx-auto max-w-5xl">
+      <section className="px-6 py-16">
+        <div className="mx-auto max-w-4xl">
           {/* Latest Entry */}
           {latestEntry && (
             <Link href={`/daily/${latestEntry.date}`} className="block group">
-              <div className="card p-8 mb-8">
-                <div className="flex items-center gap-2 text-sm font-mono text-[var(--text-muted)] mb-4">
+              <div className="card p-8 md:p-10 mb-16">
+                <div className="flex items-center gap-2 text-sm font-mono text-[var(--text-muted)] mb-6">
                   <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                   </svg>
                   {formatDate(latestEntry.date)}
                 </div>
-                <h2 className="text-2xl md:text-3xl font-bold text-[var(--text-primary)] mb-4 font-mono group-hover:text-[var(--border-medium)] transition-colors">
+                <h2 className="text-2xl md:text-4xl font-semibold text-[var(--text-primary)] mb-6 font-mono leading-tight group-hover:text-[var(--border-medium)] transition-colors">
                   {latestEntry.title}
                 </h2>
-                <p className="text-[var(--text-secondary)] leading-relaxed mb-6">
+                <p className="text-[var(--text-secondary)] leading-relaxed mb-8 text-lg">
                   {latestExcerpt}
                 </p>
-                <div className="flex items-center gap-2 text-sm font-mono text-[var(--text-primary)]">
+                <div className="flex items-center gap-2 text-sm font-mono text-[var(--text-primary)] group-hover:gap-3 transition-all">
                   <span>阅读完整内容</span>
                   <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -110,8 +109,8 @@ export default async function DailyPage() {
           {/* Historical Entries */}
           {entries.length > 1 && (
             <>
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-bold text-[var(--text-primary)] font-mono">
+              <div className="flex items-center justify-between mb-8">
+                <h2 className="text-xl font-semibold text-[var(--text-primary)] font-mono">
                   历史归档
                 </h2>
                 {entries.length > 4 && (
@@ -120,7 +119,7 @@ export default async function DailyPage() {
                   </span>
                 )}
               </div>
-              <div className="grid gap-4 md:grid-cols-2">
+              <div className="grid gap-5 md:grid-cols-2">
                 {entries.slice(1).map((entry) => {
                   const metrics = extractMetrics(entry.content);
                   const excerpt = extractExcerpt(entry.content, 120);
@@ -131,25 +130,30 @@ export default async function DailyPage() {
                       href={`/daily/${entry.date}`}
                       className="card-interactive card p-6 group"
                     >
-                      <div className="flex items-center gap-2 text-xs font-mono text-[var(--text-muted)] mb-3">
+                      <div className="flex items-center gap-2 text-xs font-mono text-[var(--text-muted)] mb-4">
                         <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                         </svg>
                         {entry.date.slice(0, 4)}-{entry.date.slice(4, 6)}-{entry.date.slice(6, 8)}
                       </div>
-                      <h3 className="text-lg font-bold text-[var(--text-primary)] mb-2 font-mono group-hover:text-[var(--border-medium)] transition-colors">
+                      <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-3 font-mono group-hover:text-[var(--border-medium)] transition-colors leading-snug">
                         {entry.title}
                       </h3>
-                      <p className="text-sm text-[var(--text-secondary)] line-clamp-2 leading-relaxed mb-4">
+                      <p className="text-sm text-[var(--text-secondary)] line-clamp-2 leading-relaxed mb-5">
                         {excerpt}
                       </p>
-                      {metrics.count && (
-                        <div className="flex items-center gap-2">
+                      <div className="flex items-center justify-between">
+                        {metrics.count && (
                           <span className="text-xs font-mono text-[var(--text-muted)]">
                             {metrics.count} 条动态
                           </span>
+                        )}
+                        <div className="flex items-center gap-1 text-sm font-mono text-[var(--text-primary)] opacity-0 group-hover:opacity-100 transition-opacity group-hover:translate-x-1">
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                          </svg>
                         </div>
-                      )}
+                      </div>
                     </Link>
                   );
                 })}
