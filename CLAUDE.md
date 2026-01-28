@@ -4,13 +4,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-AI Hot Tech is a static site generator that displays AI technology news articles, series content, and interactive learning tools. Content is stored in a GitHub repository and fetched via GitHub API during build time. The site uses Next.js 14 App Router with SSG/ISR for optimal performance.
+DevFox (AI Hot Tech) is a personal portfolio and content platform displaying AI technology news, series content, and interactive learning tools. Content is stored in GitHub repositories and fetched via GitHub API during build time. The site uses Next.js 14 App Router with SSG/ISR for optimal performance.
 
 **Content Channels:**
 - **Daily Hot Tech** (`/daily`) - Daily AI industry news digests from `data/daily/{YYYYMMDD}/digest/`
 - **Series Learning** (`/series`) - Structured learning paths from `data/series/`
+- **Book Digests** (`/book-digest`) - Book summaries and insights from external book-digest repository
 - **Archive** (`/archive`) - Historical content browser
 - **Blog** (`/blog`) - Content aggregation page showcasing all content types
+- **Products** (`/products`) - Product showcase page
 - **Prompts Library** (`/prompts`) - AI prompt inspiration showcase with curated prompts from `awesome-prompt` and `wonderful-prompts` repositories
 
 **Interactive Tools:**
@@ -21,11 +23,13 @@ AI Hot Tech is a static site generator that displays AI technology news articles
 **Portfolio Pages:**
 - **About** (`/about`) - Personal introduction with skills, GitHub repos, and social links
 - **Projects** (`/projects`) - Project showcase (Skillset, Pixel Factory, Dating Spot Finder, etc.)
+- **Contact** (`/contact`) - Contact information page
 
 **Content Sources:**
 - Daily digests: `data/daily/{YYYYMMDD}/digest/digest_*.md`
 - Daily articles: `data/{YYYYMMDD}/longform/*.md`
 - Series content: `data/series/series_{N}/episode_{N}/longform/*.md`
+- Book digests: External repository via `BOOK_DIGEST_REPO` environment variable
 - Custom/Legacy articles: `data/custom/{YYYYMMDD_HHMMSS_title}/article_*.md`
 
 ## Development Commands
@@ -85,14 +89,14 @@ The `isAdmin` field in user sessions requires special handling to ensure type sa
 - Pattern: `const token = cleanEnv(process.env.GITHUB_TOKEN)`
 
 **Content Loader Pattern:**
-- Four separate loaders (`content-loader.ts`, `series-loader.ts`, `daily-loader.ts`, `prompt-loader.ts`) for different content types
+- Five separate loaders (`content-loader.ts`, `series-loader.ts`, `daily-loader.ts`, `prompt-loader.ts`, `book-digest-loader.ts`) for different content types
 - Each loader maintains its own in-memory Map cache
 - Caches are cleared via `/api/revalidate` endpoint for ISR refresh
 - Do not mix content types in a single loader - metadata structures differ significantly
 
 ### Content Loading Architecture
 
-The system has four parallel content loading paths:
+The system has five parallel content loading paths:
 
 1. **Daily Articles** (`lib/content-loader.ts`)
    - Fetches from `data/{YYYYMMDD}/longform/` structure
@@ -110,6 +114,7 @@ The system has four parallel content loading paths:
    - Fetches from `data/daily/{YYYYMMDD}/digest/` structure
    - Optimized for daily news digest format
    - Separate cache for digest content
+   - Supports both `digest_YYYYMMDD.md` and `digest_YYYYMMDD_HHMMSS.md` filename formats
 
 4. **Prompts Library** (`lib/prompt-loader.ts`)
    - Fetches prompts from GitHub repositories
@@ -117,7 +122,13 @@ The system has four parallel content loading paths:
    - Caches in `promptsCache` Map
    - Supports categories, difficulty levels, and tags
 
-**Why separate loaders?** Daily articles, series content, daily digests, and prompts have different metadata structures and access patterns. Separating them allows for optimized caching and query strategies for each content type.
+5. **Book Digests** (`lib/book-digest-loader.ts`)
+   - Fetches from external repository defined by `BOOK_DIGEST_REPO` environment variable
+   - Loads JSON data from `output/json/` directory structure
+   - Caches in `bookCache` Map
+   - Supports categories, difficulty levels, and book metadata
+
+**Why separate loaders?** Daily articles, series content, daily digests, prompts, and book digests have different metadata structures and access patterns. Separating them allows for optimized caching and query strategies for each content type.
 
 ### Authentication & Authorization
 
@@ -208,7 +219,9 @@ Series use separate JSON metadata files instead of encoding everything in filena
 |----------|----------|-------------|
 | `GITHUB_TOKEN` | Yes | GitHub Personal Access Token with `repo` scope |
 | `GITHUB_DATA_REPO` | Yes | Data repository in format `owner/repo` |
+| `BOOK_DIGEST_REPO` | Optional | Book digest repository in format `owner/repo` |
 | `CRON_SECRET` | Yes | Secret for protecting ISR endpoint at `/api/revalidate` |
+| `GITHUB_WEBHOOK_SECRET` | Recommended | Secret for GitHub webhook verification |
 | `GLM_API_KEY` | Optional | GLM-4.7 API key for quiz generation feature |
 | `MODELSCOPE_API_KEY` | Optional | ModelScope API key for image generation feature |
 | `DATABASE_URL` | Yes | PostgreSQL connection string for Prisma |
@@ -240,6 +253,7 @@ Series use separate JSON metadata files instead of encoding everything in filena
 | `lib/series-loader.ts` | Series/episode caching, metadata extraction, episode ordering |
 | `lib/daily-loader.ts` | Daily digest caching and content loading |
 | `lib/prompt-loader.ts` | Prompts library caching from external repositories |
+| `lib/book-digest-loader.ts` | Book digest caching from external repository |
 | `lib/glm-api.ts` | GLM-4.7 API integration for quiz generation |
 | `lib/modelscope-api.ts` | ModelScope API integration for image generation |
 | `lib/markdown-parser.ts` | Markdown → HTML conversion with remark/rehype, heading extraction |
@@ -248,6 +262,7 @@ Series use separate JSON metadata files instead of encoding everything in filena
 | `lib/subscription-check.ts` | Subscription validation, admin checks, usage recording |
 | `lib/prisma.ts` | Prisma client singleton |
 | `types/content.ts` | TypeScript interfaces for all content types |
+| `types/book-digest.ts` | TypeScript interfaces for book digest content |
 
 ### Key Routes
 
@@ -256,8 +271,10 @@ Series use separate JSON metadata files instead of encoding everything in filena
 | `/` | Homepage portfolio with article timeline |
 | `/daily` | Daily digest browser |
 | `/series` | Series learning paths |
+| `/book-digest` | Book digest library |
 | `/archive` | Historical content archive |
 | `/blog` | Content aggregation page |
+| `/products` | Product showcase page |
 | `/prompts` | AI prompt inspiration showcase |
 | `/quiz-generator` | Quiz generation tool (requires subscription) |
 | `/quiz-generator/create` | Multi-step quiz creation workflow |
@@ -265,6 +282,7 @@ Series use separate JSON metadata files instead of encoding everything in filena
 | `/image-tools` | Image processing with crop selection |
 | `/projects` | Project showcase portfolio |
 | `/about` | Personal introduction page |
+| `/contact` | Contact information page |
 | `/admin` | Admin dashboard (requires admin role) |
 | `/auth/signin` | Sign in page |
 | `/subscribe` | Subscription page |
@@ -275,6 +293,8 @@ Series use separate JSON metadata files instead of encoding everything in filena
 |-------|---------|
 | `/api/auth/[...nextauth]` | NextAuth.js handler |
 | `/api/revalidate` | ISR cache invalidation (protected by CRON_SECRET) |
+| `/api/webhook/github` | GitHub webhook handler for real-time content updates |
+| `/api/cron/check-updates` | Cron job endpoint for checking content updates |
 | `/api/quiz/generate` | Generate quiz from content |
 | `/api/quiz/regenerate` | Regenerate a quiz |
 | `/api/quiz/record-usage` | Record quiz usage (internal) |
@@ -293,7 +313,7 @@ Series use separate JSON metadata files instead of encoding everything in filena
 - **Platform**: Vercel (configured in `vercel.json`)
 - **Region**: `hkg1` (Hong Kong)
 - **Database**: PostgreSQL (requires external database service for production)
-- **Cron Schedule**: Daily at 2 AM UTC
+- **Cron Schedule**: Three daily runs at 22:00, 4:00, and 10:00 UTC (6:00, 12:00, 18:00 Beijing time)
 - **Image Optimization**: Disabled (`unoptimized: true` in next.config.mjs)
 
 When adding environment variables via Vercel CLI, add to all environments:
@@ -308,6 +328,14 @@ echo "your-token" | vercel env add GITHUB_TOKEN development
 - `DATABASE_URL` - PostgreSQL connection string (e.g., from Vercel Postgres, Supabase, or Neon)
 - `NEXTAUTH_SECRET` - Generate with `openssl rand -base64 32`
 - `NEXTAUTH_URL` - Your production domain URL
+
+**Auto-Update System:**
+The site supports three mechanisms for content updates:
+1. **GitHub Webhooks** (Recommended) - Real-time updates when content is pushed to the data repository
+2. **Vercel Cron Jobs** - Scheduled checks at 6:00, 12:00, and 18:00 Beijing time
+3. **Manual Trigger** - Via `/api/revalidate` endpoint
+
+See `AUTO_UPDATE_SETUP.md` and `DAILY_AUTO_UPDATE_GUIDE.md` for detailed setup instructions.
 
 ### Content Format
 
@@ -359,6 +387,26 @@ The markdown parser (lib/markdown-parser.ts) processes:
 ```
 
 The series loader (lib/series-loader.ts) reads these JSON files to build the series structure, then combines with article content from the longform/ subdirectories.
+
+### Book Digests
+
+The `/book-digest` route provides a library of book summaries and insights:
+
+**Architecture:**
+- Fetches book data from external GitHub repository defined by `BOOK_DIGEST_REPO`
+- Loads JSON metadata from `output/json/` directory structure
+- Caches book data in-memory for performance
+- Category-based organization with difficulty levels
+
+**Key Features:**
+- Categories: technology, business, psychology, self-improvement, science, history
+- Difficulty levels: beginner, intermediate, advanced
+- Book metadata including title, author, summary, and key insights
+- Search and filter functionality
+
+**Key Components:**
+- `lib/book-digest-loader.ts` - Book digest fetching and caching
+- `app/book-digest/page.tsx` - Book digest library interface
 
 ### Prompts Library
 
@@ -515,5 +563,15 @@ The `/api/payment` routes handle payment processing for subscription purchases:
 **TypeScript types for session.user:**
 - Extend the NextAuth types to include `isAdmin` in your type definitions
 - See `lib/auth.ts` for the session callback that adds `isAdmin`
+
+**Book digest not loading:**
+- Ensure `BOOK_DIGEST_REPO` environment variable is set correctly
+- Verify the repository has the correct structure with `output/json/` directory
+- Check that the repository is accessible with the provided `GITHUB_TOKEN`
+
+**Webhook not triggering updates:**
+- Verify `GITHUB_WEBHOOK_SECRET` matches between GitHub and Vercel
+- Check webhook delivery logs in GitHub repository settings
+- Ensure webhook URL is using HTTPS (required by GitHub)
 
 

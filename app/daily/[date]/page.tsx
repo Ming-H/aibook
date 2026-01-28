@@ -3,6 +3,7 @@ import { parseMarkdown } from "@/lib/markdown-parser";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import type { Metadata } from "next";
+import { DigestContent } from "./DigestContent";
 
 // 临时改为 SSR 以加快构建速度
 export const dynamic = "force-dynamic";
@@ -75,28 +76,30 @@ export default async function DailyDetailPage({ params }: { params: { date: stri
       </div>
 
       {/* 内容区域 */}
-      <article className="relative px-6 pt-12 pb-24">
-        <div className="mx-auto max-w-5xl">
+      <article className="relative px-4 sm:px-6 pt-16 pb-32">
+        <div className="mx-auto max-w-4xl">
           {/* 标题 */}
-          <header className="mb-12">
-            <div className="mb-6 inline-flex items-center gap-3 rounded-full bg-[var(--gradient-primary)] px-6 py-2 text-sm font-bold text-white shadow-lg">
+          <header className="mb-16">
+            <div className="mb-8 inline-flex items-center gap-3 rounded-full bg-[var(--gradient-primary)] px-6 py-2.5 text-sm font-bold text-white shadow-lg">
               <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               {entry.date}
             </div>
-            <h1 className="text-5xl md:text-6xl font-black text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-display)' }}>
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-black text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-display)' }}>
               {entry.title}
             </h1>
           </header>
 
           {/* Markdown 内容 */}
-          <div className="relative rounded-3xl border border-[var(--border-default)] bg-[var(--background-secondary)] backdrop-blur-xl p-8 md:p-16 shadow-2xl">
+          <div className="relative rounded-3xl border border-[var(--border-default)] bg-[var(--background-secondary)] backdrop-blur-xl p-6 sm:p-10 md:p-14 lg:p-16 shadow-2xl">
             {/* 顶部装饰条 */}
             <div className="absolute top-0 left-8 right-8 h-1 bg-gradient-to-r from-[var(--color-brand)] via-[var(--color-purple)] to-[var(--color-pink)] rounded-t-3xl" />
 
+            <DigestContent html={parsed.html || entry.content} title={entry.title} />
+
             <div
-              className="prose prose-lg prose-invert prose-slate max-w-none"
+              className="prose-digest"
               dangerouslySetInnerHTML={{ __html: parsed.html || entry.content }}
             />
           </div>
