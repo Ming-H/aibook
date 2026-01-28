@@ -41,31 +41,13 @@ export default async function DailyDetailPage({ params }: { params: { date: stri
   const parsed = await parseMarkdown(entry.content);
 
   return (
-    <div className="min-h-screen bg-[var(--background-primary)] bg-noise">
-      {/* 动态背景 */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute inset-0 bg-grid opacity-40" />
-        <div className="absolute top-0 left-1/4 w-[600px] h-[600px] rounded-full animate-float"
-          style={{
-            background: 'radial-gradient(circle, rgba(102, 126, 234, 0.15) 0%, transparent 70%)',
-            filter: 'blur(80px)'
-          }}
-        />
-        <div className="absolute bottom-0 right-1/4 w-[600px] h-[600px] rounded-full animate-float"
-          style={{
-            background: 'radial-gradient(circle, rgba(168, 85, 247, 0.15) 0%, transparent 70%)',
-            animationDelay: '1.5s',
-            filter: 'blur(80px)'
-          }}
-        />
-      </div>
-
+    <div className="min-h-screen bg-[var(--background-primary)]">
       {/* 返回按钮 */}
-      <div className="relative px-6 pt-8">
-        <div className="mx-auto max-w-5xl">
+      <div className="px-6 pt-8">
+        <div className="mx-auto max-w-4xl">
           <Link
             href="/daily"
-            className="inline-flex items-center gap-2 text-sm text-[var(--text-secondary)] transition-all hover:text-[var(--text-primary)] rounded-xl px-4 py-2 hover:bg-[var(--background-secondary)]"
+            className="inline-flex items-center gap-2 text-sm text-[var(--text-secondary)] transition-colors hover:text-[var(--text-primary)]"
           >
             <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -76,30 +58,25 @@ export default async function DailyDetailPage({ params }: { params: { date: stri
       </div>
 
       {/* 内容区域 */}
-      <article className="relative px-4 sm:px-6 pt-16 pb-32">
+      <article className="px-6 pt-12 pb-24">
         <div className="mx-auto max-w-4xl">
           {/* 标题 */}
-          <header className="mb-16">
-            <div className="mb-8 inline-flex items-center gap-3 rounded-full bg-[var(--gradient-primary)] px-6 py-2.5 text-sm font-bold text-white shadow-lg">
+          <header className="mb-12">
+            <div className="mb-6 inline-flex items-center gap-2 text-sm text-[var(--text-muted)]">
               <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               {entry.date}
             </div>
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-black text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-display)' }}>
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-semibold text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-display)' }}>
               {entry.title}
             </h1>
           </header>
 
           {/* Markdown 内容 */}
-          <div className="relative rounded-3xl border border-[var(--border-default)] bg-[var(--background-secondary)] backdrop-blur-xl p-6 sm:p-10 md:p-14 lg:p-16 shadow-2xl">
-            {/* 顶部装饰条 */}
-            <div className="absolute top-0 left-8 right-8 h-1 bg-gradient-to-r from-[var(--color-brand)] via-[var(--color-purple)] to-[var(--color-pink)] rounded-t-3xl" />
-
+          <div className="prose-digest">
             <DigestContent html={parsed.html || entry.content} title={entry.title} />
-
             <div
-              className="prose-digest"
               dangerouslySetInnerHTML={{ __html: parsed.html || entry.content }}
             />
           </div>
