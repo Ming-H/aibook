@@ -172,43 +172,62 @@ export async function articleExists(articleDir: string, filename: string): Promi
 // ==================== 系列相关功能 ====================
 
 /**
- * 列出所有系列目录
- * 从 data/series/ 目录下读取
- * 数据结构: series_1, series_2, ...
+ * 递归查找所有系列目录
+ * 从 data/series/ 目录下递归查找
+ * 数据结构: LLM_series/series_1_*, ML_series/series_1_*, 或直接的 series_1_*
  */
-export async function listSeries(): Promise<string[]> {
+async function findSeriesRecursively(path: string): Promise<string[]> {
   const allSeries: string[] = [];
 
   try {
-    console.log(`[listSeries] Fetching series from ${owner}/${repo}/data/series`);
     const { data } = await octokit.rest.repos.getContent({
       owner,
       repo,
-      path: "data/series",
+      path,
     });
 
-    console.log(`[listSeries] GitHub API returned ${Array.isArray(data) ? data.length : 0} items`);
+    if (!Array.isArray(data)) {
+      return allSeries;
+    }
 
-    if (Array.isArray(data)) {
-      // 过滤出系列目录（按 series_1_*, series_2_* 等命名）
-      const directories = data
-        .filter((item) => {
-          const isDir = item.type === "dir";
-          const matchesPattern = /^series_\d+/.test(item.name);
-          console.log(`[listSeries] Checking ${item.name}: dir=${isDir}, matches=${matchesPattern}`);
-          return isDir && matchesPattern;
-        })
-        .map((item) => item.name)
-        .sort();
-
-      console.log(`[listSeries] Found directories:`, directories);
-      allSeries.push(...directories);
+    for (const item of data) {
+      if (item.type === "dir") {
+        // 检查是否是系列目录（支持 series_数字 或 ml_series_数字 开头）
+        const isSeries = /^series_\d+/.test(item.name) || /^ml_series_\d+/.test(item.name);
+        if (isSeries) {
+          // 返回相对于 data/series 的完整路径
+          const relativePath = path.replace(/^data\/series\/?/, "");
+          const fullPath = relativePath ? `${relativePath}/${item.name}` : item.name;
+          allSeries.push(fullPath);
+        } else {
+          // 如果不是系列目录，递归查找子目录
+          const subSeries = await findSeriesRecursively(`${path}/${item.name}`);
+          allSeries.push(...subSeries);
+        }
+      }
     }
   } catch (error) {
-    console.error("[listSeries] Failed to list series from GitHub:", error);
+    console.error(`[findSeriesRecursively] Failed to list ${path}:`, error);
   }
 
   return allSeries;
+}
+
+/**
+ * 列出所有系列目录
+ * 从 data/series/ 目录下递归读取
+ * 数据结构: 支持嵌套目录如 LLM_series/series_1_*, ML_series/series_1_*
+ */
+export async function listSeries(): Promise<string[]> {
+  try {
+    console.log(`[listSeries] Fetching series from ${owner}/${repo}/data/series`);
+    const allSeries = await findSeriesRecursively("data/series");
+    console.log(`[listSeries] Found ${allSeries.length} series:`, allSeries);
+    return allSeries.sort();
+  } catch (error) {
+    console.error("[listSeries] Failed to list series from GitHub:", error);
+    return [];
+  }
 }
 
 /**

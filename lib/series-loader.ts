@@ -51,11 +51,13 @@ function extractEpisodeNumber(episodeId: string): number {
 
 /**
  * 从 series ID 提取序号
- * series_1 -> 1
+ * series_1 -> 1, ml_series_1 -> 1
+ * 支持嵌套路径如 LLM_series/series_1_llm_foundation
  */
 function extractSeriesNumber(seriesId: string): number {
-  const match = seriesId.match(/series_(\d+)/);
-  return match ? parseInt(match[1], 10) : 0;
+  // 尝试匹配 series_数字 或 ml_series_数字
+  const seriesMatch = seriesId.match(/(?:ml_)?series_(\d+)/);
+  return seriesMatch ? parseInt(seriesMatch[1], 10) : 0;
 }
 
 /**
