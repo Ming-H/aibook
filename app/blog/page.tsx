@@ -21,11 +21,8 @@ export default async function BlogPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[var(--background-primary)]">
-      {/* 点阵背景 */}
-      <div className="fixed inset-0 pointer-events-none bg-dot-matrix opacity-50" />
-
-      <div className="relative max-w-7xl mx-auto px-6 py-12">
+    <div className="min-h-screen bg-white dark:bg-[var(--background-primary)] bg-dot-matrix py-12 px-4 sm:px-6 lg:px-8">
+      <div className="relative max-w-7xl mx-auto">
         {/* Hero Section */}
         <div className="text-center mb-16">
           <h1 className="text-4xl sm:text-5xl font-bold text-[var(--text-primary)] mb-4 font-mono border-b-4 border-[var(--border-medium)] inline-block pb-2">
