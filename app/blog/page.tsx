@@ -27,20 +27,17 @@ export default async function BlogPage() {
 
       <div className="relative max-w-7xl mx-auto px-6 py-12">
         {/* Hero Section */}
-        <section className="mb-16">
-          <div className="text-center mb-12">
-            <h1 className="text-5xl md:text-6xl lg:text-7xl font-black tracking-tight text-[var(--text-primary)] mb-4 font-mono">
-              <span className="border-b-4 border-[var(--border-medium)]">
-                BLOG
-              </span>
-            </h1>
-            <p className="text-lg text-[var(--text-secondary)] max-w-2xl mx-auto">
-              探索 AI 技术前沿 · 系统化学习路径 · 实战项目经验
-            </p>
-          </div>
+        <div className="text-center mb-16">
+          <h1 className="text-4xl sm:text-5xl font-bold text-[var(--text-primary)] mb-4 font-mono border-b-4 border-[var(--border-medium)] inline-block pb-2">
+            BLOG
+          </h1>
+          <p className="text-[var(--text-secondary)] text-lg max-w-2xl mx-auto">
+            探索 AI 技术前沿 · 系统化学习路径 · 实战项目经验
+          </p>
+        </div>
 
-          {/* 统计数据 */}
-          <div className="flex justify-center gap-4">
+        {/* 统计数据 */}
+        <div className="flex justify-center gap-4">
             <div className="card px-6 py-3 text-center">
               <div className="text-2xl font-bold text-[var(--text-primary)] mb-1 font-mono">{llmSeries.length}+</div>
               <div className="text-xs text-[var(--text-muted)] font-mono">LLM系列</div>
