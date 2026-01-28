@@ -1,4 +1,4 @@
-import { getAllSeries, getTotalEpisodes } from "@/lib/series-loader";
+import { getLLMSeries, getTotalEpisodes } from "@/lib/series-loader";
 import Link from "next/link";
 import type { SeriesMetadata } from "@/types/content";
 
@@ -10,7 +10,7 @@ export default async function SeriesPage() {
   let totalEpisodes = 0;
 
   try {
-    allSeries = await getAllSeries();
+    allSeries = await getLLMSeries();
   } catch (error) {
     console.error('[Series Page] Failed to load series:', error);
   }

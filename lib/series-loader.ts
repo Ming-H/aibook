@@ -102,6 +102,22 @@ export async function getAllSeries(): Promise<SeriesMetadata[]> {
 }
 
 /**
+ * 获取LLM系列（过滤掉ML系列）
+ */
+export async function getLLMSeries(): Promise<SeriesMetadata[]> {
+  const allSeries = await getAllSeries();
+  return allSeries.filter(series => !series.id.startsWith('ML_series/'));
+}
+
+/**
+ * 获取ML系列（只返回ML系列）
+ */
+export async function getMLSeries(): Promise<SeriesMetadata[]> {
+  const allSeries = await getAllSeries();
+  return allSeries.filter(series => series.id.startsWith('ML_series/'));
+}
+
+/**
  * 获取指定系列的信息
  */
 export async function getSeriesInfo(seriesId: string): Promise<SeriesMetadata | null> {

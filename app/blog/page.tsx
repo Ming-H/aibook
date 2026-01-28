@@ -5,6 +5,7 @@
  */
 
 import Link from "next/link";
+import { MLSeriesSection } from "@/components/MLSeriesSection";
 
 interface BlogSection {
   id: string;
@@ -129,6 +130,9 @@ export default function BlogPage() {
             </Link>
           ))}
         </div>
+
+        {/* ML 系列教程 */}
+        <MLSeriesSection />
 
         {/* 专题分类 */}
         <div className="mb-16">
