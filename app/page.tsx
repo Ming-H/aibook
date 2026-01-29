@@ -56,9 +56,9 @@ export default function HomePage() {
       </section>
 
       {/* Featured Projects - 精选实验室作品 */}
-      <section className="relative px-6 py-24 bg-[var(--background-secondary)]">
+      <section className="relative px-6 py-16 bg-[var(--background-secondary)]">
         <div className="mx-auto max-w-7xl">
-          <div className="text-center mb-20">
+          <div className="text-center mb-12">
             <h2 className="text-5xl md:text-6xl lg:text-7xl font-semibold text-[var(--text-primary)] mb-6 tracking-tight">
               精选实验室作品
             </h2>
@@ -137,9 +137,9 @@ export default function HomePage() {
       </section>
 
       {/* Product Showcase - Minimal Cards */}
-      <section className="relative px-6 py-24">
+      <section className="relative px-6 py-16">
         <div className="mx-auto max-w-7xl">
-          <div className="text-center mb-20">
+          <div className="text-center mb-12">
             <h2 className="text-5xl md:text-6xl lg:text-7xl font-semibold text-[var(--text-primary)] mb-6 tracking-tight">
               AI 工具集
             </h2>
@@ -204,9 +204,9 @@ export default function HomePage() {
       </section>
 
       {/* Content Hub - Minimal Grid */}
-      <section className="relative px-6 py-24 bg-[var(--background-secondary)]">
+      <section className="relative px-6 py-16 bg-[var(--background-secondary)]">
         <div className="mx-auto max-w-7xl">
-          <div className="text-center mb-20">
+          <div className="text-center mb-12">
             <h2 className="text-5xl md:text-6xl lg:text-7xl font-semibold text-[var(--text-primary)] mb-6 tracking-tight">
               内容中心
             </h2>
@@ -263,7 +263,7 @@ export default function HomePage() {
       </section>
 
       {/* Blog Section - Clean Layout */}
-      <section className="relative px-6 py-24">
+      <section className="relative px-6 py-16">
         <div className="mx-auto max-w-7xl">
           <div className="flex items-center justify-between mb-16">
             <div>
@@ -327,7 +327,7 @@ export default function HomePage() {
       </section>
 
       {/* Final CTA - Clean & Direct */}
-      <section className="relative px-6 py-32 bg-[var(--background-secondary)]">
+      <section className="relative px-6 py-20 bg-[var(--background-secondary)]">
         <div className="mx-auto max-w-4xl text-center">
           <h2 className="text-5xl md:text-6xl lg:text-7xl font-semibold text-[var(--text-primary)] mb-8 tracking-tight">
             准备好了吗？
@@ -356,7 +356,7 @@ export default function HomePage() {
       </section>
 
       {/* Footer - with Email Copy Functionality */}
-      <footer className="relative px-6 py-16 border-t-2 border-[var(--border-subtle)]">
+      <footer className="relative px-6 py-10 border-t-2 border-[var(--border-subtle)]">
         <div className="mx-auto max-w-7xl">
           {/* Email Copy Section - Centered */}
           <div className="flex flex-col items-center justify-center mb-12">
