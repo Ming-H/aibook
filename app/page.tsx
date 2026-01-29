@@ -15,7 +15,7 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-white dark:bg-[var(--background-primary)]">
       {/* Hero Section - Apple Style */}
-      <section className="relative px-6 py-32 md:py-48 lg:py-64 overflow-hidden">
+      <section className="relative px-6 py-16 md:py-24 lg:py-32 overflow-hidden">
         <div className="relative mx-auto max-w-5xl">
           <div className="text-center">
             {/* Hero Title - with Gradient Animation */}
@@ -27,7 +27,7 @@ export default function HomePage() {
             </h1>
 
             {/* Subtitle - Clean & Simple */}
-            <p className="text-xl md:text-2xl lg:text-3xl text-[var(--text-secondary)] mb-16 max-w-3xl mx-auto leading-relaxed font-normal">
+            <p className="text-xl md:text-2xl lg:text-3xl text-[var(--text-secondary)] mb-12 max-w-3xl mx-auto leading-relaxed font-normal">
               探索 AI 技术的实用边界
               <br />
               <span className="text-lg md:text-xl lg:text-2xl">为创造者构建高效工具</span>
