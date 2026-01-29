@@ -113,7 +113,7 @@ export default function AboutPage() {
 
                   {/* Climbing photo */}
                   <img
-                    src="https://maas-log-prod.cn-wlcb.ufileos.com/anthropic/d18386b8-fa1d-418b-8078-2186a719c605/bc3cf29bc91cb9b2550d6edcc8508574.jpg?UCloudPublicKey=TOKEN_e15ba47a-d098-4fbd-9afc-a0dcf0e4e621&Expires=1769690990&Signature=MA5hlhZvYAsYqz0R5XWc/qh7/5k="
+                    src="/登山照.jpg"
                     alt="Ming Hao - 登山照"
                     className="absolute inset-0 w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700"
                   />
