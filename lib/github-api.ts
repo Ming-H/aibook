@@ -178,36 +178,48 @@ export async function articleExists(articleDir: string, filename: string): Promi
  */
 async function findSeriesRecursively(path: string): Promise<string[]> {
   const allSeries: string[] = [];
+  let page = 1;
+  let hasMore = true;
 
-  try {
-    const { data } = await octokit.rest.repos.getContent({
-      owner,
-      repo,
-      path,
-    });
+  while (hasMore) {
+    try {
+      const { data } = await octokit.rest.repos.getContent({
+        owner,
+        repo,
+        path,
+        per_page: 100,
+        page,
+      });
 
-    if (!Array.isArray(data)) {
-      return allSeries;
-    }
+      if (!Array.isArray(data)) {
+        hasMore = false;
+        continue;
+      }
 
-    for (const item of data) {
-      if (item.type === "dir") {
-        // 检查是否是系列目录（支持 series_数字 或 ml_series_数字 开头）
-        const isSeries = /^series_\d+/.test(item.name) || /^ml_series_\d+/.test(item.name);
-        if (isSeries) {
-          // 返回相对于 data/series 的完整路径
-          const relativePath = path.replace(/^data\/series\/?/, "");
-          const fullPath = relativePath ? `${relativePath}/${item.name}` : item.name;
-          allSeries.push(fullPath);
-        } else {
-          // 如果不是系列目录，递归查找子目录
-          const subSeries = await findSeriesRecursively(`${path}/${item.name}`);
-          allSeries.push(...subSeries);
+      for (const item of data) {
+        if (item.type === "dir") {
+          // 检查是否是系列目录（支持 series_数字 或 ml_series_数字 开头）
+          const isSeries = /^series_\d+/.test(item.name) || /^ml_series_\d+/.test(item.name);
+          if (isSeries) {
+            // 返回相对于 data/series 的完整路径
+            const relativePath = path.replace(/^data\/series\/?/, "");
+            const fullPath = relativePath ? `${relativePath}/${item.name}` : item.name;
+            allSeries.push(fullPath);
+          } else {
+            // 如果不是系列目录，递归查找子目录
+            const subSeries = await findSeriesRecursively(`${path}/${item.name}`);
+            allSeries.push(...subSeries);
+          }
         }
       }
+
+      // 如果返回的数据少于100条，说明已经到最后一页
+      hasMore = data.length === 100;
+      page++;
+    } catch (error) {
+      console.error(`[findSeriesRecursively] Failed to list ${path} (page ${page}):`, error);
+      hasMore = false;
     }
-  } catch (error) {
-    console.error(`[findSeriesRecursively] Failed to list ${path}:`, error);
   }
 
   return allSeries;

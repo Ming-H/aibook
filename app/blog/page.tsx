@@ -111,29 +111,24 @@ export default async function BlogPage() {
             <div className="flex items-center justify-between mb-6">
               <div>
                 <h2 className="text-2xl md:text-3xl font-bold text-[var(--text-primary)] mb-2 font-mono">
-                  LLM 系列精选
+                  LLM 系列教程
                 </h2>
                 <p className="text-[var(--text-secondary)]">
                   从基础到精通的系统化学习路径
                 </p>
               </div>
-              <Link
-                href="/series"
-                className="hidden md:flex items-center gap-2 px-6 py-3 rounded-md font-mono text-[var(--text-primary)] border-2 border-[var(--border-subtle)] hover:bg-[var(--background-tertiary)] hover:border-[var(--border-default)] transition-all duration-200"
-              >
-                查看全部
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                </svg>
-              </Link>
+              <div className="hidden sm:block card px-4 py-2">
+                <span className="text-2xl font-bold text-[var(--text-primary)] mr-2 font-mono">{llmSeries.length}</span>
+                <span className="text-sm text-[var(--text-muted)] font-mono">个系列</span>
+              </div>
             </div>
 
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-              {llmSeries.slice(0, 8).map((series) => (
+            <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-6">
+              {llmSeries.map((series) => (
                 <Link
                   key={series.id}
                   href={`/series/${series.id}`}
-                  className="card p-6 group"
+                  className="card-interactive card p-5 group"
                 >
                   {/* 序号 */}
                   <div className="mb-3 flex items-center justify-between">
@@ -146,7 +141,7 @@ export default async function BlogPage() {
                   </div>
 
                   {/* 标题 */}
-                  <h3 className="text-base font-bold text-[var(--text-primary)] mb-2 group-hover:text-[var(--text-primary)] transition-colors font-mono line-clamp-2">
+                  <h3 className="text-sm font-bold text-[var(--text-primary)] mb-2 group-hover:text-[var(--text-primary)] transition-colors font-mono line-clamp-2">
                     {series.title}
                   </h3>
 

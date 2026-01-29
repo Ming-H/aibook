@@ -20,6 +20,30 @@ export async function MLSeriesSection() {
     return null;
   }
 
+  // ML系列emoji映射
+  const mlEmojis: Record<string, string> = {
+    "ml_series_1": "🎯",
+    "ml_series_2": "🧠",
+    "ml_series_3": "👁️",
+    "ml_series_4": "💬",
+    "ml_series_5": "🎮",
+    "ml_series_6": "📊",
+    "ml_series_7": "⚡",
+    "ml_series_8": "🔬",
+    "ml_series_9": "🔧",
+    "ml_series_10": "🚀",
+  };
+
+  // 获取系列对应的emoji
+  const getSeriesEmoji = (seriesId: string): string => {
+    for (const [key, emoji] of Object.entries(mlEmojis)) {
+      if (seriesId.includes(key)) {
+        return emoji;
+      }
+    }
+    return "📚";
+  };
+
   return (
     <section className="mb-12">
       <div className="flex items-center justify-between mb-6">
@@ -46,9 +70,7 @@ export async function MLSeriesSection() {
           >
             {/* 序号 */}
             <div className="mb-3 flex items-center justify-between">
-              {series.emoji && (
-                <div className="text-3xl">{series.emoji}</div>
-              )}
+              <div className="text-3xl">{series.emoji || getSeriesEmoji(series.id)}</div>
               <span className="tag text-xs font-mono">
                 {String(series.order).padStart(2, '0')}
               </span>

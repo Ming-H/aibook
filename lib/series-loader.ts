@@ -111,10 +111,17 @@ export async function getLLMSeries(): Promise<SeriesMetadata[]> {
 
 /**
  * 获取ML系列（只返回ML系列）
+ * 过滤掉404和不完整的系列
  */
 export async function getMLSeries(): Promise<SeriesMetadata[]> {
   const allSeries = await getAllSeries();
-  return allSeries.filter(series => series.id.startsWith('ML_series/'));
+  const mlSeries = allSeries.filter(series => series.id.startsWith('ML_series/'));
+
+  // 过滤掉无效的系列（没有episodes的）
+  const validMLSeries = mlSeries.filter(series => series.totalEpisodes > 0);
+
+  console.log(`[getMLSeries] Found ${mlSeries.length} ML series, ${validMLSeries.length} valid`);
+  return validMLSeries;
 }
 
 /**
