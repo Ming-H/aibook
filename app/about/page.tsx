@@ -91,14 +91,14 @@ export default function AboutPage() {
   return (
     <div className="min-h-screen bg-white dark:bg-[var(--background-primary)]">
       {/* Hero Section with Photo - Apple Style */}
-      <section className="relative px-6 py-12 md:py-16 bg-[var(--background-secondary)]">
+      <section className="relative px-6 py-8 md:py-12 bg-[var(--background-secondary)]">
         <div className="relative mx-auto max-w-7xl">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
             {/* Photo Section */}
             <div className="order-2 lg:order-1">
-              <div className="relative max-w-md mx-auto lg:mx-0">
+              <div className="relative max-w-xs mx-auto lg:mx-0">
                 {/* Main photo - Minimal Frame */}
-                <div className="relative aspect-[3/4] md:aspect-[4/5] rounded-3xl overflow-hidden bg-[var(--background-primary)] shadow-2xl group">
+                <div className="relative aspect-[3/4] md:aspect-[3/4] rounded-3xl overflow-hidden bg-[var(--background-primary)] shadow-2xl group">
                   <img
                     src="/登山照.jpg"
                     alt="Ming Hao - 登山照"
@@ -183,6 +183,14 @@ export default function AboutPage() {
                 >
                   GitHub
                 </a>
+                <a
+                  href="https://dinq.me/devfoxai"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-8 py-4 text-[var(--text-primary)] rounded-full font-medium text-lg transition-all hover:bg-[var(--background-primary)]"
+                >
+                  钉钉
+                </a>
               </div>
             </div>
           </div>
@@ -190,7 +198,7 @@ export default function AboutPage() {
       </section>
 
       {/* Achievements Stats - Clean Numbers */}
-      <section className="relative px-6 py-24">
+      <section className="relative px-6 py-16">
         <div className="mx-auto max-w-7xl">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
             {achievements.map((achievement, index) => (
@@ -214,7 +222,7 @@ export default function AboutPage() {
       </section>
 
       {/* Experience & Expertise */}
-      <section className="relative px-6 py-24 bg-[var(--background-secondary)]">
+      <section className="relative px-6 py-16 bg-[var(--background-secondary)]">
         <div className="mx-auto max-w-7xl">
           <div className="text-center mb-20">
             <h2 className="text-5xl md:text-6xl font-semibold text-[var(--text-primary)] mb-6 tracking-tight">
@@ -248,7 +256,7 @@ export default function AboutPage() {
       </section>
 
       {/* Tech Stack */}
-      <section className="relative px-6 py-24">
+      <section className="relative px-6 py-16">
         <div className="mx-auto max-w-7xl">
           <div className="text-center mb-20">
             <h2 className="text-5xl md:text-6xl font-semibold text-[var(--text-primary)] mb-6 tracking-tight">
@@ -283,7 +291,7 @@ export default function AboutPage() {
       </section>
 
       {/* Featured Projects */}
-      <section className="relative px-6 py-24 bg-[var(--background-secondary)]">
+      <section className="relative px-6 py-16 bg-[var(--background-secondary)]">
         <div className="mx-auto max-w-7xl">
           <div className="flex items-center justify-between mb-16">
             <div>
@@ -348,7 +356,7 @@ export default function AboutPage() {
       </section>
 
       {/* Contact Section */}
-      <section className="relative px-6 py-32">
+      <section className="relative px-6 py-20">
         <div className="mx-auto max-w-4xl text-center">
           <div className="bg-[var(--background-secondary)] rounded-3xl p-16">
             <h2 className="text-5xl md:text-6xl font-semibold text-[var(--text-primary)] mb-6 tracking-tight">
@@ -399,6 +407,18 @@ export default function AboutPage() {
                   <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
                 </svg>
                 X (Twitter)
+              </a>
+              <span>•</span>
+              <a
+                href="https://dinq.me/devfoxai"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-[var(--text-primary)] transition-colors flex items-center gap-2"
+              >
+                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+                </svg>
+                钉钉
               </a>
             </div>
           </div>
