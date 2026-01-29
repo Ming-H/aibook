@@ -42,7 +42,7 @@ export default function AboutPage() {
           <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 items-start">
             {/* Avatar */}
             <div className="flex-shrink-0">
-              <div className="relative w-40 h-40 md:w-48 md:h-48 rounded-full overflow-hidden bg-[var(--background-secondary)] border-4 border-[var(--border-subtle)]">
+              <div className="relative w-56 h-56 md:w-64 md:h-64 rounded-full overflow-hidden bg-[var(--background-secondary)] border-4 border-[var(--border-subtle)]">
                 <img
                   src="/登山照.jpg"
                   alt="Ming Hao"
