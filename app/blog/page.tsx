@@ -34,7 +34,7 @@ export default async function BlogPage() {
         </div>
 
         {/* 统计数据 */}
-        <div className="flex justify-center gap-4">
+        <section className="flex justify-center gap-4">
             <div className="card px-6 py-3 text-center">
               <div className="text-2xl font-bold text-[var(--text-primary)] mb-1 font-mono">{llmSeries.length}+</div>
               <div className="text-xs text-[var(--text-muted)] font-mono">LLM系列</div>
