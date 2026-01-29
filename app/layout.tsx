@@ -25,7 +25,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
-      <body className="min-h-screen bg-white dark:bg-[var(--background-primary)] antialiased">
+      <body className="min-h-screen bg-[var(--background-primary)] text-[var(--text-primary)] antialiased">
         <ThemeProvider>
           <SessionProvider>
             <div className="min-h-screen">

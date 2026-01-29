@@ -1,52 +1,43 @@
 /**
- * 极客狐 DevFox - 极客风格设计系统
- * Geek Style Design System - Pure Monochrome
- * 纯黑白灰配色 + 等宽字体 + 网格边框 + 科技感元素
- * Inspired by GitHub, Vercel, Linear, Terminal/IDE
+ * DevFox - Apple-inspired Design System
+ * 极简、留白、精致排版、单一强调色
+ * Inspired by apple.com: clarity, restraint, premium feel
  */
 
 /* ==================== 浅色模式 ==================== */
 
 :root {
-  /* 纯黑白灰配色系统 - 8级灰阶 */
-  --gray-50: #FAFAFA;
-  --gray-100: #F5F5F5;
-  --gray-200: #E5E5E5;
-  --gray-300: #D4D4D4;
-  --gray-400: #A3A3A3;
-  --gray-500: #737373;
-  --gray-600: #525252;
-  --gray-700: #404040;
-  --gray-800: #262626;
-  --gray-900: #171717;
-  --gray-950: #0A0A0A;
+  /* 中性灰阶 - 偏暖一点更柔和 */
+  --gray-50: #FBFBFB;
+  --gray-100: #F5F5F7;
+  --gray-200: #E8E8ED;
+  --gray-300: #D2D2D7;
+  --gray-400: #A1A1A6;
+  --gray-500: #86868B;
+  --gray-600: #6E6E73;
+  --gray-700: #424245;
+  --gray-800: #1D1D1F;
+  --gray-900: #111111;
+  --gray-950: #000000;
 
-  /* 品牌色 - 科技蓝紫渐变 */
-  --color-brand: #667EEA;
-  --color-purple: #A855F7;
-  --color-pink: #EC4899;
-  --neon-cyan: #06B6D4;
-  --neon-purple: #8B5CF6;
-  --neon-pink: #EC4899;
-
-  /* 渐变 */
-  --gradient-primary: linear-gradient(135deg, #667EEA 0%, #A855F7 100%);
-  --gradient-brand: linear-gradient(135deg, var(--color-brand) 0%, var(--color-purple) 100%);
+  /* 单一强调色 - Apple Blue */
+  --color-accent: #0071E3;
+  --color-accent-hover: #0077ED;
 
   /* 背景层次 */
   --background-primary: #FFFFFF;
-  --background-secondary: #F5F5F5;
-  --background-tertiary: #E5E5E5;
+  --background-secondary: #FBFBFB;
+  --background-tertiary: #F5F5F7;
   --background-elevated: #FFFFFF;
-  --background-floating: #FFFFFF;
+  --background-floating: rgba(255, 255, 255, 0.72);
 
   /* 文字层次 */
-  --text-primary: #262626;
-  --text-secondary: #404040;
-  --text-tertiary: #525252;
-  --text-muted: #A3A3A3;
-  --text-disabled: #D4D4D4;
-  --text-strong: #171717;
+  --text-primary: #1D1D1F;
+  --text-secondary: #424245;
+  --text-tertiary: #6E6E73;
+  --text-muted: #86868B;
+  --text-disabled: #A1A1A6;
+  --text-strong: #111111;
 
   /* 文字尺寸 */
   --text-xs: 0.75rem;
@@ -60,19 +51,32 @@
   --text-5xl: 3rem;
 
   /* 间距系统 */
-  --space-1: 0.25rem;   /* 4px */
-  --space-2: 0.5rem;    /* 8px */
-  --space-3: 0.75rem;   /* 12px */
-  --space-4: 1rem;      /* 16px */
-  --space-5: 1.25rem;   /* 20px */
-  --space-6: 1.5rem;    /* 24px */
-  --space-7: 1.75rem;   /* 28px */
-  --space-8: 2rem;      /* 32px */
-  --space-10: 2.5rem;   /* 40px */
-  --space-12: 3rem;     /* 48px */
-  --space-14: 3.5rem;   /* 56px */
-  --space-16: 4rem;     /* 64px */
-  --space-20: 5rem;     /* 80px */
+  --space-1: 0.25rem;
+  /* 4px */
+  --space-2: 0.5rem;
+  /* 8px */
+  --space-3: 0.75rem;
+  /* 12px */
+  --space-4: 1rem;
+  /* 16px */
+  --space-5: 1.25rem;
+  /* 20px */
+  --space-6: 1.5rem;
+  /* 24px */
+  --space-7: 1.75rem;
+  /* 28px */
+  --space-8: 2rem;
+  /* 32px */
+  --space-10: 2.5rem;
+  /* 40px */
+  --space-12: 3rem;
+  /* 48px */
+  --space-14: 3.5rem;
+  /* 56px */
+  --space-16: 4rem;
+  /* 64px */
+  --space-20: 5rem;
+  /* 80px */
 
   /* 行高 */
   --leading-tight: 1.25;
@@ -87,60 +91,66 @@
   --border-medium: #737373;
   --border-strong: #525252;
 
-  /* 阴影 - 黑白阴影 */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 2px 4px rgba(0, 0, 0, 0.08);
-  --shadow-lg: 0 4px 8px rgba(0, 0, 0, 0.1);
-  --shadow-xl: 0 8px 16px rgba(0, 0, 0, 0.12);
+  /* 阴影 - 柔和、轻微 */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.08);
+  --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.1);
 
-  /* 字体 - 标题使用等宽字体 */
-  --font-display: 'JetBrains Mono', 'Fira Code', 'SF Mono', 'Monaco', 'Consolas', monospace;
-  --font-heading: 'JetBrains Mono', 'Fira Code', 'SF Mono', 'Monaco', 'Consolas', monospace;
-  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  --font-mono: 'JetBrains Mono', 'Fira Code', 'SF Mono', 'Monaco', 'Consolas', monospace;
+  /* 字体 - Apple 风格：系统无衬线，清晰可读 */
+  --font-display: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
+  --font-heading: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
+  --font-body: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'SF Mono', ui-monospace, 'Cascadia Code', Monaco, Consolas, monospace;
 
   /* 过渡 */
   --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
   --transition-base: 200ms cubic-bezier(0.4, 0, 0.2, 1);
   --transition-normal: 300ms cubic-bezier(0.4, 0, 0.2, 1);
 
-  /* 圆角 */
-  --radius-sm: 0.25rem;   /* 4px */
-  --radius-md: 0.5rem;    /* 8px */
-  --radius-lg: 0.75rem;   /* 12px */
-  --radius-xl: 1rem;      /* 16px */
+  /* 圆角 - Apple 风格略大圆角 */
+  --radius-sm: 0.375rem;
+  /* 6px */
+  --radius-md: 0.5rem;
+  /* 8px */
+  --radius-lg: 0.75rem;
+  /* 12px */
+  --radius-xl: 1.125rem;
+  /* 18px */
+  --radius-2xl: 1.25rem;
+  /* 20px */
   --radius-full: 9999px;
 }
 
 /* ==================== 深色模式 ==================== */
 
 .dark {
-  /* 背景层次 - 反转 */
-  --background-primary: #050505;
+  /* 背景层次 */
+  --background-primary: #000000;
   --background-secondary: #0A0A0A;
   --background-tertiary: #171717;
   --background-elevated: #0A0A0A;
-  --background-floating: #0A0A0A;
+  --background-floating: rgba(0, 0, 0, 0.72);
 
-  /* 文字层次 - 反转 */
-  --text-primary: #E5E5E5;
-  --text-secondary: #D4D4D4;
-  --text-tertiary: #A3A3A3;
-  --text-muted: #737373;
-  --text-disabled: #525252;
-  --text-strong: #FAFAFA;
+  /* 文字层次 */
+  --text-primary: #F5F5F7;
+  --text-secondary: #A1A1A6;
+  --text-tertiary: #86868B;
+  --text-muted: #6E6E73;
+  --text-disabled: #424245;
+  --text-strong: #FFFFFF;
 
   /* 边框 */
-  --border-subtle: #262626;
-  --border-default: #404040;
-  --border-medium: #525252;
-  --border-strong: #737373;
+  --border-subtle: #2C2C2E;
+  --border-default: #424245;
+  --border-medium: #636366;
+  --border-strong: #8E8E93;
 
-  /* 阴影 - 深色模式使用发光阴影 */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
-  --shadow-md: 0 2px 4px rgba(0, 0, 0, 0.5);
-  --shadow-lg: 0 4px 8px rgba(0, 0, 0, 0.6);
-  --shadow-xl: 0 8px 16px rgba(0, 0, 0, 0.7);
+  /* 阴影 */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+  --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.6);
 }
 
 /* ==================== 极客风格工具类 ==================== */
@@ -169,21 +179,17 @@
 
 /* 点阵背景 */
 .bg-dot-matrix {
-  background-image: radial-gradient(
-    circle,
-    var(--border-subtle) 1px,
-    transparent 1px
-  );
+  background-image: radial-gradient(circle,
+      var(--border-subtle) 1px,
+      transparent 1px);
   background-size: 20px 20px;
   background-position: center center;
 }
 
 .bg-dot-matrix-dense {
-  background-image: radial-gradient(
-    circle,
-    var(--border-subtle) 1px,
-    transparent 1px
-  );
+  background-image: radial-gradient(circle,
+      var(--border-subtle) 1px,
+      transparent 1px);
   background-size: 10px 10px;
   background-position: center center;
 }
@@ -264,12 +270,10 @@
 /* 分割线 */
 .divider-horizontal {
   height: 2px;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    var(--border-default) 50%,
-    transparent 100%
-  );
+  background: linear-gradient(90deg,
+      transparent 0%,
+      var(--border-default) 50%,
+      transparent 100%);
 }
 
 .divider-dotted {
@@ -305,33 +309,33 @@
   padding: 0.125rem 0.375rem;
 }
 
-/* 标题等宽字体全局样式 */
-h1, h2, h3, h4, h5, h6 {
+/* 标题 - Apple 风格字重与字间距 */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-family: var(--font-heading);
   font-weight: 600;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.025em;
   color: var(--text-primary);
-}
-
-/* 主题平滑过渡 */
-* {
-  transition-property: background-color, border-color, color, fill, stroke;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  transition-duration: 200ms;
-}
-
-/* 禁用过渡的元素 */
-.no-transition,
-.no-transition * {
-  transition: none !important;
 }
 
 /* ==================== 极客风格动画 ==================== */
 
 /* 终端光标闪烁 */
 @keyframes cursorBlink {
-  0%, 50% { border-color: var(--text-primary); }
-  51%, 100% { border-color: transparent; }
+
+  0%,
+  50% {
+    border-color: var(--text-primary);
+  }
+
+  51%,
+  100% {
+    border-color: transparent;
+  }
 }
 
 .cursor-blink {
@@ -341,8 +345,13 @@ h1, h2, h3, h4, h5, h6 {
 
 /* 终端打字效果 */
 @keyframes terminalType {
-  from { width: 0; }
-  to { width: 100%; }
+  from {
+    width: 0;
+  }
+
+  to {
+    width: 100%;
+  }
 }
 
 .terminal-typing {
@@ -353,8 +362,15 @@ h1, h2, h3, h4, h5, h6 {
 
 /* 像素闪烁 */
 @keyframes pixelBlink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.3; }
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.3;
+  }
 }
 
 .pixel-blink {
@@ -363,9 +379,19 @@ h1, h2, h3, h4, h5, h6 {
 
 /* 数据传输线 */
 @keyframes dataTransmit {
-  0% { transform: translateX(-100%); opacity: 0; }
-  50% { opacity: 1; }
-  100% { transform: translateX(100%); opacity: 0; }
+  0% {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+
+  50% {
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateX(100%);
+    opacity: 0;
+  }
 }
 
 .data-transmit {

@@ -32,15 +32,8 @@ module.exports = {
         "2xl": "1.25rem"
       },
       fontFamily: {
-        // 等宽字体配置 - 用于标题和代码
-        mono: [
-          'JetBrains Mono',
-          'Fira Code',
-          'SF Mono',
-          'Monaco',
-          'Consolas',
-          'monospace'
-        ],
+        sans: ['-apple-system', 'BlinkMacSystemFont', 'SF Pro Text', 'Segoe UI', 'Roboto', 'sans-serif'],
+        mono: ['SF Mono', 'ui-monospace', 'Cascadia Code', 'Monaco', 'Consolas', 'monospace'],
       },
     }
   },

@@ -7,6 +7,7 @@
 @import '../styles/animations.css';
 
 @layer base {
+
   *,
   *::before,
   *::after {
@@ -25,11 +26,15 @@
     -moz-osx-font-smoothing: grayscale;
   }
 
-  /* 标题使用等宽字体 - 极客风格 */
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     font-family: var(--font-heading);
     font-weight: 600;
-    letter-spacing: -0.02em;
+    letter-spacing: -0.025em;
   }
 }
 
@@ -120,16 +125,15 @@
 }
 
 .prose a {
-  color: var(--text-primary);
-  text-decoration: underline;
-  text-decoration-color: var(--border-default);
-  text-underline-offset: 2px;
-  transition: color var(--transition-fast), text-decoration-color var(--transition-fast);
+  color: var(--color-accent);
+  text-decoration: none;
+  transition: color var(--transition-fast), opacity var(--transition-fast);
 }
 
 .prose a:hover {
-  color: var(--text-strong);
-  text-decoration-color: var(--border-medium);
+  color: var(--color-accent-hover);
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 .prose strong {
@@ -501,7 +505,7 @@
 /* Background patterns */
 .bg-grid {
   background-image: linear-gradient(rgba(128, 128, 128, 0.05) 1px, transparent 1px),
-                    linear-gradient(90deg, rgba(128, 128, 128, 0.05) 1px, transparent 1px);
+    linear-gradient(90deg, rgba(128, 128, 128, 0.05) 1px, transparent 1px);
   background-size: 50px 50px;
 }
 
@@ -524,8 +528,15 @@
 }
 
 @keyframes gradientMove {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
+
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
 }
 
 /* Full radius utility */
@@ -533,21 +544,44 @@
   border-radius: var(--radius-full);
 }
 
-/* ==================== Purple-Blue Gradient Animation ==================== */
-.animate-gradient-text {
-  background: linear-gradient(135deg, #a855f7 0%, #3b82f6 50%, #a855f7 100%);
-  background-size: 200% 200%;
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  animation: gradientTextFlow 4s ease infinite;
+/* ==================== Hero 入场动画 ==================== */
+@keyframes heroFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-@keyframes gradientTextFlow {
-  0%, 100% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
+.animate-hero-in {
+  animation: heroFadeUp 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.animate-hero-in-delay-1 {
+  animation-delay: 0.1s;
+  opacity: 0;
+}
+
+.animate-hero-in-delay-2 {
+  animation-delay: 0.2s;
+  opacity: 0;
+}
+
+.animate-hero-in-delay-3 {
+  animation-delay: 0.35s;
+  opacity: 0;
+}
+
+.animate-hero-in-delay-4 {
+  animation-delay: 0.5s;
+  opacity: 0;
+}
+
+.animate-hero-in-delay-5 {
+  animation-delay: 0.65s;
+  opacity: 0;
 }
