@@ -47,7 +47,6 @@ export default async function BlogPage() {
               <div className="text-2xl font-bold text-[var(--text-primary)] mb-1 font-mono">20+</div>
               <div className="text-xs text-[var(--text-muted)] font-mono">每日热点</div>
             </div>
-          </div>
         </section>
 
         {/* 主要内容区 - 三列布局 */}
