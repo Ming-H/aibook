@@ -34,7 +34,7 @@ export default async function HomePage() {
                 href="/prompts"
                 className="btn-primary px-10 py-4 inline-flex items-center gap-2 font-mono text-lg font-bold"
               >
-                <span>Explore Tools</span>
+                <span>探索工具</span>
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                 </svg>
@@ -43,7 +43,7 @@ export default async function HomePage() {
                 href="/about"
                 className="btn-secondary px-10 py-4 font-mono text-lg font-bold"
               >
-                About DevFox
+                关于我们
               </Link>
             </div>
           </div>
@@ -55,10 +55,10 @@ export default async function HomePage() {
         <div className="mx-auto max-w-7xl">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-black text-[var(--text-primary)] mb-4 font-mono tracking-tight">
-              Featured Products
+              精选产品
             </h2>
             <p className="text-xl text-[var(--text-secondary)] max-w-2xl mx-auto">
-              AI-powered tools and resources for creators, developers, and innovators
+              为创造者、开发者和创新者打造的 AI 工具与资源
             </p>
           </div>
 
@@ -73,18 +73,18 @@ export default async function HomePage() {
                 <div className="flex-1">
                   <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full text-white font-mono text-sm font-bold mb-4">
                     <span>⭐</span>
-                    <span>Featured</span>
+                    <span>精选</span>
                   </div>
                   <h3 className="text-3xl md:text-4xl font-black text-[var(--text-primary)] mb-4 font-mono group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-purple-500 group-hover:to-pink-500 group-hover:bg-clip-text transition-all">
-                    Prompts Library
+                    提示词灵感库
                   </h3>
                   <p className="text-lg text-[var(--text-secondary)] mb-6 leading-relaxed max-w-2xl">
-                    Curated collection of AI prompts for creative inspiration. Browse hundreds of expertly crafted prompts across writing, coding, design, and more.
+                    精心策划的 AI 提示词收藏，为创意提供灵感。浏览数百个专业设计的提示词，涵盖写作、编码、设计等领域
                   </p>
                   <div className="flex flex-wrap gap-3">
-                    <span className="tag font-mono text-sm">Creative Writing</span>
-                    <span className="tag font-mono text-sm">Code Generation</span>
-                    <span className="tag font-mono text-sm">Design Prompts</span>
+                    <span className="tag font-mono text-sm">创意写作</span>
+                    <span className="tag font-mono text-sm">代码生成</span>
+                    <span className="tag font-mono text-sm">设计提示</span>
                   </div>
                 </div>
                 <div className="flex-shrink-0">
@@ -98,7 +98,7 @@ export default async function HomePage() {
 
           {/* Product Grid */}
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {/* Skillset */}
+            {/* Quiz Generator */}
             <Link
               href="/quiz-generator"
               className="card-interactive card p-8 group relative overflow-hidden"
@@ -109,14 +109,14 @@ export default async function HomePage() {
                   ✨
                 </div>
                 <h3 className="text-2xl font-black text-[var(--text-primary)] mb-3 font-mono group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-blue-500 group-hover:to-cyan-500 group-hover:bg-clip-text transition-all">
-                  Quiz Generator
+                  测题生成器
                 </h3>
                 <p className="text-[var(--text-secondary)] mb-4 leading-relaxed">
-                  AI-powered quiz creation tool. Generate questions from any content with GLM-4.7
+                  基于 GLM-4.7 的 AI 测题工具，从任何内容中自动生成题目
                 </p>
                 <div className="flex gap-2">
                   <span className="tag font-mono text-xs">GLM-4.7</span>
-                  <span className="tag font-mono text-xs">Education</span>
+                  <span className="tag font-mono text-xs">教育</span>
                 </div>
               </div>
             </Link>
@@ -132,14 +132,14 @@ export default async function HomePage() {
                   🎨
                 </div>
                 <h3 className="text-2xl font-black text-[var(--text-primary)] mb-3 font-mono group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-pink-500 group-hover:to-purple-500 group-hover:bg-clip-text transition-all">
-                  Creative Workshop
+                  创意工坊
                 </h3>
                 <p className="text-[var(--text-secondary)] mb-4 leading-relaxed">
-                  AI image generation with ModelScope. Create stunning visuals with text-to-image
+                  基于 ModelScope 的 AI 图像生成，用文字创作精美视觉作品
                 </p>
                 <div className="flex gap-2">
                   <span className="tag font-mono text-xs">ModelScope</span>
-                  <span className="tag font-mono text-xs">AI Art</span>
+                  <span className="tag font-mono text-xs">AI 艺术</span>
                 </div>
               </div>
             </Link>
@@ -155,14 +155,14 @@ export default async function HomePage() {
                   🖼️
                 </div>
                 <h3 className="text-2xl font-black text-[var(--text-primary)] mb-3 font-mono group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-orange-500 group-hover:to-red-500 group-hover:bg-clip-text transition-all">
-                  Image Tools
+                  图片工具
                 </h3>
                 <p className="text-[var(--text-secondary)] mb-4 leading-relaxed">
-                  Pure frontend image processing. Crop, convert, and optimize images in your browser
+                  纯前端图片处理工具，在浏览器中裁剪、转换和优化图片
                 </p>
                 <div className="flex gap-2">
                   <span className="tag font-mono text-xs">Canvas API</span>
-                  <span className="tag font-mono text-xs">No Server</span>
+                  <span className="tag font-mono text-xs">无需服务器</span>
                 </div>
               </div>
             </Link>
@@ -175,10 +175,10 @@ export default async function HomePage() {
         <div className="mx-auto max-w-7xl">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-black text-[var(--text-primary)] mb-4 font-mono tracking-tight">
-              Content Hub
+              内容中心
             </h2>
             <p className="text-xl text-[var(--text-secondary)] max-w-2xl mx-auto">
-              Explore AI insights, tutorials, and industry updates
+              探索 AI 洞察、教程和行业动态
             </p>
           </div>
 
@@ -186,29 +186,29 @@ export default async function HomePage() {
             {[
               {
                 icon: '🔥',
-                title: 'Daily AI Hot Tech',
-                desc: '20+ daily AI industry updates covering breakthroughs, innovations, and product launches',
+                title: '每日 AI 热点',
+                desc: '每日 20+ 条 AI 行业动态，涵盖突破性创新、技术进展和产品发布',
                 href: '/daily',
                 gradient: 'from-red-500 to-orange-500',
               },
               {
                 icon: '📚',
-                title: 'Series Learning',
-                desc: 'Structured learning paths with 10+ series on LLM, RAG, Agents, and more',
+                title: '系列学习',
+                desc: '结构化学习路径，10+ 系列内容涵盖 LLM、RAG、Agent 等领域',
                 href: '/series',
                 gradient: 'from-blue-500 to-cyan-500',
               },
               {
                 icon: '📖',
-                title: 'Book Digests',
-                desc: 'Curated book summaries on technology, business, and personal development',
+                title: '书籍摘要',
+                desc: '精心策划的书籍摘要，涵盖技术、商业和个人发展领域',
                 href: '/book-digest',
                 gradient: 'from-green-500 to-emerald-500',
               },
               {
                 icon: '📁',
-                title: 'Archive',
-                desc: 'Browse all historical content with search, tags, and categorization',
+                title: '内容归档',
+                desc: '浏览所有历史内容，支持搜索、标签和分类筛选',
                 href: '/archive',
                 gradient: 'from-purple-500 to-pink-500',
               },
@@ -242,17 +242,17 @@ export default async function HomePage() {
           <div className="flex items-center justify-between mb-12">
             <div>
               <h2 className="text-3xl md:text-4xl font-black text-[var(--text-primary)] mb-2 font-mono tracking-tight">
-                Latest Content
+                最新内容
               </h2>
               <p className="text-[var(--text-secondary)]">
-                Fresh AI insights and tutorials delivered daily
+                每日更新的 AI 洞察和教程
               </p>
             </div>
             <Link
               href="/blog"
               className="hidden md:flex items-center gap-2 px-6 py-3 rounded-md font-mono text-[var(--text-primary)] border-2 border-[var(--border-subtle)] hover:bg-[var(--background-tertiary)] hover:border-[var(--border-default)] transition-all duration-200 font-bold"
             >
-              <span>View All</span>
+              <span>查看全部</span>
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
               </svg>
@@ -263,20 +263,20 @@ export default async function HomePage() {
             {[
               {
                 icon: '📝',
-                title: 'All Articles',
-                desc: 'Complete collection of AI technology articles and tutorials',
+                title: '所有文章',
+                desc: 'AI 技术文章和教程的完整合集',
                 href: '/blog',
               },
               {
                 icon: '🏢',
-                title: 'Projects',
-                desc: 'Open source projects and product showcases',
+                title: '项目展示',
+                desc: '开源项目和产品展示',
                 href: '/projects',
               },
               {
                 icon: '🛒',
-                title: 'Products',
-                desc: 'Premium AI tools and services',
+                title: '产品服务',
+                desc: '优质 AI 工具和服务',
                 href: '/products',
               },
             ].map((item) => (
@@ -304,17 +304,17 @@ export default async function HomePage() {
       <section className="relative px-6 py-24">
         <div className="mx-auto max-w-4xl text-center">
           <h2 className="text-4xl md:text-5xl font-black text-[var(--text-primary)] mb-6 font-mono tracking-tight">
-            Ready to Explore?
+            准备好了吗？
           </h2>
           <p className="text-xl text-[var(--text-secondary)] mb-10 max-w-2xl mx-auto">
-            Start your journey with AI-powered tools and resources
+            开启您的 AI 工具与资源探索之旅
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
             <Link
               href="/prompts"
               className="btn-primary px-10 py-4 inline-flex items-center gap-2 font-mono text-lg font-bold"
             >
-              <span>Get Started</span>
+              <span>立即开始</span>
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
               </svg>
@@ -323,7 +323,7 @@ export default async function HomePage() {
               href="/about"
               className="btn-secondary px-10 py-4 font-mono text-lg font-bold"
             >
-              About the Creator
+              关于创作者
             </Link>
           </div>
         </div>
