@@ -25,7 +25,7 @@ export default async function BlogPage() {
       <div className="relative max-w-7xl mx-auto">
         {/* Hero Section */}
         <div className="text-center mb-16">
-          <h1 className="text-3xl sm:text-4xl font-bold text-[var(--text-primary)] mb-4 font-mono border-b-4 border-[var(--border-medium)] inline-block pb-2">
+          <h1 className="text-4xl sm:text-5xl font-bold text-[var(--text-primary)] mb-4 font-mono border-b-4 border-[var(--border-medium)] inline-block pb-2">
             BLOG
           </h1>
           <p className="text-[var(--text-secondary)] text-lg max-w-2xl mx-auto">
