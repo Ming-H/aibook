@@ -17,16 +17,15 @@ export default async function HomePage() {
         <div className="relative mx-auto max-w-7xl">
           <div className="text-center max-w-4xl mx-auto">
             {/* Slogan - Bold & Minimal */}
-            <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tight text-[var(--text-primary)] mb-6 leading-tight">
-              Empowering Creativity
-              <br />
-              <span className="bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 bg-clip-text text-transparent">
-                with AI Tools
+            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-tight text-[var(--text-primary)] mb-6 leading-tight">
+              DevFox AI
+              <span className="block text-3xl sm:text-4xl md:text-5xl lg:text-6xl mt-2">
+                独立开发者的 AI 实验室
               </span>
             </h1>
 
             <p className="text-xl md:text-2xl text-[var(--text-secondary)] mb-12 max-w-2xl mx-auto leading-relaxed">
-              Discover intelligent tools and resources designed for the modern creator
+              探索 AI 技术的实用边界，为创造者构建高效工具
             </p>
 
             {/* CTA Buttons */}

@@ -26,10 +26,10 @@ export function Navbar() {
 
   const navItems = [
     { href: '/', label: '首页', icon: '🏠' },
-    { href: '/products', label: '产品', icon: '🚀' },
-    { href: '/projects', label: '作品', icon: '💼' },
-    { href: '/blog', label: '博客', icon: '📝' },
-    { href: '/about', label: '关于', icon: '👤' },
+    { href: '/products', label: 'AI 产品', icon: '🚀' },
+    { href: '/projects', label: '作品集', icon: '💼' },
+    { href: '/blog', label: '技术博客', icon: '📝' },
+    { href: '/about', label: '关于主理人', icon: '👤' },
   ];
 
   return (
