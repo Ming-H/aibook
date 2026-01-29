@@ -1,18 +1,26 @@
+'use client';
+
 import Link from "next/link";
+import { useState } from "react";
 
-export const dynamic = "force-static";
-export const revalidate = 3600;
+export default function HomePage() {
+  const [emailCopied, setEmailCopied] = useState(false);
 
-export default async function HomePage() {
+  const handleEmailCopy = async () => {
+    await navigator.clipboard.writeText('1518246548@qq.com');
+    setEmailCopied(true);
+    setTimeout(() => setEmailCopied(false), 2000);
+  };
+
   return (
     <div className="min-h-screen bg-white dark:bg-[var(--background-primary)]">
       {/* Hero Section - Apple Style */}
       <section className="relative px-6 py-32 md:py-48 lg:py-64 overflow-hidden">
         <div className="relative mx-auto max-w-5xl">
           <div className="text-center">
-            {/* Hero Title - BOLD & MINIMAL */}
-            <h1 className="text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-semibold tracking-tight text-[var(--text-primary)] mb-8 leading-[1.05]">
-              DevFox AI
+            {/* Hero Title - with Gradient Animation */}
+            <h1 className="text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-semibold tracking-tight mb-8 leading-[1.05]">
+              <span className="animate-gradient-text">DevFox AI</span>
               <span className="block text-4xl sm:text-5xl md:text-6xl lg:text-7xl mt-4 font-normal text-[var(--text-secondary)]">
                 独立开发者的 AI 实验室
               </span>
@@ -28,68 +36,117 @@ export default async function HomePage() {
             {/* CTA Buttons - Apple Style */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <Link
-                href="/prompts"
+                href="/products"
                 className="group relative px-8 py-4 bg-[var(--text-primary)] text-[var(--background-primary)] rounded-full font-medium text-lg transition-all hover:scale-105 hover:shadow-lg"
               >
-                探索工具
+                探索工具集
                 <svg className="inline-block ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                 </svg>
               </Link>
               <Link
                 href="/about"
-                className="px-8 py-4 text-[var(--text-primary)] rounded-full font-medium text-lg transition-all hover:bg-[var(--background-secondary)]"
+                className="px-8 py-4 text-[var(--text-primary)] border-2 border-[var(--border-default)] rounded-full font-medium text-lg transition-all hover:border-[var(--border-medium)] hover:bg-[var(--background-secondary)]"
               >
-                了解更多
+                了解主理人
               </Link>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Product Showcase - Minimal Cards */}
+      {/* Featured Projects - 精选实验室作品 */}
       <section className="relative px-6 py-24 bg-[var(--background-secondary)]">
         <div className="mx-auto max-w-7xl">
           <div className="text-center mb-20">
             <h2 className="text-5xl md:text-6xl lg:text-7xl font-semibold text-[var(--text-primary)] mb-6 tracking-tight">
-              精选产品
+              精选实验室作品
+            </h2>
+            <p className="text-xl text-[var(--text-secondary)] max-w-2xl mx-auto font-normal">
+              探索我们的核心项目与创新工具
+            </p>
+          </div>
+
+          {/* Featured Projects Grid */}
+          <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+            {/* Pixel Factory */}
+            <Link
+              href="/projects"
+              className="group bg-white dark:bg-[var(--background-primary)] rounded-3xl p-10 md:p-12 transition-all duration-500 hover:shadow-2xl hover:scale-[1.02]"
+            >
+              <div className="flex items-start gap-6">
+                <div className="flex-shrink-0">
+                  <div className="w-24 h-24 md:w-28 md:h-28 flex items-center justify-center rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 text-5xl md:text-6xl shadow-lg group-hover:scale-110 transition-transform duration-300">
+                    🎨
+                  </div>
+                </div>
+                <div className="flex-1">
+                  <div className="inline-block px-3 py-1 bg-[var(--background-secondary)] rounded-full text-xs font-medium mb-4 text-[var(--text-secondary)]">
+                    创意工具
+                  </div>
+                  <h3 className="text-3xl md:text-4xl font-semibold text-[var(--text-primary)] mb-4 tracking-tight group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-purple-500 group-hover:to-pink-500 group-hover:bg-clip-text transition-all">
+                    Pixel Factory
+                  </h3>
+                  <p className="text-[var(--text-secondary)] mb-6 leading-relaxed font-normal">
+                    在线像素艺术编辑器和生成工具，支持像素画创作、动画制作和资源导出
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {['React', 'TypeScript', 'Canvas', 'Vite'].map((tag) => (
+                      <span key={tag} className="px-3 py-1 bg-[var(--background-secondary)] rounded-full text-xs font-medium text-[var(--text-secondary)]">
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </Link>
+
+            {/* 提示词灵感库 */}
+            <Link
+              href="/prompts"
+              className="group bg-white dark:bg-[var(--background-primary)] rounded-3xl p-10 md:p-12 transition-all duration-500 hover:shadow-2xl hover:scale-[1.02]"
+            >
+              <div className="flex items-start gap-6">
+                <div className="flex-shrink-0">
+                  <div className="w-24 h-24 md:w-28 md:h-28 flex items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600 text-5xl md:text-6xl shadow-lg group-hover:scale-110 transition-transform duration-300">
+                    💡
+                  </div>
+                </div>
+                <div className="flex-1">
+                  <div className="inline-block px-3 py-1 bg-[var(--background-secondary)] rounded-full text-xs font-medium mb-4 text-[var(--text-secondary)]">
+                    ⭐ 精选推荐
+                  </div>
+                  <h3 className="text-3xl md:text-4xl font-semibold text-[var(--text-primary)] mb-4 tracking-tight group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-blue-500 group-hover:to-purple-600 group-hover:bg-clip-text transition-all">
+                    提示词灵感库
+                  </h3>
+                  <p className="text-[var(--text-secondary)] mb-6 leading-relaxed font-normal">
+                    精心策划的 AI 提示词收藏。浏览数百个专业设计的提示词，涵盖写作、编码、设计等领域
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {['创意写作', '代码生成', '设计提示'].map((tag) => (
+                      <span key={tag} className="px-3 py-1 bg-[var(--background-secondary)] rounded-full text-xs font-medium text-[var(--text-secondary)]">
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Product Showcase - Minimal Cards */}
+      <section className="relative px-6 py-24">
+        <div className="mx-auto max-w-7xl">
+          <div className="text-center mb-20">
+            <h2 className="text-5xl md:text-6xl lg:text-7xl font-semibold text-[var(--text-primary)] mb-6 tracking-tight">
+              AI 工具集
             </h2>
             <p className="text-xl text-[var(--text-secondary)] max-w-2xl mx-auto font-normal">
               为创造者打造的智能工具
             </p>
           </div>
-
-          {/* Hero Product - Large Card */}
-          <Link
-            href="/prompts"
-            className="block mb-8 bg-white dark:bg-[var(--background-primary)] rounded-3xl p-10 md:p-16 group transition-all duration-500 hover:shadow-2xl hover:scale-[1.02]"
-          >
-            <div className="flex flex-col md:flex-row md:items-center gap-10">
-              <div className="flex-1">
-                <div className="inline-block px-4 py-2 bg-[var(--background-secondary)] rounded-full text-sm font-medium mb-6 text-[var(--text-secondary)]">
-                  ⭐ 精选推荐
-                </div>
-                <h3 className="text-4xl md:text-5xl font-semibold text-[var(--text-primary)] mb-6 tracking-tight group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-blue-500 group-hover:to-purple-600 group-hover:bg-clip-text group-hover:bg-clip-text transition-all">
-                  提示词灵感库
-                </h3>
-                <p className="text-xl text-[var(--text-secondary)] mb-8 leading-relaxed max-w-2xl font-normal">
-                  精心策划的 AI 提示词收藏。浏览数百个专业设计的提示词，涵盖写作、编码、设计等领域
-                </p>
-                <div className="flex flex-wrap gap-3">
-                  {['创意写作', '代码生成', '设计提示'].map((tag) => (
-                    <span key={tag} className="px-4 py-2 bg-[var(--background-secondary)] rounded-full text-sm font-medium text-[var(--text-secondary)]">
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              </div>
-              <div className="flex-shrink-0">
-                <div className="w-32 h-32 md:w-40 md:h-40 flex items-center justify-center rounded-3xl bg-gradient-to-br from-blue-500 to-purple-600 text-6xl md:text-7xl shadow-xl group-hover:scale-110 transition-transform duration-300">
-                  💡
-                </div>
-              </div>
-            </div>
-          </Link>
 
           {/* Product Grid - Clean Cards */}
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -147,7 +204,7 @@ export default async function HomePage() {
       </section>
 
       {/* Content Hub - Minimal Grid */}
-      <section className="relative px-6 py-24">
+      <section className="relative px-6 py-24 bg-[var(--background-secondary)]">
         <div className="mx-auto max-w-7xl">
           <div className="text-center mb-20">
             <h2 className="text-5xl md:text-6xl lg:text-7xl font-semibold text-[var(--text-primary)] mb-6 tracking-tight">
@@ -206,7 +263,7 @@ export default async function HomePage() {
       </section>
 
       {/* Blog Section - Clean Layout */}
-      <section className="relative px-6 py-24 bg-[var(--background-secondary)]">
+      <section className="relative px-6 py-24">
         <div className="mx-auto max-w-7xl">
           <div className="flex items-center justify-between mb-16">
             <div>
@@ -219,7 +276,7 @@ export default async function HomePage() {
             </div>
             <Link
               href="/blog"
-              className="hidden md:inline-flex items-center gap-2 px-6 py-3 rounded-full font-medium text-[var(--text-primary)] transition-all hover:bg-[var(--background-primary)]"
+              className="hidden md:inline-flex items-center gap-2 px-6 py-3 rounded-full font-medium text-[var(--text-primary)] transition-all hover:bg-[var(--background-secondary)]"
             >
               查看全部
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -270,7 +327,7 @@ export default async function HomePage() {
       </section>
 
       {/* Final CTA - Clean & Direct */}
-      <section className="relative px-6 py-32">
+      <section className="relative px-6 py-32 bg-[var(--background-secondary)]">
         <div className="mx-auto max-w-4xl text-center">
           <h2 className="text-5xl md:text-6xl lg:text-7xl font-semibold text-[var(--text-primary)] mb-8 tracking-tight">
             准备好了吗？
@@ -290,13 +347,73 @@ export default async function HomePage() {
             </Link>
             <Link
               href="/about"
-              className="px-10 py-5 text-[var(--text-primary)] rounded-full font-semibold text-xl transition-all hover:bg-[var(--background-secondary)]"
+              className="px-10 py-5 text-[var(--text-primary)] rounded-full font-semibold text-xl transition-all hover:bg-[var(--background-primary)]"
             >
               关于创作者
             </Link>
           </div>
         </div>
       </section>
+
+      {/* Footer - with Email Copy Functionality */}
+      <footer className="relative px-6 py-16 border-t-2 border-[var(--border-subtle)]">
+        <div className="mx-auto max-w-7xl">
+          {/* Email Copy Section - Centered */}
+          <div className="flex flex-col items-center justify-center mb-12">
+            <p className="text-sm text-[var(--text-muted)] mb-4 font-normal">
+              联系邮箱
+            </p>
+            <button
+              onClick={handleEmailCopy}
+              className="group flex items-center gap-3 px-8 py-4 bg-[var(--background-secondary)] hover:bg-[var(--background-tertiary)] rounded-full transition-all hover:scale-105"
+            >
+              <svg className="w-5 h-5 text-[var(--text-secondary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              </svg>
+              <span className="text-[var(--text-primary)] font-medium">
+                1518246548@qq.com
+              </span>
+              <svg className={`w-5 h-5 transition-all ${emailCopied ? 'text-green-500 scale-110' : 'text-[var(--text-secondary)] group-hover:text-[var(--text-primary)]'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+              </svg>
+              {emailCopied && (
+                <span className="text-green-500 text-sm font-medium">已复制!</span>
+              )}
+            </button>
+          </div>
+
+          {/* Social Links */}
+          <div className="flex justify-center gap-8 mb-8">
+            <a
+              href="https://github.com/Ming-H"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors flex items-center gap-2"
+            >
+              <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                <path fillRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clipRule="evenodd" />
+              </svg>
+              <span className="text-sm font-medium">Ming-H</span>
+            </a>
+            <a
+              href="https://x.com/MingFire520"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors flex items-center gap-2"
+            >
+              <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+              </svg>
+              <span className="text-sm font-medium">MingFire520</span>
+            </a>
+          </div>
+
+          {/* Copyright */}
+          <div className="text-center text-sm text-[var(--text-muted)] font-normal">
+            <p>© {new Date().getFullYear()} DevFox AI. All rights reserved.</p>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }

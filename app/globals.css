@@ -532,3 +532,22 @@
 .radius-full {
   border-radius: var(--radius-full);
 }
+
+/* ==================== Purple-Blue Gradient Animation ==================== */
+.animate-gradient-text {
+  background: linear-gradient(135deg, #a855f7 0%, #3b82f6 50%, #a855f7 100%);
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradientTextFlow 4s ease infinite;
+}
+
+@keyframes gradientTextFlow {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
