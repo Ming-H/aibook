@@ -1,71 +1,80 @@
 'use client';
 
 /**
- * 关于我页面 - 个人介绍
- * 展示个人信息、技能、项目等
+ * About Page - Personal credentials and portfolio
+ * Showcasing the creator behind DevFox AI
  */
 
 import { useState } from 'react';
 
+interface Achievement {
+  number: string;
+  label: string;
+  icon: string;
+}
+
+interface TechSkill {
+  name: string;
+  category: string;
+}
+
 interface Project {
   name: string;
   description: string;
-  stars: number;
-  language: string;
+  tech: string[];
   url: string;
-}
-
-interface SocialLink {
-  platform: string;
-  url: string;
-  icon: string;
+  stars?: string;
 }
 
 export default function AboutPage() {
   const [copied, setCopied] = useState(false);
 
-  const profile = {
-    avatar: '🦊',
-    name: '极客狐DevFox',
-    verified: true,
-    title: '自媒体博主 | 独立开发者',
-    education: '硕士, 北京工业大学',
-    email: '1518246548@qq.com',
-    location: '北京, 中国',
-    timezone: 'UTC +08:00',
-    tags: ['AI科技', '自媒体', '独立开发者'],
-    bio: '热爱技术，专注于AI领域的探索与实践。分享最新的AI技术动态，开发实用的工具产品。',
-  };
+  const achievements: Achievement[] = [
+    { number: '10+', label: 'Open Source Projects', icon: '🚀' },
+    { number: '50+', label: 'Technical Articles', icon: '📝' },
+    { number: '1.5K+', label: 'Social Followers', icon: '👥' },
+    { number: '3+', label: 'AI Products Built', icon: '🤖' },
+  ];
 
-  const skills = [
-    { name: 'Python', level: 90 },
-    { name: 'TypeScript', level: 85 },
-    { name: 'Kotlin', level: 80 },
-    { name: 'Next.js', level: 85 },
-    { name: 'AI/ML', level: 75 },
+  const techStack: TechSkill[] = [
+    { name: 'Python', category: 'Languages' },
+    { name: 'TypeScript', category: 'Languages' },
+    { name: 'Kotlin', category: 'Languages' },
+    { name: 'Next.js', category: 'Frameworks' },
+    { name: 'React', category: 'Frameworks' },
+    { name: 'PostgreSQL', category: 'Database' },
+    { name: 'LLM/RAG', category: 'AI/ML' },
+    { name: 'Vercel', category: 'Infrastructure' },
   ];
 
   const projects: Project[] = [
     {
-      name: 'content-forge-ai',
-      description: 'AI内容生成工具，专注于 demos 和实用工具开发',
-      stars: 1,
-      language: 'TypeScript',
-      url: 'https://github.com/devfoxaicn/content-forge-ai',
+      name: 'aibook',
+      description: 'AI technology showcase platform with daily updates on LLM breakthroughs and industry insights',
+      tech: ['Next.js', 'TypeScript', 'GitHub API'],
+      url: 'https://github.com/devfoxaicn/aibook',
+      stars: '2',
     },
     {
-      name: 'aibook',
-      description: 'AI技术热点展示平台，每日呈现最新的AI技术话题',
-      stars: 2,
-      language: 'TypeScript',
-      url: 'https://github.com/devfoxaicn/aibook',
+      name: 'content-forge-ai',
+      description: 'AI content generation toolkit specializing in demos and practical utilities',
+      tech: ['Python', 'Kotlin', 'TypeScript'],
+      url: 'https://github.com/devfoxaicn/content-forge-ai',
+      stars: '1',
     },
   ];
 
-  const socialLinks: SocialLink[] = [
-    { platform: 'GitHub', url: 'https://github.com/devfoxaicn', icon: '🐙' },
-    { platform: 'X (Twitter)', url: 'https://x.com/MingFire520', icon: '𝕏' },
-    { platform: 'Email', url: 'mailto:1518246548@qq.com', icon: '📧' },
+  const experiences = [
+    {
+      role: 'AI Engineer & Independent Developer',
+      focus: 'Building AI-powered products and sharing technical insights',
+      expertise: ['LLM Application Development', 'Full-Stack Web Development', 'Technical Writing'],
+    },
+    {
+      role: 'Tech Blogger',
+      focus: 'Creating accessible content on AI/ML topics',
+      expertise: ['AI Technology Analysis', 'Tutorial Creation', 'Industry Insights'],
+    },
   ];
 
   const handleShare = async () => {
@@ -80,304 +89,371 @@ export default function AboutPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[var(--background-primary)] bg-dot-matrix py-12 px-4 sm:px-6 lg:px-8">
-      <div className="relative max-w-6xl mx-auto">
-        {/* 页面标题 */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl sm:text-5xl font-bold text-[var(--text-primary)] mb-4 font-mono border-b-4 border-[var(--border-medium)] inline-block pb-2">
-            关于我
-          </h1>
-          <p className="text-[var(--text-secondary)] text-lg">
-            了解更多关于我的信息
-          </p>
+    <div className="min-h-screen bg-white dark:bg-[var(--background-primary)]">
+      {/* Hero Section with Climbing Photo */}
+      <section className="relative px-6 py-16 md:py-24 bg-[var(--background-secondary)] overflow-hidden">
+        {/* Background gradient */}
+        <div className="absolute inset-0 opacity-5 dark:opacity-10">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-br from-purple-500 to-pink-500 rounded-full blur-3xl"></div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* 左侧 - 个人信息卡片 */}
-          <div className="lg:col-span-2 space-y-8">
-            {/* 主资料卡 */}
-            <div className="card p-8">
-              {/* 头像和基本信息 */}
-              <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 mb-8">
-                <div className="relative">
-                  <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-[var(--border-default)]">
-                    <img
-                      src="/avatar.png"
-                      alt="极客狐DevFox"
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  {profile.verified && (
-                    <div className="absolute -bottom-1 -right-1 w-8 h-8 bg-[var(--background-primary)] border-2 border-[var(--border-medium)] rounded-full flex items-center justify-center">
-                      <svg className="w-4 h-4 text-[var(--text-primary)]" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                      </svg>
+        <div className="relative mx-auto max-w-7xl">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            {/* Photo Section */}
+            <div className="order-2 lg:order-1">
+              <div className="relative">
+                {/* Main photo container */}
+                <div className="relative aspect-[4/5] rounded-2xl overflow-hidden border-4 border-[var(--border-medium)] bg-[var(--background-tertiary)] group">
+                  {/* Climbing photo */}
+                  <img
+                    src="https://maas-log-prod.cn-wlcb.ufileos.com/anthropic/d18386b8-fa1d-418b-8078-2186a719c605/bc3cf29bc91cb9b2550d6edcc8508574.jpg?UCloudPublicKey=TOKEN_e15ba47a-d098-4fbd-9afc-a0dcf0e4e621&Expires=1769690990&Signature=MA5hlhZvYAsYqz0R5XWc/qh7/5k="
+                    alt="Ming Hao - Climbing"
+                    className="absolute inset-0 w-full h-full object-cover"
+                  />
+
+                  {/* Hover overlay with social links */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-center pb-8">
+                    <div className="flex gap-4">
+                      <a
+                        href="https://github.com/devfoxaicn"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-12 h-12 flex items-center justify-center rounded-full bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 transition-all"
+                        aria-label="GitHub"
+                      >
+                        <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+                          <path fillRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clipRule="evenodd" />
+                        </svg>
+                      </a>
+                      <a
+                        href="https://x.com/MingFire520"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-12 h-12 flex items-center justify-center rounded-full bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 transition-all"
+                        aria-label="X (Twitter)"
+                      >
+                        <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                        </svg>
+                      </a>
+                      <a
+                        href="https://dinq.me/devfoxai"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-12 h-12 flex items-center justify-center rounded-full bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 transition-all"
+                        aria-label="DINQ"
+                      >
+                        <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                        </svg>
+                      </a>
                     </div>
-                  )}
+                  </div>
                 </div>
 
-                <div className="flex-1 text-center sm:text-left">
-                  <h2 className="text-3xl font-bold text-[var(--text-primary)] mb-2 flex items-center justify-center sm:justify-start gap-2 font-mono">
-                    {profile.name}
-                  </h2>
-                  <p className="text-[var(--text-secondary)] text-lg mb-4 font-mono">
-                    {profile.title}
-                  </p>
-                  <div className="flex flex-wrap gap-2 justify-center sm:justify-start mb-3">
-                    {profile.tags.map((tag, index) => (
-                      <span
-                        key={index}
-                        className="tag font-mono"
-                      >
-                        {tag}
-                      </span>
-                    ))}
+                {/* Floating info card */}
+                <div className="absolute -bottom-6 -right-6 card p-6 max-w-xs hidden lg:block">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="w-3 h-3 rounded-full bg-green-500 animate-pulse"></div>
+                    <span className="text-sm font-mono text-[var(--text-secondary)]">Available for work</span>
                   </div>
-                  <a
-                    href="https://dinq.me/devfoxai"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors text-sm font-medium font-mono"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                    </svg>
-                    DINQ: dinq.me/devfoxai
-                  </a>
+                  <p className="text-xs text-[var(--text-muted)] font-mono">
+                    Open to collaborations and freelance projects
+                  </p>
                 </div>
               </div>
+            </div>
 
-              {/* 详细信息 */}
-              <div className="space-y-4 mb-8">
-                <div className="flex items-center gap-3 text-[var(--text-secondary)]">
-                  <svg className="w-5 h-5 text-[var(--text-tertiary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            {/* Info Section */}
+            <div className="order-1 lg:order-2">
+              <div className="mb-6">
+                <span className="inline-block px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full text-white font-mono text-sm font-bold mb-4">
+                  About the Creator
+                </span>
+                <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-[var(--text-primary)] mb-4 font-mono tracking-tight">
+                  Ming Hao
+                  <span className="block text-2xl md:text-3xl text-[var(--text-secondary)] mt-2">
+                    极客狐 DevFox
+                  </span>
+                </h1>
+                <p className="text-xl text-[var(--text-secondary)] leading-relaxed max-w-xl">
+                  AI Engineer, Independent Developer, and Tech Writer building intelligent tools and sharing knowledge with the community
+                </p>
+              </div>
+
+              {/* Quick Info */}
+              <div className="flex flex-wrap gap-4 text-sm font-mono text-[var(--text-secondary)] mb-8">
+                <div className="flex items-center gap-2">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5z" />
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
                   </svg>
-                  <span className="font-mono">{profile.education}</span>
+                  <span>Master's, Beijing Univ. of Technology</span>
                 </div>
-                <div className="flex items-center gap-3 text-[var(--text-secondary)]">
-                  <svg className="w-5 h-5 text-[var(--text-tertiary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                  </svg>
-                  <a href={`mailto:${profile.email}`} className="hover:text-[var(--text-primary)] transition-colors font-mono">
-                    {profile.email}
-                  </a>
-                </div>
-                <div className="flex items-center gap-3 text-[var(--text-secondary)]">
-                  <svg className="w-5 h-5 text-[var(--text-tertiary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="flex items-center gap-2">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
-                  <span className="font-mono">{profile.location}</span>
-                </div>
-                <div className="flex items-center gap-3 text-[var(--text-secondary)]">
-                  <svg className="w-5 h-5 text-[var(--text-tertiary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  <span className="font-mono">{profile.timezone}</span>
+                  <span>Beijing, China</span>
                 </div>
               </div>
 
-              {/* 个人简介 */}
-              <div className="bg-[var(--background-tertiary)] rounded-xl p-6 border border-[var(--border-subtle)]">
-                <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-3 font-mono">个人简介</h3>
-                <p className="text-[var(--text-secondary)] leading-relaxed">
-                  {profile.bio}
-                </p>
-              </div>
-            </div>
-
-            {/* 技能卡片 */}
-            <div className="card p-8">
-              <h3 className="text-xl font-semibold text-[var(--text-primary)] mb-6 font-mono">技术栈</h3>
-              <div className="space-y-4">
-                {skills.map((skill, index) => (
-                  <div key={index}>
-                    <div className="flex justify-between mb-2">
-                      <span className="text-[var(--text-secondary)] font-mono">{skill.name}</span>
-                      <span className="text-[var(--text-muted)] font-mono">{skill.level}%</span>
-                    </div>
-                    <div className="h-2 bg-[var(--background-tertiary)] rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-[var(--text-primary)] rounded-full transition-all duration-1000 ease-out"
-                        style={{ width: `${skill.level}%` }}
-                      />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* 项目卡片 */}
-            <div className="card p-8">
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-xl font-semibold text-[var(--text-primary)] font-mono">开源项目</h3>
+              {/* CTA Buttons */}
+              <div className="flex flex-wrap gap-4">
                 <a
-                  href="https://github.com/devfoxaicn?tab=repositories"
+                  href="mailto:1518246548@qq.com"
+                  className="btn-primary px-8 py-4 inline-flex items-center gap-2 font-mono font-bold"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  </svg>
+                  <span>Get in Touch</span>
+                </a>
+                <a
+                  href="https://github.com/devfoxaicn"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] text-sm flex items-center gap-1 font-mono"
+                  className="btn-secondary px-8 py-4 inline-flex items-center gap-2 font-mono font-bold"
                 >
-                  查看全部
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                    <path fillRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clipRule="evenodd" />
                   </svg>
+                  <span>GitHub</span>
                 </a>
-              </div>
-              <div className="space-y-4">
-                {projects.map((project, index) => (
-                  <a
-                    key={index}
-                    href={`https://github.com/devfoxaicn/${project.name}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="block bg-[var(--background-tertiary)] rounded-xl p-5 border border-[var(--border-subtle)] hover:border-[var(--border-medium)] transition-all duration-300 group"
-                  >
-                    <div className="flex items-start justify-between mb-2">
-                      <h4 className="text-[var(--text-primary)] font-semibold group-hover:text-[var(--text-primary)] transition-colors font-mono">
-                        {project.name}
-                      </h4>
-                      <div className="flex items-center gap-1 text-[var(--text-muted)]">
-                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                        </svg>
-                        <span className="text-sm">{project.stars}</span>
-                      </div>
-                    </div>
-                    <p className="text-[var(--text-secondary)] text-sm mb-3">
-                      {project.description}
-                    </p>
-                    <span className="tag text-xs font-mono">
-                      {project.language}
-                    </span>
-                  </a>
-                ))}
               </div>
             </div>
           </div>
+        </div>
+      </section>
 
-          {/* 右侧 - 社交链接和其他信息 */}
-          <div className="space-y-8">
-            {/* 社交链接卡片 */}
-            <div className="card p-6">
-              <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-4 font-mono">社交媒体</h3>
-              <div className="space-y-3">
-                {socialLinks.map((link, index) => (
-                  <a
-                    key={index}
-                    href={link.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-3 p-3 bg-[var(--background-tertiary)] rounded-xl border border-[var(--border-subtle)] hover:border-[var(--border-medium)] hover:bg-[var(--background-elevated)] transition-all duration-300 group"
-                  >
-                    <span className="text-2xl">{link.icon}</span>
-                    <span className="text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors font-mono">
-                      {link.platform}
+      {/* Achievements Stats */}
+      <section className="relative px-6 py-16">
+        <div className="mx-auto max-w-7xl">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+            {achievements.map((achievement, index) => (
+              <div
+                key={index}
+                className="card p-8 text-center group relative overflow-hidden"
+              >
+                <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-pink-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <div className="relative">
+                  <div className="text-5xl mb-4 group-hover:scale-110 transition-transform duration-300">
+                    {achievement.icon}
+                  </div>
+                  <div className="text-4xl font-black text-[var(--text-primary)] mb-2 font-mono">
+                    {achievement.number}
+                  </div>
+                  <div className="text-sm text-[var(--text-secondary)] font-mono">
+                    {achievement.label}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Experience & Expertise */}
+      <section className="relative px-6 py-16 bg-[var(--background-secondary)]">
+        <div className="mx-auto max-w-7xl">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-black text-[var(--text-primary)] mb-4 font-mono tracking-tight">
+              Experience & Expertise
+            </h2>
+            <p className="text-lg text-[var(--text-secondary)] max-w-2xl mx-auto">
+              Building at the intersection of AI engineering and full-stack development
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-8">
+            {experiences.map((exp, index) => (
+              <div key={index} className="card p-8">
+                <h3 className="text-2xl font-black text-[var(--text-primary)] mb-3 font-mono">
+                  {exp.role}
+                </h3>
+                <p className="text-[var(--text-secondary)] mb-6 leading-relaxed">
+                  {exp.focus}
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {exp.expertise.map((skill, i) => (
+                    <span key={i} className="tag font-mono text-sm">
+                      {skill}
                     </span>
-                    <svg className="w-4 h-4 ml-auto text-[var(--text-muted)] group-hover:text-[var(--text-primary)] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                    </svg>
-                  </a>
-                ))}
-              </div>
-            </div>
-
-            {/* 统计信息卡片 */}
-            <div className="card p-6">
-              <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-4 font-mono">统计信息</h3>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-[var(--text-secondary)] font-mono">GitHub Stars</span>
-                  <span className="text-2xl font-bold text-[var(--text-primary)] font-mono">3</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-[var(--text-secondary)] font-mono">公开项目</span>
-                  <span className="text-2xl font-bold text-[var(--text-primary)] font-mono">10+</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-[var(--text-secondary)] font-mono">技术文章</span>
-                  <span className="text-2xl font-bold text-[var(--text-primary)] font-mono">50+</span>
+                  ))}
                 </div>
               </div>
-            </div>
+            ))}
+          </div>
+        </div>
+      </section>
 
-            {/* 分享卡片 */}
-            <div className="card p-6">
-              <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-4 font-mono">分享页面</h3>
-              <button
-                onClick={handleShare}
-                className="w-full py-3 px-4 btn-primary font-bold flex items-center justify-center gap-2"
+      {/* Tech Stack */}
+      <section className="relative px-6 py-16">
+        <div className="mx-auto max-w-7xl">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-black text-[var(--text-primary)] mb-4 font-mono tracking-tight">
+              Tech Stack
+            </h2>
+            <p className="text-lg text-[var(--text-secondary)] max-w-2xl mx-auto">
+              Tools and technologies I use to bring ideas to life
+            </p>
+          </div>
+
+          <div className="flex flex-wrap justify-center gap-4 max-w-4xl mx-auto">
+            {techStack.map((tech, index) => (
+              <div
+                key={index}
+                className="card-interactive card px-6 py-4 group"
               >
-                {copied ? (
-                  <>
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                    已复制链接
-                  </>
-                ) : (
-                  <>
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
-                    </svg>
-                    复制链接分享
-                  </>
-                )}
-              </button>
-            </div>
+                <div className="flex items-center gap-3">
+                  <div className="w-3 h-3 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 group-hover:scale-125 transition-transform"></div>
+                  <div>
+                    <div className="text-[var(--text-primary)] font-mono font-bold">
+                      {tech.name}
+                    </div>
+                    <div className="text-xs text-[var(--text-muted)] font-mono">
+                      {tech.category}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
 
-            {/* 联系方式卡片 */}
-            <div className="card p-6">
-              <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-3 font-mono">联系方式</h3>
-              <p className="text-[var(--text-secondary)] text-sm mb-4">
-                欢迎技术交流、项目合作或其他形式的沟通
+      {/* Featured Projects */}
+      <section className="relative px-6 py-16 bg-[var(--background-secondary)]">
+        <div className="mx-auto max-w-7xl">
+          <div className="flex items-center justify-between mb-12">
+            <div>
+              <h2 className="text-3xl md:text-4xl font-black text-[var(--text-primary)] mb-2 font-mono tracking-tight">
+                Open Source Projects
+              </h2>
+              <p className="text-[var(--text-secondary)]">
+                Public repositories showcasing my work
               </p>
+            </div>
+            <a
+              href="https://github.com/devfoxaicn?tab=repositories"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hidden md:flex items-center gap-2 px-6 py-3 rounded-md font-mono text-[var(--text-primary)] border-2 border-[var(--border-subtle)] hover:bg-[var(--background-tertiary)] hover:border-[var(--border-default)] transition-all duration-200 font-bold"
+            >
+              <span>View All</span>
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </a>
+          </div>
 
-              {/* 邮箱 */}
-              <div className="mb-4">
-                <a
-                  href={`mailto:${profile.email}`}
-                  className="flex items-center gap-2 p-3 bg-[var(--background-tertiary)] rounded-xl border border-[var(--border-subtle)] hover:border-[var(--border-medium)] transition-all duration-300 group"
-                >
-                  <svg className="w-5 h-5 text-[var(--text-secondary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                  </svg>
-                  <span className="text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors text-sm font-mono">
-                    {profile.email}
-                  </span>
-                </a>
-              </div>
-
-              {/* 微信 */}
-              <div className="mb-4">
-                <div className="flex items-center gap-2 p-3 bg-[var(--background-tertiary)] rounded-xl border border-[var(--border-subtle)]">
-                  <svg className="w-5 h-5 text-[var(--text-secondary)]" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M8.5 10c-.828 0-1.5-.672-1.5-1.5S7.672 7 8.5 7s1.5.672 1.5 1.5S9.328 10 8.5 10zm7 0c-.828 0-1.5-.672-1.5-1.5S14.672 7 15.5 7s1.5.672 1.5 1.5-.672 1.5-1.5 1.5zm-3.5-8C5.467 2 2 5.467 2 9.5c0 2.687 1.12 5.083 2.883 6.758V19l2.96-1.963c.854.475 1.832.743 2.883.743 4.033 0 7.5-3.467 7.5-7.5S16.033 2 12 2zm0 13c-.85 0-1.735-.19-2.52-.54l-.23-.1-2.77 1.836v-2.32c-1.46-1.39-2.48-3.42-2.48-5.87 0-3.59 2.91-6.5 6.5-6.5s6.5 2.91 6.5 6.5-2.91 6.5-6.5 6.5z"/>
-                  </svg>
-                  <span className="text-[var(--text-secondary)] text-sm font-mono">DevFoxAI</span>
-                </div>
-              </div>
-
+          <div className="grid md:grid-cols-2 gap-6">
+            {projects.map((project, index) => (
               <a
-                href={`mailto:${profile.email}`}
-                className="w-full py-3 px-4 btn-primary font-bold flex items-center justify-center gap-2"
+                key={index}
+                href={project.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="card-interactive card p-8 group relative overflow-hidden"
               >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-full blur-2xl -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-700"></div>
+                <div className="relative">
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex-1">
+                      <h3 className="text-2xl font-black text-[var(--text-primary)] mb-2 font-mono group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-purple-500 group-hover:to-pink-500 group-hover:bg-clip-text transition-all">
+                        {project.name}
+                      </h3>
+                      <p className="text-[var(--text-secondary)] leading-relaxed">
+                        {project.description}
+                      </p>
+                    </div>
+                    {project.stars && (
+                      <div className="flex items-center gap-1 text-[var(--text-muted)] ml-4">
+                        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                        </svg>
+                        <span className="font-mono font-bold">{project.stars}</span>
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {project.tech.map((t, i) => (
+                      <span key={i} className="tag font-mono text-xs">
+                        {t}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </a>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Contact Section */}
+      <section className="relative px-6 py-24">
+        <div className="mx-auto max-w-4xl text-center">
+          <div className="card p-12">
+            <h2 className="text-3xl md:text-4xl font-black text-[var(--text-primary)] mb-4 font-mono tracking-tight">
+              Let's Connect
+            </h2>
+            <p className="text-lg text-[var(--text-secondary)] mb-8 max-w-2xl mx-auto">
+              Interested in collaboration, freelance work, or just want to chat about AI and tech?
+            </p>
+
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
+              <a
+                href="mailto:1518246548@qq.com"
+                className="btn-primary px-10 py-4 inline-flex items-center gap-3 font-mono font-bold text-lg"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                 </svg>
-                发送邮件
+                <span>1518246548@qq.com</span>
+              </a>
+            </div>
+
+            <div className="flex justify-center gap-4 text-sm font-mono text-[var(--text-muted)]">
+              <a
+                href="https://github.com/devfoxaicn"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-[var(--text-primary)] transition-colors flex items-center gap-2"
+              >
+                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                  <path fillRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clipRule="evenodd" />
+                </svg>
+                GitHub
+              </a>
+              <span>•</span>
+              <a
+                href="https://x.com/MingFire520"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-[var(--text-primary)] transition-colors flex items-center gap-2"
+              >
+                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                </svg>
+                X (Twitter)
+              </a>
+              <span>•</span>
+              <a
+                href="https://dinq.me/devfoxai"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-[var(--text-primary)] transition-colors flex items-center gap-2"
+              >
+                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                </svg>
+                DINQ
               </a>
             </div>
           </div>
         </div>
-
-        {/* 页脚 */}
-        <div className="mt-16 text-center text-[var(--text-muted)] text-sm">
-          <p>Built with ❤️ by {profile.name}</p>
-          <p className="mt-2">© 2024 All rights reserved</p>
-        </div>
-      </div>
+      </section>
     </div>
   );
 }

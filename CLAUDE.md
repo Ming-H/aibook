@@ -574,4 +574,11 @@ The `/api/payment` routes handle payment processing for subscription purchases:
 - Check webhook delivery logs in GitHub repository settings
 - Ensure webhook URL is using HTTPS (required by GitHub)
 
+**Git push issues with proxy settings:**
+- If `http_proxy` or `https_proxy` environment variables are causing git push failures, temporarily unset them:
+  ```bash
+  env -u http_proxy -u https_proxy -u HTTP_PROXY -u HTTPS_PROXY git push
+  ```
+  Or use git config to bypass proxy for specific operations.
+
 
