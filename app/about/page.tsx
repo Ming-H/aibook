@@ -1,8 +1,8 @@
 'use client';
 
 /**
- * About Page - Compact Design with Dot Background
- * Reference style from /products page
+ * About Page - Flat Design, One-Screen Layout
+ * No borders, compact layout
 */
 
 interface TechBadge {
@@ -36,20 +36,22 @@ export default function AboutPage() {
 
   return (
     <div className="min-h-screen bg-white dark:bg-[var(--background-primary)] bg-dot-matrix py-8 px-4 sm:px-6">
-      <div className="max-w-4xl mx-auto">
-        {/* Header Section */}
-        <section className="mb-8">
-          <div className="card p-6">
+      <div className="max-w-6xl mx-auto">
+        <div className="grid lg:grid-cols-3 gap-8">
+          {/* Left Column - Profile Info */}
+          <div className="lg:col-span-1 space-y-6">
             {/* Title */}
-            <h1 className="text-2xl md:text-3xl font-bold text-[var(--text-primary)] mb-2 font-mono">
-              DevFox AI
-            </h1>
-            <p className="text-[var(--text-secondary)] mb-4">
-              极客狐
-            </p>
+            <div>
+              <h1 className="text-2xl md:text-3xl font-bold text-[var(--text-primary)] mb-1 font-mono">
+                DevFox AI
+              </h1>
+              <p className="text-[var(--text-secondary)]">
+                极客狐
+              </p>
+            </div>
 
             {/* Bio */}
-            <p className="text-[var(--text-secondary)] leading-relaxed mb-5">
+            <p className="text-[var(--text-secondary)] leading-relaxed text-sm">
               构建智能工具并与社区分享知识。专注于 AI 技术的实际应用，从 LLM 应用开发到全栈 Web 开发，致力于让 AI 技术更容易被理解和使用。
             </p>
 
@@ -59,7 +61,7 @@ export default function AboutPage() {
                 navigator.clipboard.writeText('1518246548@qq.com');
                 alert('邮箱已复制！');
               }}
-              className="btn-primary px-5 py-2 text-sm font-mono mb-5"
+              className="btn-primary px-5 py-2 text-sm font-mono w-fit"
             >
               <span className="flex items-center gap-2">
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -70,9 +72,9 @@ export default function AboutPage() {
             </button>
 
             {/* Info List */}
-            <div className="flex flex-wrap gap-x-5 gap-y-2 mb-4 text-sm text-[var(--text-secondary)]">
+            <div className="space-y-2 text-sm text-[var(--text-secondary)]">
               <div className="flex items-center gap-2">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
@@ -114,7 +116,7 @@ export default function AboutPage() {
             </div>
 
             {/* Achievements */}
-            <div className="flex flex-wrap gap-5 pt-4 border-t border-[var(--border-subtle)] text-sm">
+            <div className="space-y-2 pt-2 text-sm">
               <div className="flex items-center gap-2">
                 <svg className="w-4 h-4 text-[var(--text-muted)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
@@ -138,54 +140,53 @@ export default function AboutPage() {
               </div>
             </div>
           </div>
-        </section>
 
-        {/* Tech Stack & Experience - Merged */}
-        <section className="card p-6">
-          <h2 className="text-lg font-semibold text-[var(--text-primary)] mb-4 font-mono">
-            技术栈 & 经验
-          </h2>
-
-          {/* Tech Stack Badges */}
-          <div className="mb-5">
-            <h3 className="text-sm font-medium text-[var(--text-secondary)] mb-2">技术栈</h3>
-            <div className="flex flex-wrap gap-2">
-              {techStack.map((tech, index) => (
-                <span
-                  key={index}
-                  className={`px-3 py-1 rounded-full text-sm font-medium ${tech.color}`}
-                >
-                  {tech.name}
-                </span>
-              ))}
+          {/* Right Column - Tech Stack & Experience */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Tech Stack */}
+            <div>
+              <h2 className="text-lg font-semibold text-[var(--text-primary)] mb-3 font-mono">
+                技术栈
+              </h2>
+              <div className="flex flex-wrap gap-2">
+                {techStack.map((tech, index) => (
+                  <span
+                    key={index}
+                    className={`px-3 py-1 rounded-full text-sm font-medium ${tech.color}`}
+                  >
+                    {tech.name}
+                  </span>
+                ))}
+              </div>
             </div>
-          </div>
 
-          {/* Experience Items */}
-          <div>
-            <h3 className="text-sm font-medium text-[var(--text-secondary)] mb-3">经验与专长</h3>
-            <div className="space-y-4">
-              {experiences.map((exp, index) => (
-                <div key={index} className="border-l-2 border-[var(--border-subtle)] pl-4">
-                  <h4 className="text-base font-semibold text-[var(--text-primary)] mb-1">
-                    {exp.role}
-                  </h4>
-                  <p className="text-sm text-[var(--text-secondary)] mb-2">
-                    {exp.focus}
-                  </p>
-                  <div className="flex flex-wrap gap-2">
-                    {exp.expertise.map((skill, i) => (
-                      <span key={i} className="tag text-xs">
-                        {skill}
-                      </span>
-                    ))}
+            {/* Experience & Expertise */}
+            <div>
+              <h2 className="text-lg font-semibold text-[var(--text-primary)] mb-3 font-mono">
+                经验与专长
+              </h2>
+              <div className="grid sm:grid-cols-2 gap-4">
+                {experiences.map((exp, index) => (
+                  <div key={index}>
+                    <h3 className="text-base font-semibold text-[var(--text-primary)] mb-1">
+                      {exp.role}
+                    </h3>
+                    <p className="text-sm text-[var(--text-secondary)] mb-2">
+                      {exp.focus}
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {exp.expertise.map((skill, i) => (
+                        <span key={i} className="tag text-xs">
+                          {skill}
+                        </span>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           </div>
-        </section>
-
+        </div>
       </div>
     </div>
   );
