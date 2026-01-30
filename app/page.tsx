@@ -12,30 +12,44 @@ export default function HomePage() {
     setTimeout(() => setEmailCopied(false), 2000);
   };
 
+  const products = [
+    { title: '提示词库', desc: 'AI 灵感集合', href: '/prompts', icon: '💡', tags: ['AI', '提示词', '创意'] },
+    { title: '创意工坊', desc: 'AI 图像生成', href: '/creative-workshop', icon: '🎨', tags: ['AI', 'ModelScope', '图像生成'] },
+    { title: '智能出题', desc: '智能出题系统', href: '/quiz-generator', icon: '✨', tags: ['AI', 'GLM-4.7', '教育'] },
+    { title: '图片工具', desc: '纯前端图片处理', href: '/image-tools', icon: '🛠️', tags: ['Canvas', '工具', '隐私'] },
+  ];
+
+  const contentItems = [
+    { title: '每日热点', desc: '20+ 条 AI 行业动态', href: '/daily', icon: '🔥', tags: ['AI', '新闻', '每日'] },
+    { title: '系列学习', desc: '系统化学习路径', href: '/series', icon: '📚', tags: ['学习', '教程', '系统化'] },
+    { title: '书籍摘要', desc: '精选知识精华', href: '/book-digest', icon: '📖', tags: ['阅读', '摘要', '知识'] },
+    { title: '技术博客', desc: '深度技术文章', href: '/blog', icon: '📝', tags: ['博客', '技术', '文章'] },
+  ];
+
   return (
-    <div className="min-h-screen bg-white dark:bg-[var(--background-primary)]">
-      {/* Hero Section - 大胆留白，突出重点 */}
-      <section className="px-6 py-20 md:py-28 lg:py-36">
+    <div className="min-h-screen bg-white dark:bg-[var(--background-primary)] bg-dot-matrix">
+      {/* Hero Section */}
+      <section className="px-6 py-16 md:py-24 lg:py-32">
         <div className="mx-auto max-w-4xl text-center">
-          <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold text-[var(--text-primary)] mb-6 tracking-tight">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-[var(--text-primary)] mb-4 tracking-tight font-mono">
             DevFox AI
           </h1>
-          <p className="text-xl md:text-2xl text-[var(--text-secondary)] max-w-2xl mx-auto mb-10 leading-relaxed">
+          <p className="text-xl md:text-2xl text-[var(--text-secondary)] max-w-2xl mx-auto mb-6">
             独立开发者的 AI 实验室
           </p>
-          <p className="text-base text-[var(--text-tertiary)] max-w-xl mx-auto mb-12">
+          <p className="text-base text-[var(--text-tertiary)] max-w-xl mx-auto mb-10">
             探索 AI 技术的实用边界，为创造者构建高效工具
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/products"
-              className="btn-primary px-10 py-4 font-mono text-base"
+              className="btn-primary px-8 py-3 font-mono text-base"
             >
               探索工具集
             </Link>
             <Link
               href="/about"
-              className="btn-secondary px-10 py-4 font-mono text-base"
+              className="btn-secondary px-8 py-3 font-mono text-base"
             >
               关于主理人
             </Link>
@@ -43,8 +57,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 核心产品 - 突出重点项目 */}
-      <section className="px-6 py-16 md:py-20 bg-[var(--background-secondary)]">
+      {/* 核心产品 - 与 products 页面风格一致 */}
+      <section className="px-6 py-12 md:py-16">
         <div className="mx-auto max-w-6xl">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-[var(--text-primary)] mb-3 font-mono">
@@ -54,28 +68,40 @@ export default function HomePage() {
               精心打造的 AI 工具与创意平台
             </p>
           </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[
-              { title: 'Pixel Factory', desc: '像素艺术编辑器', href: '/projects', icon: '🎨', color: 'from-purple-500 to-pink-500' },
-              { title: '提示词库', desc: 'AI 灵感集合', href: '/prompts', icon: '💡', color: 'from-yellow-500 to-orange-500' },
-              { title: '测题生成', desc: '智能出题系统', href: '/quiz-generator', icon: '✨', color: 'from-blue-500 to-cyan-500' },
-              { title: '创意工坊', desc: 'AI 图像生成', href: '/creative-workshop', icon: '🎨', color: 'from-green-500 to-emerald-500' },
-            ].map((product) => (
+          <div className="grid md:grid-cols-2 gap-8">
+            {products.map((product) => (
               <Link
                 key={product.href}
                 href={product.href}
                 className="group"
               >
-                <div className="relative overflow-hidden rounded-2xl bg-[var(--background-primary)] p-8 transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
-                  <div className={`mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br ${product.color} text-3xl shadow-lg`}>
-                    {product.icon}
+                <div className="card p-8 h-full">
+                  {/* 产品头部 */}
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-3">
+                        <span className="text-4xl">{product.icon}</span>
+                        <div>
+                          <h3 className="text-2xl font-bold text-[var(--text-primary)] font-mono">
+                            {product.title}
+                          </h3>
+                          <p className="text-[var(--text-secondary)]">{product.desc}</p>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                  <h3 className="text-xl font-bold text-[var(--text-primary)] mb-2 font-mono">
-                    {product.title}
-                  </h3>
-                  <p className="text-sm text-[var(--text-secondary)]">
-                    {product.desc}
-                  </p>
+
+                  {/* 技术标签 */}
+                  <div className="flex flex-wrap gap-2">
+                    {product.tags.map((tag) => (
+                      <span
+                        key={tag}
+                        className="tag font-mono text-sm"
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
                 </div>
               </Link>
             ))}
@@ -83,8 +109,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 内容中心 - 简洁明了 */}
-      <section className="px-6 py-16 md:py-20">
+      {/* 内容中心 */}
+      <section className="px-6 py-12 md:py-16">
         <div className="mx-auto max-w-6xl">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-[var(--text-primary)] mb-3 font-mono">
@@ -94,25 +120,30 @@ export default function HomePage() {
               AI 洞察、教程与行业动态
             </p>
           </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {[
-              { title: '每日热点', desc: '20+ 条 AI 行业动态', href: '/daily', icon: '🔥' },
-              { title: '系列学习', desc: '系统化学习路径', href: '/series', icon: '📚' },
-              { title: '书籍摘要', desc: '精选知识精华', href: '/book-digest', icon: '📖' },
-              { title: '技术博客', desc: '深度技术文章', href: '/blog', icon: '📝' },
-            ].map((item) => (
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {contentItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
-                className="group card p-6 text-center"
+                className="group card p-6 text-center h-full"
               >
                 <div className="mb-4 text-4xl">{item.icon}</div>
-                <h3 className="text-lg font-bold text-[var(--text-primary)] mb-2 font-mono group-hover:text-[var(--color-accent)] transition-colors">
+                <h3 className="text-lg font-bold text-[var(--text-primary)] mb-2 font-mono">
                   {item.title}
                 </h3>
-                <p className="text-sm text-[var(--text-secondary)]">
+                <p className="text-sm text-[var(--text-secondary)] mb-4">
                   {item.desc}
                 </p>
+                <div className="flex flex-wrap gap-2 justify-center">
+                  {item.tags.map((tag) => (
+                    <span
+                      key={tag}
+                      className="tag font-mono text-xs"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
               </Link>
             ))}
           </div>
@@ -120,32 +151,34 @@ export default function HomePage() {
       </section>
 
       {/* CTA Section */}
-      <section className="px-6 py-16 md:py-20 bg-[var(--background-secondary)]">
-        <div className="mx-auto max-w-3xl text-center">
-          <h2 className="text-3xl md:text-4xl font-bold text-[var(--text-primary)] mb-4 font-mono">
-            开始探索
-          </h2>
-          <p className="text-lg text-[var(--text-secondary)] mb-8 max-w-xl mx-auto">
-            开启您的 AI 工具与资源探索之旅
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              href="/products"
-              className="btn-primary px-10 py-4 font-mono text-base"
-            >
-              查看全部产品
-            </Link>
-            <Link
-              href="/about"
-              className="btn-secondary px-10 py-4 font-mono text-base"
-            >
-              了解更多
-            </Link>
+      <section className="px-6 py-16 md:py-20">
+        <div className="mx-auto max-w-3xl">
+          <div className="card p-8 text-center">
+            <h2 className="text-2xl md:text-3xl font-bold text-[var(--text-primary)] mb-3 font-mono">
+              开始探索
+            </h2>
+            <p className="text-lg text-[var(--text-secondary)] mb-6 max-w-xl mx-auto">
+              开启您的 AI 工具与资源探索之旅
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link
+                href="/products"
+                className="btn-primary px-8 py-3 font-mono text-base"
+              >
+                查看全部产品
+              </Link>
+              <Link
+                href="/about"
+                className="btn-secondary px-8 py-3 font-mono text-base"
+              >
+                了解更多
+              </Link>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Footer - 简洁 */}
+      {/* Footer */}
       <footer className="border-t border-[var(--border-subtle)] px-6 py-12">
         <div className="mx-auto max-w-4xl">
           <div className="flex flex-col items-center justify-center gap-6">
@@ -153,7 +186,7 @@ export default function HomePage() {
               <p className="text-sm text-[var(--text-muted)] mb-3 font-mono">联系邮箱</p>
               <button
                 onClick={handleEmailCopy}
-                className="inline-flex items-center gap-2 rounded-md bg-[var(--background-tertiary)] px-6 py-3 text-sm font-medium text-[var(--text-primary)] transition-all duration-200 hover:bg-[var(--border-subtle)]"
+                className="inline-flex items-center gap-2 rounded-md bg-[var(--background-tertiary)] px-6 py-3 text-sm font-medium text-[var(--text-primary)] transition-all duration-200 hover:bg-[var(--border-subtle)] border border-[var(--border-subtle)] font-mono"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />

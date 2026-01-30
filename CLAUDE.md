@@ -38,6 +38,9 @@ DevFox (AI Hot Tech) is a personal portfolio and content platform displaying AI 
 # Start development server
 npm run dev
 
+# Start on alternative port (3001)
+npm run dev:3001
+
 # Build for production (includes Prisma client generation)
 npm run build
 
@@ -46,6 +49,12 @@ npm start
 
 # Lint code
 npm run lint
+
+# Run E2E tests with Playwright
+npm run test:e2e
+
+# Run E2E tests in headed mode (with browser window)
+npm run test:e2e:headed
 
 # Deploy to Vercel production
 vercel --prod
@@ -217,6 +226,9 @@ Series use separate JSON metadata files instead of encoding everything in filena
 
 | Variable | Required | Description |
 |----------|----------|-------------|
+| `DATABASE_URL` | Yes | PostgreSQL connection string for Prisma |
+| `NEXTAUTH_SECRET` | Yes | Secret for NextAuth.js JWT signing |
+| `NEXTAUTH_URL` | Yes | Your app's URL (e.g., `http://localhost:3000` in dev) |
 | `GITHUB_TOKEN` | Yes | GitHub Personal Access Token with `repo` scope |
 | `GITHUB_DATA_REPO` | Yes | Data repository in format `owner/repo` |
 | `BOOK_DIGEST_REPO` | Optional | Book digest repository in format `owner/repo` |
@@ -224,9 +236,16 @@ Series use separate JSON metadata files instead of encoding everything in filena
 | `GITHUB_WEBHOOK_SECRET` | Recommended | Secret for GitHub webhook verification |
 | `GLM_API_KEY` | Optional | GLM-4.7 API key for quiz generation feature |
 | `MODELSCOPE_API_KEY` | Optional | ModelScope API key for image generation feature |
-| `DATABASE_URL` | Yes | PostgreSQL connection string for Prisma |
-| `NEXTAUTH_SECRET` | Yes | Secret for NextAuth.js JWT signing |
-| `NEXTAUTH_URL` | Yes | Your app's URL (e.g., `http://localhost:3000` in dev) |
+| `NEXT_PUBLIC_MODELSCOPE_API_KEY` | Optional | Public ModelScope API key (client-side) |
+| `ADMIN_SETUP_SECRET` | Optional | Secret for admin setup endpoint |
+| `MOCK_PAYMENT` | Optional | Set to "true" to enable mock payment for testing |
+| `ALIPAY_APP_ID` | Optional | Alipay app ID for production payments |
+| `ALIPAY_PRIVATE_KEY` | Optional | Alipay private key for production payments |
+| `ALIPAY_PUBLIC_KEY` | Optional | Alipay public key for production payments |
+| `WECHAT_APP_ID` | Optional | WeChat Pay app ID for production payments |
+| `WECHAT_MCH_ID` | Optional | WeChat Pay merchant ID for production payments |
+| `WECHAT_PRIVATE_KEY` | Optional | WeChat Pay private key for production payments |
+| `WECHAT_PUBLIC_KEY` | Optional | WeChat Pay public key for production payments |
 
 **Important**: Environment variables set via Vercel CLI may contain trailing newlines. Use `cleanEnv()` from `lib/github-api.ts` to strip them.
 
@@ -314,6 +333,7 @@ Series use separate JSON metadata files instead of encoding everything in filena
 - **Region**: `hkg1` (Hong Kong)
 - **Database**: PostgreSQL (requires external database service for production)
 - **Cron Schedule**: Three daily runs at 22:00, 4:00, and 10:00 UTC (6:00, 12:00, 18:00 Beijing time)
+- **Function Configuration**: 30s max duration, 1GB memory for API routes
 - **Image Optimization**: Disabled (`unoptimized: true` in next.config.mjs)
 
 When adding environment variables via Vercel CLI, add to all environments:
@@ -580,5 +600,19 @@ The `/api/payment` routes handle payment processing for subscription purchases:
   env -u http_proxy -u https_proxy -u HTTP_PROXY -u HTTPS_PROXY git push
   ```
   Or use git config to bypass proxy for specific operations.
+
+### Testing
+
+The project uses Playwright for E2E testing:
+
+```bash
+# Run all E2E tests
+npm run test:e2e
+
+# Run tests in headed mode (with browser window)
+npm run test:e2e:headed
+```
+
+Test files are located in the `e2e/` directory with configuration in `playwright.config.ts`. Tests cover critical user flows like homepage navigation and About page rendering.
 
 
