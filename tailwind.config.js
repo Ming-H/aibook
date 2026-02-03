@@ -32,8 +32,9 @@ module.exports = {
         "2xl": "1.25rem"
       },
       fontFamily: {
-        sans: ['-apple-system', 'BlinkMacSystemFont', 'SF Pro Text', 'Segoe UI', 'Roboto', 'sans-serif'],
-        mono: ['SF Mono', 'ui-monospace', 'Cascadia Code', 'Monaco', 'Consolas', 'monospace'],
+        sans: ['var(--font-body)', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'sans-serif'],
+        heading: ['var(--font-heading)', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'sans-serif'],
+        mono: ['var(--font-mono)', 'ui-monospace', 'SF Mono', 'Cascadia Code', 'Fira Code', 'monospace'],
       },
     }
   },

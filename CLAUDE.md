@@ -194,18 +194,22 @@ This hybrid approach provides:
 
 ### Content Filename Patterns
 
-**Daily Articles:**
+**Daily Articles (Legacy Format):**
 ```
 article_{emoji}_{platform}_{model_name}_{YYYYMMDD}_{HHMMSS}.md
 ```
 Example: `article_🤗_meta-llama_Llama-3.1-8B-Inst_20260108_123847.md`
 
+**Daily Articles (New Format):**
+```
+{YYYYMMDD}_{HHMMSS}_{title}/
+```
+Example: `20260108_123847_article-title/`
+
 The filename encodes metadata that gets parsed by `lib/fs-utils.ts`:
-- `emoji` - Display emoji for the article
-- `platform` - Source platform (e.g., meta-llama, huggingface)
-- `model_name` - Model or topic name
-- `YYYYMMDD` - Publication date
-- `HHMMSS` - Timestamp for uniqueness
+- Legacy format: Extracts emoji, platform, model_name from filename segments
+- New format: Directory-based structure with date/timestamp prefix
+- Both formats are supported for backward compatibility
 
 **Series Structure:**
 ```
@@ -248,6 +252,25 @@ Series use separate JSON metadata files instead of encoding everything in filena
 | `WECHAT_PUBLIC_KEY` | Optional | WeChat Pay public key for production payments |
 
 **Important**: Environment variables set via Vercel CLI may contain trailing newlines. Use `cleanEnv()` from `lib/github-api.ts` to strip them.
+
+### TypeScript Configuration
+
+**Path Aliases** (`tsconfig.json`):
+```json
+{
+  "baseUrl": ".",
+  "paths": {
+    "@/*": ["./*"]
+  }
+}
+```
+Use `@/` prefix for imports: `import { foo } from '@/lib/bar'`
+
+**Type Safety:**
+- Strict mode enabled
+- NextAuth types extended in `types/next-auth.d.ts`
+- Zod schemas for API validation
+- Prisma generates types from schema
 
 ### Key Libraries
 
@@ -516,23 +539,38 @@ The `/image-tools` route provides pure frontend image processing capabilities:
 
 ### Design System
 
-The site uses a custom dark theme design system with glass morphism effects:
+The site uses a **pure CSS design system** with an Apple-inspired aesthetic. No JavaScript-based theme switching - themes are handled entirely through CSS variables.
 
-**Key Design Features:**
-- Dark theme with vibrant accent colors
-- Glass morphism (backdrop-blur, semi-transparent backgrounds)
-- Neon gradient system for branding
-- Animated gradient backgrounds and particle effects
-- 3D card hover effects
-- Custom scrollbar styling
+**Design Tokens** (`styles/themes.css`):
+- **Neutral grayscale palette** with precise tonal steps (50-950)
+- **Single accent color**: Apple Blue (#0071E3)
+- **Light/dark themes** via CSS custom properties
+- **Typography hierarchy**: Apple system fonts (SF Pro Display/Text) with precise sizing
+- **Spacing system**: 4px base unit with consistent scale
+- **Border radius**: Apple-style larger rounded corners
+- **Shadows**: Subtle, layered shadows for depth
+- **Transitions**: Consistent timing functions (150ms/200ms/300ms)
 
-**Theming:**
-- CSS custom properties for consistent theming
-- Tailwind CSS with custom design tokens
-- Responsive design system with mobile-first approach
+**Animation System** (`styles/animations.css`):
+- Comprehensive keyframe animations (fadeIn, scaleIn, slideIn, pulse, spin, float, etc.)
+- Geek-style animations (cursorBlink, terminalType, pixelBlink, glitch, hologram)
+- Utility classes with delays, durations, and easing functions
+- Hover effects (lift, scale, shine, 3D interactive)
+
+**Geek/Terminal Aesthetic**:
+- Dot-matrix background patterns (`bg-dot-matrix`, `bg-dot-matrix-dense`)
+- Monospace font buttons (`btn-primary`, `btn-secondary`, `btn-terminal`)
+- Terminal-style prompts with `>` prefix
+- 2px borders for card components
+- Dotted dividers and technical tag styling
+
+**CSS-Only Architecture**:
+- Theme switching happens through `.dark` class on root element
+- No JavaScript runtime theming - all CSS variables
+- Progressive enhancement: works without JS
 
 **UI Components** (`components/ui/`):
-- Glass card components
+- Glass card components with backdrop-blur
 - Theme-aware form controls
 - Navigation system
 - Reusable button and input components
@@ -555,6 +593,54 @@ The `/api/payment` routes handle payment processing for subscription purchases:
 - Payment callbacks are verified for authenticity (signature verification)
 - Subscription start dates are set to payment completion time
 - Admin users can manually create subscriptions via `/api/admin/subscription`
+
+### Error Handling Conventions
+
+API routes consistently follow this pattern:
+
+```typescript
+try {
+  // Business logic
+  return NextResponse.json({ success: true, data });
+} catch (err) {
+  return NextResponse.json(
+    {
+      message: "Error message",
+      error: err instanceof Error ? err.message : String(err)
+    },
+    { status: 500 }
+  );
+}
+```
+
+**Key Points:**
+- Always wrap API logic in try-catch
+- Return consistent error response format
+- Use `instanceof Error` type guards
+- Include descriptive error messages for debugging
+
+### Static Generation Configuration
+
+**Next.js Config** (`next.config.mjs`):
+```javascript
+{
+  reactStrictMode: true,
+  images: {
+    unoptimized: true  // Disabled for external image handling
+  }
+}
+```
+
+**Page-level patterns:**
+- Content pages: `export const dynamic = "force-static"`
+- API routes: `export const runtime = 'nodejs'` for compatibility
+- ISR pages: Add `revalidate: N` (in seconds) for incremental regeneration
+
+**Build process:**
+1. `prisma generate` - Generates Prisma client from schema
+2. `next build` - Builds Next.js application with SSG/ISR
+3. Static pages pre-rendered at build time
+4. API routes deployed as serverless functions
 
 ### Common Issues
 

@@ -361,7 +361,7 @@ export default function QuizCreatePage() {
                               {model.name}
                             </div>
                             {model.recommended && (
-                              <span className="px-2 py-0.5 text-xs rounded-full bg-[var(--neon-green)]/20 text-[var(--neon-green)] font-medium">
+                              <span className="px-2 py-0.5 text-xs rounded-full bg-[var(--color-accent-soft)] text-[var(--color-accent)] font-medium">
                                 推荐
                               </span>
                             )}
@@ -634,7 +634,7 @@ export default function QuizCreatePage() {
                       {AVAILABLE_QUIZ_MODELS.find(m => m.id === selectedModel)?.name || selectedModel}
                     </span>
                     {AVAILABLE_QUIZ_MODELS.find(m => m.id === selectedModel)?.recommended && (
-                      <span className="px-2 py-0.5 text-xs rounded-full bg-[var(--neon-green)]/20 text-[var(--neon-green)] font-medium">
+                      <span className="px-2 py-0.5 text-xs rounded-full bg-[var(--color-accent-soft)] text-[var(--color-accent)] font-medium">
                         推荐
                       </span>
                     )}

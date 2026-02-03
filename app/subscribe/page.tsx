@@ -193,7 +193,7 @@ export default function SubscribePage() {
               </ol>
             </div>
             <p className="mt-4 text-center text-gray-700 font-medium">
-              支付完成后，请添加微信：<span className="text-blue-600">MingFire520</span>
+              支付完成后，请联系支持团队：<span className="text-blue-600">support@devfox.ai</span>
             </p>
             <button
               type="button"

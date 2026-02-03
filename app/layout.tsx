@@ -3,10 +3,32 @@ import type { ReactNode } from "react";
 import { Navbar } from "@/components/Navbar";
 import { SessionProvider } from "@/components/providers";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import { JetBrains_Mono, Manrope, Sora } from "next/font/google";
+
+const sora = Sora({
+  subsets: ["latin"],
+  weight: ["400", "600", "700"],
+  variable: "--font-sora",
+  display: "swap",
+});
+
+const manrope = Manrope({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-manrope",
+  display: "swap",
+});
+
+const jetbrains = JetBrains_Mono({
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
+  variable: "--font-jetbrains",
+  display: "swap",
+});
 
 export const metadata = {
-  title: "极客狐 DevFox - AI 工程师 & 独立开发者",
-  description: "分享 AI 技术见解、独立开发经验和实用工具",
+  title: "DevFox AI — AI 产品与开发者平台",
+  description: "DevFox AI 提供可组合的 AI 工具与工作流，为团队与独立开发者加速产品落地。",
 };
 
 // 防止主题闪烁的内联脚本
@@ -21,7 +43,11 @@ const themeScript = `
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="zh-CN" className="scroll-smooth" suppressHydrationWarning>
+    <html
+      lang="zh-CN"
+      className={`${sora.variable} ${manrope.variable} ${jetbrains.variable} scroll-smooth`}
+      suppressHydrationWarning
+    >
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>

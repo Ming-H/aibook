@@ -145,70 +145,37 @@ export default function CreativeWorkshopPage() {
   const currentModel = AVAILABLE_MODELS.find(m => m.id === selectedModel);
 
   return (
-    <div className="min-h-screen bg-[var(--background-primary)] bg-noise">
-      {/* 动态背景 */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute inset-0 bg-grid opacity-30" />
-        <div className="absolute top-1/4 right-0 w-[500px] h-[500px] rounded-full animate-float"
-          style={{
-            background: 'radial-gradient(circle, rgba(255, 107, 107, 0.15) 0%, transparent 70%)',
-            filter: 'blur(80px)',
-            animationDelay: '1s'
-          }}
-        />
-        <div className="absolute bottom-1/4 left-0 w-[500px] h-[500px] rounded-full animate-float"
-          style={{
-            background: 'radial-gradient(circle, rgba(78, 205, 196, 0.15) 0%, transparent 70%)',
-            filter: 'blur(80px)',
-            animationDelay: '2s'
-          }}
-        />
-      </div>
+    <div className="min-h-screen bg-[var(--background-primary)] relative overflow-hidden">
+      <div className="absolute inset-0 bg-aurora" />
+      <div className="absolute inset-0 bg-grid-fine opacity-50" />
 
       {/* Hero Section */}
       <section className="relative overflow-hidden">
-        <div className="relative max-w-7xl mx-auto px-6 py-32 sm:px-8 lg:px-12">
+        <div className="relative max-w-6xl mx-auto px-6 py-24 sm:px-8 lg:px-12">
           <div className="text-center">
-            {/* 顶部徽章 */}
-            <div className="mb-10 flex justify-center animate-fade-in-down">
-              <div className="inline-flex items-center gap-3 rounded-full glass-card px-6 py-3 pulse-ring">
-                <div className="relative flex h-2 w-2">
-                  <div className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[var(--neon-cyan)] opacity-75" />
-                  <div className="relative inline-flex h-2 w-2 rounded-full bg-[var(--neon-cyan)] animate-pulse" />
-                </div>
-                <span className="text-sm font-bold tracking-wide" style={{
-                  background: 'var(--gradient-text-neon)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  backgroundClip: 'text'
-                }}>
-                  基于 ModelScope AI
-                </span>
+            <div className="mb-8 flex justify-center">
+              <div className="inline-flex items-center gap-2 rounded-full border border-[var(--border-subtle)] surface-soft px-4 py-2 text-xs uppercase tracking-[0.2em] text-[var(--text-muted)]">
+                <span className="h-2 w-2 rounded-full bg-[var(--color-accent)]" />
+                基于 ModelScope AI
               </div>
             </div>
-
-            {/* 标题 */}
-            <h1 className="mb-8 text-6xl sm:text-7xl lg:text-8xl font-black animate-fade-in-up" style={{ fontFamily: 'var(--font-display)' }}>
-              <span className="block animate-gradient bg-gradient-to-r from-[var(--color-brand)] via-[var(--color-purple)] to-[var(--color-pink)] bg-clip-text text-transparent"
-                style={{ backgroundSize: '200% 200%' }}>
-                创意工坊
-              </span>
-              <span className="block mt-4 text-[var(--text-primary)]" style={{ fontSize: '0.5em' }}>
-                AI 驱动的图片生成工具
-              </span>
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-semibold text-[var(--text-primary)]">
+              创意工坊
             </h1>
-
-            <p className="text-xl sm:text-2xl text-[var(--text-secondary)] mb-16 max-w-3xl mx-auto leading-relaxed">
-              用 AI 创造无限可能，将你的想象力转化为精美的图像
+            <p className="mt-4 text-lg text-[var(--text-secondary)]">
+              AI 驱动的图片生成工具
+            </p>
+            <p className="mt-6 text-[var(--text-secondary)] max-w-2xl mx-auto leading-relaxed">
+              用 AI 创造无限可能，将你的想象力转化为精美的图像。
             </p>
           </div>
         </div>
       </section>
 
       {/* 生成器界面 */}
-      <section className="max-w-6xl mx-auto px-6 pb-24 sm:px-8 lg:px-12">
-        <div className="glass-card border border-[var(--border-default)] rounded-3xl p-8 md:p-12">
-          <h2 className="text-3xl font-bold mb-8 text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-display)' }}>
+      <section className="relative max-w-6xl mx-auto px-6 pb-24 sm:px-8 lg:px-12">
+        <div className="card p-8 md:p-12">
+          <h2 className="text-2xl md:text-3xl font-semibold mb-8 text-[var(--text-primary)]">
             开始创作
           </h2>
 
@@ -228,7 +195,7 @@ export default function CreativeWorkshopPage() {
                     className={`
                       px-4 py-3 rounded-xl border-2 transition-all duration-200 text-left relative
                       ${selectedModel === model.id
-                        ? 'border-[var(--color-brand)] bg-[var(--color-brand)]/10 shadow-lg'
+                        ? 'border-[var(--color-accent)] bg-[var(--color-accent-soft)] shadow-md'
                         : 'border-[var(--border-default)] hover:border-[var(--border-strong)] bg-[var(--background-secondary)]'
                       }
                     `}
@@ -237,12 +204,12 @@ export default function CreativeWorkshopPage() {
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">
                           <div className={`font-semibold text-sm ${
-                            selectedModel === model.id ? 'text-[var(--color-brand)]' : 'text-[var(--text-primary)]'
+                            selectedModel === model.id ? 'text-[var(--color-accent)]' : 'text-[var(--text-primary)]'
                           }`}>
                             {model.name}
                           </div>
                           {model.recommended && (
-                            <span className="px-2 py-0.5 text-xs rounded-full bg-[var(--neon-green)]/20 text-[var(--neon-green)] font-medium">
+                            <span className="px-2 py-0.5 text-xs rounded-full bg-[var(--color-accent-soft)] text-[var(--color-accent)] font-medium">
                               推荐
                             </span>
                           )}
@@ -252,7 +219,7 @@ export default function CreativeWorkshopPage() {
                         </div>
                       </div>
                       {selectedModel === model.id && (
-                        <div className="w-5 h-5 rounded-full bg-[var(--color-brand)] flex items-center justify-center flex-shrink-0 ml-2">
+                        <div className="w-5 h-5 rounded-full bg-[var(--color-accent)] flex items-center justify-center flex-shrink-0 ml-2">
                           <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
                             <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                           </svg>
@@ -306,7 +273,7 @@ export default function CreativeWorkshopPage() {
             <button
               onClick={handleGenerate}
               disabled={isGenerating || !prompt.trim()}
-              className="w-full px-8 py-5 bg-[var(--gradient-primary)] text-white font-bold rounded-2xl shadow-2xl transition-all duration-300 hover:scale-105 hover-glow-brand-strong hover:shadow-3d-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-3"
+              className="btn-primary w-full px-8 py-4 text-base flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isGenerating ? (
                 <>
@@ -328,7 +295,7 @@ export default function CreativeWorkshopPage() {
         {/* 生成的图片展示 */}
         {generatedImages.length > 0 && (
           <div className="mt-12">
-            <h2 className="text-3xl font-bold mb-8 text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-display)' }}>
+            <h2 className="text-2xl md:text-3xl font-semibold mb-8 text-[var(--text-primary)]">
               生成结果
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -337,7 +304,7 @@ export default function CreativeWorkshopPage() {
                 return (
                   <div
                     key={image.taskId}
-                    className="glass-card border border-[var(--border-default)] rounded-3xl overflow-hidden group animate-fade-in-up"
+                    className="card overflow-hidden group animate-fade-in-up"
                     style={{ animationDelay: `${index * 0.1}s` }}
                   >
                     <div className="relative aspect-square bg-[var(--background-secondary)]">
@@ -348,7 +315,7 @@ export default function CreativeWorkshopPage() {
                       />
                       {/* 模型标签 */}
                       {modelInfo && (
-                        <div className="absolute top-3 left-3 px-3 py-1.5 rounded-full glass-card text-xs font-semibold text-[var(--text-primary)]">
+                        <div className="absolute top-3 left-3 px-3 py-1.5 rounded-full surface-soft text-xs font-semibold text-[var(--text-primary)]">
                           {modelInfo.name}
                         </div>
                       )}
@@ -356,7 +323,7 @@ export default function CreativeWorkshopPage() {
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
                         <button
                           onClick={() => handleDownload(image.url, index)}
-                          className="px-6 py-3 bg-[var(--gradient-primary)] text-white font-bold rounded-xl shadow-lg hover:scale-105 transition-transform"
+                          className="btn-primary px-6 py-2 text-sm"
                         >
                           下载图片
                         </button>
@@ -372,11 +339,11 @@ export default function CreativeWorkshopPage() {
 
       {/* Features Section */}
       <section className="max-w-7xl mx-auto px-6 py-24 sm:px-8 lg:px-12">
-        <div className="text-center mb-16 animate-fade-in-up">
-          <h2 className="text-4xl md:text-5xl font-black mb-4 text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-display)' }}>
+        <div className="text-center mb-12">
+          <h2 className="text-3xl md:text-4xl font-semibold mb-3 text-[var(--text-primary)]">
             核心功能
           </h2>
-          <p className="text-lg text-[var(--text-muted)]">
+          <p className="text-[var(--text-secondary)]">
             强大的 AI，简单的操作
           </p>
         </div>
@@ -422,8 +389,7 @@ export default function CreativeWorkshopPage() {
           ].map((feature, index) => (
             <div
               key={feature.title}
-              className="card-3d-interactive group p-8 glass-card border border-[var(--border-default)] rounded-3xl transition-all duration-500 hover:border-[var(--border-strong)] hover-glow animate-fade-in-up"
-              style={{ animationDelay: `${index * 0.1}s` }}
+              className="card p-8"
             >
               <div
                 className="w-16 h-16 mb-6 rounded-2xl flex items-center justify-center text-3xl shadow-lg group-hover:scale-110 transition-transform"
@@ -431,7 +397,7 @@ export default function CreativeWorkshopPage() {
               >
                 {feature.icon}
               </div>
-              <h3 className="text-2xl font-bold mb-3 text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-heading)' }}>
+              <h3 className="text-xl font-semibold mb-3 text-[var(--text-primary)]">
                 {feature.title}
               </h3>
               <p className="text-[var(--text-secondary)] leading-relaxed">

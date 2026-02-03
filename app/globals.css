@@ -42,6 +42,17 @@
   .text-balance {
     text-wrap: balance;
   }
+
+  .text-gradient {
+    background: linear-gradient(120deg, var(--text-primary), var(--color-accent));
+    -webkit-background-clip: text;
+    color: transparent;
+  }
+}
+
+::selection {
+  background: var(--color-accent-soft);
+  color: var(--text-strong);
 }
 
 /* ==================== 自定义滚动条（黑白） ==================== */

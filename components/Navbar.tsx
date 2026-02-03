@@ -23,31 +23,36 @@ export function Navbar() {
 
   const navItems = [
     { href: '/', label: '首页' },
-    { href: '/products', label: 'AI 产品' },
-    { href: '/projects', label: '作品集' },
-    { href: '/blog', label: '博客' },
+    { href: '/products', label: '产品' },
+    { href: '/#capabilities', label: '能力' },
+    { href: '/#solutions', label: '解决方案' },
     { href: '/about', label: '关于' },
   ];
 
   return (
     <header
       className={`sticky top-0 z-50 w-full transition-all duration-300 ${scrolled
-          ? 'bg-[var(--background-floating)] backdrop-blur-xl border-b border-[var(--border-subtle)]'
+          ? 'bg-[var(--background-floating)] backdrop-blur-xl border-b border-[var(--border-subtle)] shadow-sm'
           : 'bg-transparent border-b border-transparent'
         }`}
     >
       <div className="mx-auto flex max-w-6xl items-center justify-between px-5 sm:px-8 py-4">
         <Link href="/" className="flex items-center gap-3 group">
-          <div className="relative flex h-9 w-9 overflow-hidden rounded-lg bg-[var(--background-tertiary)]">
+          <div className="relative h-9 w-9 overflow-hidden rounded-xl border border-[var(--border-subtle)] bg-[var(--background-tertiary)]">
             <img
               src="/avatar.png"
-              alt="DevFox"
+              alt="DevFox AI"
               className="h-full w-full object-cover"
             />
           </div>
-          <span className="text-[17px] font-semibold tracking-tight text-[var(--text-primary)]">
-            DevFox AI
-          </span>
+          <div className="flex flex-col leading-tight">
+            <span className="text-[17px] font-semibold tracking-tight text-[var(--text-primary)]">
+              DevFox AI
+            </span>
+            <span className="text-xs text-[var(--text-muted)] hidden sm:block">
+              AI Product Studio
+            </span>
+          </div>
         </Link>
 
         <nav className="hidden md:flex items-center gap-1">
@@ -68,10 +73,19 @@ export function Navbar() {
           })}
         </nav>
 
-        <div className="flex items-center gap-2">
+        <div className="hidden md:flex items-center gap-3">
+          <ThemeToggle />
+          <a
+            href="mailto:1518246548@qq.com"
+            className="btn-primary px-4 py-2 text-sm"
+          >
+            获取演示
+          </a>
+        </div>
+        <div className="flex items-center gap-2 md:hidden">
           <ThemeToggle />
           <button
-            className="md:hidden p-2.5 rounded-lg hover:bg-[var(--background-tertiary)] transition-colors"
+            className="p-2.5 rounded-lg hover:bg-[var(--background-tertiary)] transition-colors"
             onClick={() => setMobileOpen(!mobileOpen)}
             aria-label="菜单"
           >
@@ -102,6 +116,13 @@ export function Navbar() {
                 {item.label}
               </Link>
             ))}
+            <a
+              href="mailto:1518246548@qq.com"
+              className="mt-2 btn-primary px-4 py-3 text-center text-sm"
+              onClick={() => setMobileOpen(false)}
+            >
+              获取演示
+            </a>
           </nav>
         </div>
       )}
