@@ -96,7 +96,6 @@ export async function POST(request: Request) {
     revalidatePath("/daily");
     revalidatePath("/daily/[date]");
     revalidatePath("/archive");
-    revalidatePath("/blog");
 
     // 清除所有内容缓存
     const { clearCache } = await import("@/lib/content-loader");

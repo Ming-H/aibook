@@ -38,7 +38,6 @@ export async function GET(request: Request) {
     revalidatePath("/daily/[date]");
     revalidatePath("/archive");
     revalidatePath("/series");
-    revalidatePath("/blog");
 
     // 清除所有内容缓存
     const { clearCache } = await import("@/lib/content-loader");

@@ -435,55 +435,26 @@ export default function ImageToolsPage() {
   const currentPreview = imagePreviews[currentPreviewIndex];
 
   return (
-    <div className="min-h-screen bg-[var(--background-primary)] bg-noise">
-      {/* 动态背景 */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute inset-0 bg-grid opacity-30" />
-        <div className="absolute top-1/4 right-0 w-[500px] h-[500px] rounded-full animate-float"
-          style={{
-            background: 'radial-gradient(circle, rgba(78, 205, 196, 0.15) 0%, transparent 70%)',
-            filter: 'blur(80px)',
-            animationDelay: '1s'
-          }}
-        />
-        <div className="absolute bottom-1/4 left-0 w-[500px] h-[500px] rounded-full animate-float"
-          style={{
-            background: 'radial-gradient(circle, rgba(255, 107, 107, 0.15) 0%, transparent 70%)',
-            filter: 'blur(80px)',
-            animationDelay: '2s'
-          }}
-        />
-      </div>
+    <div className="min-h-screen bg-[var(--background-primary)] relative overflow-hidden">
+      <div className="absolute inset-0 bg-aurora" />
+      <div className="absolute inset-0 bg-grid-fine opacity-50" />
 
       {/* Hero Section */}
       <section className="relative overflow-hidden">
-        <div className="relative max-w-7xl mx-auto px-6 py-20 sm:px-8 lg:px-12">
+        <div className="relative max-w-6xl mx-auto px-6 py-20 sm:px-8 lg:px-12">
           <div className="text-center">
-            <div className="mb-8 flex justify-center">
-              <div className="inline-flex items-center gap-3 rounded-full glass-card px-6 py-3 pulse-ring">
-                <div className="relative flex h-2 w-2">
-                  <div className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[var(--neon-cyan)] opacity-75" />
-                  <div className="relative inline-flex h-2 w-2 rounded-full bg-[var(--neon-cyan)] animate-pulse" />
-                </div>
-                <span className="text-sm font-bold tracking-wide" style={{
-                  background: 'var(--gradient-text-neon)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  backgroundClip: 'text'
-                }}>
-                  纯前端处理 · 本地运行
-                </span>
+            <div className="mb-6 flex justify-center">
+              <div className="inline-flex items-center gap-2 rounded-full border border-[var(--border-subtle)] surface-soft px-4 py-2 text-xs uppercase tracking-[0.2em] text-[var(--text-muted)]">
+                <span className="h-2 w-2 rounded-full bg-[var(--color-accent)]" />
+                纯前端处理 · 本地运行
               </div>
             </div>
 
-            <h1 className="mb-6 text-5xl sm:text-6xl lg:text-7xl font-black animate-fade-in-up" style={{ fontFamily: 'var(--font-display)' }}>
-              <span className="block animate-gradient bg-gradient-to-r from-[var(--color-brand)] via-[var(--color-purple)] to-[var(--color-pink)] bg-clip-text text-transparent"
-                style={{ backgroundSize: '200% 200%' }}>
-                图片工具箱
-              </span>
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-semibold text-[var(--text-primary)]">
+              图片工具箱
             </h1>
 
-            <p className="text-xl sm:text-2xl text-[var(--text-secondary)] mb-8 max-w-3xl mx-auto leading-relaxed">
+            <p className="mt-4 text-lg text-[var(--text-secondary)] max-w-3xl mx-auto leading-relaxed">
               手动选择裁剪区域，精确控制输出效果
             </p>
           </div>
@@ -496,8 +467,8 @@ export default function ImageToolsPage() {
           {/* 左侧 - 设置面板 */}
           <div className="lg:col-span-1 space-y-6">
             {/* 设置卡片 */}
-            <div className="glass-card border border-[var(--border-default)] rounded-3xl p-6">
-              <h3 className="text-xl font-bold mb-6 text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-display)' }}>
+            <div className="card p-6">
+              <h3 className="text-lg font-semibold mb-6 text-[var(--text-primary)]">
                 输出设置
               </h3>
 
@@ -619,7 +590,7 @@ export default function ImageToolsPage() {
 
             {/* 已选择的文件 */}
             {selectedFiles.length > 0 && (
-              <div className="glass-card border border-[var(--border-default)] rounded-3xl p-4">
+              <div className="card p-4">
                 <div className="flex items-center justify-between mb-3">
                   <h4 className="text-sm font-semibold text-[var(--text-primary)]">
                     已选择 {selectedFiles.length} 张
@@ -661,7 +632,7 @@ export default function ImageToolsPage() {
           {/* 右侧 - 裁剪预览 */}
           <div className="lg:col-span-2">
             {currentPreview ? (
-              <div className="glass-card border border-[var(--border-default)] rounded-3xl p-6">
+              <div className="card p-6">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-lg font-bold text-[var(--text-primary)]">
                     调整裁剪区域
@@ -735,7 +706,7 @@ export default function ImageToolsPage() {
                 </div>
               </div>
             ) : (
-              <div className="glass-card border border-[var(--border-default)] rounded-3xl p-12 text-center">
+              <div className="card p-10 text-center">
                 <div className="w-16 h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center text-3xl bg-[var(--background-tertiary)]">
                   🖼️
                 </div>
@@ -758,11 +729,11 @@ export default function ImageToolsPage() {
         )}
 
         {/* 处理按钮 */}
-        <div className="mt-6 glass-card border border-[var(--border-default)] rounded-2xl p-6">
+        <div className="mt-6 card p-6">
           <button
             onClick={handleProcess}
             disabled={imagePreviews.length === 0 || isProcessing}
-            className="w-full px-8 py-5 bg-[var(--gradient-primary)] text-white font-bold rounded-xl shadow-2xl transition-all duration-300 hover:scale-105 hover-glow-brand-strong hover:shadow-3d-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-3 relative z-10 text-lg"
+            className="btn-primary w-full px-8 py-4 text-base flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isProcessing ? (
               <>
@@ -796,12 +767,12 @@ export default function ImageToolsPage() {
         {processedImages.length > 0 && (
           <div className="mt-12">
             <div className="flex items-center justify-between mb-8">
-              <h2 className="text-3xl font-bold text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-display)' }}>
+              <h2 className="text-2xl font-semibold text-[var(--text-primary)]">
                 处理结果 ({processedImages.length})
               </h2>
               <button
                 onClick={handleDownloadAll}
-                className="px-6 py-3 bg-[var(--gradient-primary)] text-white font-bold rounded-xl shadow-lg hover:scale-105 transition-transform flex items-center gap-2"
+                className="btn-primary px-6 py-2 text-sm flex items-center gap-2"
               >
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
@@ -813,7 +784,7 @@ export default function ImageToolsPage() {
               {processedImages.map((image) => (
                 <div
                   key={image.id}
-                  className="glass-card border border-[var(--border-default)] rounded-2xl overflow-hidden group"
+                  className="card overflow-hidden group"
                 >
                   <div className="grid grid-cols-2 gap-0">
                     <div className="relative aspect-square bg-[var(--background-secondary)]">
@@ -848,7 +819,7 @@ export default function ImageToolsPage() {
                       </div>
                       <button
                         onClick={() => handleDownload(image)}
-                        className="px-4 py-2 bg-[var(--gradient-primary)] text-white text-sm font-bold rounded-lg shadow-lg hover:scale-105 transition-transform flex items-center gap-2"
+                        className="btn-primary px-4 py-2 text-xs flex items-center gap-2"
                       >
                         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />

@@ -86,15 +86,18 @@ export default function ProductsPage() {
     : products.filter(p => p.category === activeCategory);
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[var(--background-primary)] bg-dot-matrix py-12 px-4 sm:px-6 lg:px-8">
-      <div className="relative max-w-7xl mx-auto">
+    <div className="min-h-screen bg-[var(--background-primary)] relative overflow-hidden">
+      <div className="absolute inset-0 bg-aurora" />
+      <div className="absolute inset-0 bg-grid-fine opacity-40" />
+      <div className="relative max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8">
         {/* 页面标题 */}
         <div className="text-center mb-16">
-          <h1 className="text-4xl sm:text-5xl font-bold text-[var(--text-primary)] mb-4 font-mono border-b-4 border-[var(--border-medium)] inline-block pb-2">
-            AI 产品
+          <p className="text-xs uppercase tracking-[0.3em] text-[var(--text-muted)]">Products</p>
+          <h1 className="mt-4 text-4xl sm:text-5xl font-semibold text-[var(--text-primary)]">
+            DevFox AI 产品矩阵
           </h1>
-          <p className="text-[var(--text-secondary)] text-lg max-w-2xl mx-auto">
-            用 AI 解决真实问题，为创造者提供高效工具
+          <p className="mt-4 text-[var(--text-secondary)] text-lg max-w-2xl mx-auto">
+            从灵感到交付的一体化 AI 产品与工具组合。
           </p>
         </div>
 
@@ -104,10 +107,10 @@ export default function ProductsPage() {
             <button
               key={category.id}
               onClick={() => setActiveCategory(category.id)}
-              className={`px-6 py-3 rounded-md font-medium transition-all duration-200 font-mono ${
+              className={`px-6 py-3 rounded-full text-sm font-semibold transition-all duration-200 ${
                 activeCategory === category.id
-                  ? 'bg-[var(--text-primary)] text-[var(--background-primary)] border-2 border-[var(--text-primary)]'
-                  : 'bg-[var(--background-secondary)] text-[var(--text-secondary)] border-2 border-[var(--border-subtle)] hover:bg-[var(--background-tertiary)] hover:border-[var(--border-default)]'
+                  ? 'bg-[var(--color-accent)] text-white shadow-md'
+                  : 'bg-[var(--background-elevated)] text-[var(--text-secondary)] border border-[var(--border-subtle)] hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]'
               }`}
             >
               <span className="mr-2">{category.icon}</span>
@@ -129,7 +132,7 @@ export default function ProductsPage() {
                   <div className="flex items-center gap-3 mb-3">
                     <span className="text-4xl">{product.image}</span>
                     <div>
-                      <h3 className="text-2xl font-bold text-[var(--text-primary)] font-mono">
+                      <h3 className="text-2xl font-semibold text-[var(--text-primary)]">
                         {product.name}
                       </h3>
                       <p className="text-[var(--text-secondary)]">{product.description}</p>
@@ -148,7 +151,7 @@ export default function ProductsPage() {
                 {product.tags.map((tag) => (
                   <span
                     key={tag}
-                    className="tag font-mono text-sm"
+                    className="tag"
                   >
                     {tag}
                   </span>
@@ -171,7 +174,7 @@ export default function ProductsPage() {
         {/* 更多产品提示 */}
         {filteredProducts.length === 0 && (
           <div className="text-center py-20">
-            <p className="text-[var(--text-secondary)] text-lg font-mono">
+            <p className="text-[var(--text-secondary)] text-lg">
               该分类下暂无产品
             </p>
           </div>
@@ -180,26 +183,24 @@ export default function ProductsPage() {
         {/* 底部 CTA */}
         <div className="mt-20 text-center">
           <div className="card p-8 max-w-2xl mx-auto">
-            <h3 className="text-2xl font-bold text-[var(--text-primary)] mb-3 font-mono">
-              对我的 AI 产品感兴趣？
+            <h3 className="text-2xl font-semibold text-[var(--text-primary)] mb-3">
+              需要更贴合业务的方案？
             </h3>
             <p className="text-[var(--text-secondary)] mb-6">
-              欢迎体验这些工具，或者通过 GitHub 了解源码实现
+              让 DevFox AI 团队协助你完成从需求梳理到方案落地。
             </p>
             <div className="flex flex-wrap gap-4 justify-center">
               <a
-                href="https://github.com/Ming-H"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn-primary px-6 py-3 rounded-md font-bold font-mono"
+                href="mailto:1518246548@qq.com"
+                className="btn-primary px-6 py-3 rounded-md font-semibold"
               >
-                GitHub 主页
+                联系团队
               </a>
               <Link
-                href="/about"
-                className="btn-secondary px-6 py-3 rounded-md font-bold border-2 font-mono"
+                href="/#solutions"
+                className="btn-secondary px-6 py-3 rounded-md font-semibold border"
               >
-                联系我
+                查看解决方案
               </Link>
             </div>
           </div>
