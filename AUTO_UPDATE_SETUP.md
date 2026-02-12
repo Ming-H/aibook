@@ -33,7 +33,7 @@
 
 3. **在 GitHub 配置 Webhook**
 
-   - 访问：`https://github.com/devfoxaicn/content-forge-ai/settings/hooks`
+   - 访问：`https://github.com/Ming-H/content-forge-ai/settings/hooks`
    - 点击 "Add webhook"
    - 配置如下：
      - **Payload URL**: `https://www.devfoxai.cn/api/webhook/github`

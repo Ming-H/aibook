@@ -5,7 +5,7 @@
 你的网站已经具备完整的自动更新功能，可以自动获取 `content-forge-ai` 仓库的最新数据。
 
 ### 数据来源
-- **仓库**: https://github.com/devfoxaicn/content-forge-ai
+- **仓库**: https://github.com/Ming-H/content-forge-ai
 - **目录**: `data/daily/`
 - **更新频率**: 每天 9:00, 14:00, 18:00
 - **文件格式**: `digest_YYYYMMDD_HHMMSS.md`
@@ -25,7 +25,7 @@
 
 ```bash
 GITHUB_TOKEN=ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-GITHUB_DATA_REPO=devfoxaicn/content-forge-ai
+GITHUB_DATA_REPO=Ming-H/content-forge-ai
 GITHUB_WEBHOOK_SECRET=your-random-webhook-secret
 CRON_SECRET=your-random-cron-secret
 ```
@@ -51,7 +51,7 @@ CRON_SECRET=your-random-cron-secret
    粘贴刚才生成的 secret
 
 3. **在 GitHub 配置 Webhook**
-   - 访问: https://github.com/devfoxaicn/content-forge-ai/settings/hooks
+   - 访问: https://github.com/Ming-H/content-forge-ai/settings/hooks
    - 点击 "Add webhook"
    - 配置:
      - **Payload URL**: `https://www.devfoxai.cn/api/webhook/github`
