@@ -89,8 +89,8 @@ export default function ProjectsPage() {
       image: '🔧',
       tags: ['Python', 'Kotlin', 'TypeScript'],
       stars: 1,
-      url: 'https://github.com/devfoxaicn/content-forge-ai',
-      github: 'https://github.com/devfoxaicn/content-forge-ai',
+      url: 'https://github.com/Ming-H/content-forge-ai',
+      github: 'https://github.com/Ming-H/content-forge-ai',
       category: 'opensource',
     },
   ];

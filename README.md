@@ -27,7 +27,7 @@
 
 ```bash
 # 克隆仓库
-git clone https://github.com/devfoxaicn/aibook.git
+git clone https://github.com/Ming-H/aibook.git
 cd aibook
 
 # 安装依赖
