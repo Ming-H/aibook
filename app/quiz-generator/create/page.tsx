@@ -252,7 +252,7 @@ export default function QuizCreatePage() {
   };
 
   return (
-    <div className="min-h-screen">
+    <div className="page-surface page-surface-soft">
       {/* 页面头部 */}
       <div className="max-w-4xl mx-auto px-6 py-12 sm:px-8">
         <Link

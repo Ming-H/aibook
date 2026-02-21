@@ -65,7 +65,7 @@ export default async function DailyPage() {
   const latestExcerpt = latestEntry ? extractExcerpt(latestEntry.content, 180) : '';
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[var(--background-primary)]">
+    <div className="page-surface page-surface-soft">
       {/* Header */}
       <section className="px-6 py-12 md:py-16">
         <div className="mx-auto max-w-7xl">

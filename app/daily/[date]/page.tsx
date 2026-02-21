@@ -41,7 +41,7 @@ export default async function DailyDetailPage({ params }: { params: { date: stri
   const parsed = await parseMarkdown(entry.content);
 
   return (
-    <div className="min-h-screen bg-[var(--background-primary)]">
+    <div className="page-surface page-surface-soft">
       {/* Header */}
       <div className="border-b-2 border-[var(--border-subtle)]">
         <div className="px-6 py-4">

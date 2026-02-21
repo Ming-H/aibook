@@ -86,10 +86,8 @@ export default function ProductsPage() {
     : products.filter(p => p.category === activeCategory);
 
   return (
-    <div className="min-h-screen bg-[var(--background-primary)] relative overflow-hidden">
-      <div className="absolute inset-0 bg-aurora" />
-      <div className="absolute inset-0 bg-grid-fine opacity-40" />
-      <div className="relative max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8">
+    <div className="page-surface">
+      <div className="max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8">
         {/* 页面标题 */}
         <div className="text-center mb-16">
           <p className="text-xs uppercase tracking-[0.3em] text-[var(--text-muted)]">Products</p>

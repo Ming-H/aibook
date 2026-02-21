@@ -49,12 +49,10 @@ const highlights = [
 
 export default function AboutPage() {
   return (
-    <div className="min-h-screen bg-[var(--background-primary)]">
+    <div className="page-surface">
       {/* Hero */}
-      <section className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-aurora" />
-        <div className="absolute inset-0 bg-grid-fine opacity-60" />
-        <div className="relative px-6 pt-24 pb-16">
+      <section className="relative">
+        <div className="px-6 pt-24 pb-16">
           <div className="mx-auto max-w-5xl">
             <p className="text-xs uppercase tracking-[0.3em] text-[var(--text-muted)]">About</p>
             <h1 className="mt-4 text-4xl sm:text-5xl font-semibold text-[var(--text-primary)]">
@@ -107,7 +105,7 @@ export default function AboutPage() {
       </section>
 
       {/* Pillars */}
-      <section className="px-6 py-16 bg-[var(--background-secondary)]">
+      <section className="page-section-panel px-6 py-16">
         <div className="mx-auto max-w-6xl">
           <p className="text-xs uppercase tracking-[0.3em] text-[var(--text-muted)]">Pillars</p>
           <h2 className="mt-4 text-3xl md:text-4xl font-semibold">产品与平台支柱</h2>

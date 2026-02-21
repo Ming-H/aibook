@@ -435,13 +435,11 @@ export default function ImageToolsPage() {
   const currentPreview = imagePreviews[currentPreviewIndex];
 
   return (
-    <div className="min-h-screen bg-[var(--background-primary)] relative overflow-hidden">
-      <div className="absolute inset-0 bg-aurora" />
-      <div className="absolute inset-0 bg-grid-fine opacity-50" />
+    <div className="page-surface">
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden">
-        <div className="relative max-w-6xl mx-auto px-6 py-20 sm:px-8 lg:px-12">
+      <section className="relative">
+        <div className="max-w-6xl mx-auto px-6 py-20 sm:px-8 lg:px-12">
           <div className="text-center">
             <div className="mb-6 flex justify-center">
               <div className="inline-flex items-center gap-2 rounded-full border border-[var(--border-subtle)] surface-soft px-4 py-2 text-xs uppercase tracking-[0.2em] text-[var(--text-muted)]">

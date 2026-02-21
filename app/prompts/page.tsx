@@ -65,7 +65,7 @@ export default function PromptsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white dark:bg-[var(--background-primary)] bg-dot-matrix py-12 px-4 sm:px-6 lg:px-8">
+      <div className="page-surface page-surface-soft py-12 px-4 sm:px-6 lg:px-8">
         <div className="relative max-w-7xl mx-auto">
           <div className="text-center">
             <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--border-medium)]"></div>
@@ -77,7 +77,7 @@ export default function PromptsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[var(--background-primary)] bg-dot-matrix py-12 px-4 sm:px-6 lg:px-8">
+    <div className="page-surface page-surface-soft py-12 px-4 sm:px-6 lg:px-8">
       <div className="relative max-w-7xl mx-auto">
         {/* 页面标题 */}
         <div className="text-center mb-12">

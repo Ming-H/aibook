@@ -105,12 +105,7 @@ const studioModules = [
 
 export default function HomePage() {
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[var(--background-primary)] text-[var(--text-primary)]">
-      <div className="pointer-events-none absolute inset-0">
-        <div className="absolute inset-0 bg-grid-fine opacity-30" />
-        <div className="absolute left-0 right-0 top-0 h-[38rem] bg-aurora opacity-85" />
-      </div>
-      <div className="relative">
+    <div className="page-surface">
       {/* Hero */}
       <section className="relative">
         <div className="relative px-6 pt-24 pb-20">
@@ -267,10 +262,8 @@ export default function HomePage() {
       </section>
 
       {/* Capabilities */}
-      <section id="capabilities" className="relative overflow-hidden px-6 py-20">
-        <div className="pointer-events-none absolute inset-0 bg-[var(--background-secondary)] opacity-85" />
-        <div className="pointer-events-none absolute inset-0 bg-grid-fine opacity-25" />
-        <div className="relative mx-auto max-w-6xl">
+      <section id="capabilities" className="page-section-panel px-6 py-20">
+        <div className="mx-auto max-w-6xl">
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-12">
             <div>
               <p className="text-xs uppercase tracking-[0.3em] text-[var(--text-muted)]">Platform</p>
@@ -368,7 +361,6 @@ export default function HomePage() {
           </div>
         </div>
       </footer>
-      </div>
     </div>
   );
 }

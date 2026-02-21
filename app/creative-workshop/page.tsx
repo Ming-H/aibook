@@ -145,13 +145,11 @@ export default function CreativeWorkshopPage() {
   const currentModel = AVAILABLE_MODELS.find(m => m.id === selectedModel);
 
   return (
-    <div className="min-h-screen bg-[var(--background-primary)] relative overflow-hidden">
-      <div className="absolute inset-0 bg-aurora" />
-      <div className="absolute inset-0 bg-grid-fine opacity-50" />
+    <div className="page-surface">
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden">
-        <div className="relative max-w-6xl mx-auto px-6 py-24 sm:px-8 lg:px-12">
+      <section className="relative">
+        <div className="max-w-6xl mx-auto px-6 py-24 sm:px-8 lg:px-12">
           <div className="text-center">
             <div className="mb-8 flex justify-center">
               <div className="inline-flex items-center gap-2 rounded-full border border-[var(--border-subtle)] surface-soft px-4 py-2 text-xs uppercase tracking-[0.2em] text-[var(--text-muted)]">
@@ -173,7 +171,7 @@ export default function CreativeWorkshopPage() {
       </section>
 
       {/* 生成器界面 */}
-      <section className="relative max-w-6xl mx-auto px-6 pb-24 sm:px-8 lg:px-12">
+      <section className="max-w-6xl mx-auto px-6 pb-24 sm:px-8 lg:px-12">
         <div className="card p-8 md:p-12">
           <h2 className="text-2xl md:text-3xl font-semibold mb-8 text-[var(--text-primary)]">
             开始创作

@@ -29,7 +29,7 @@ export default async function BookDigestDetailPage({
   const imageBaseUrl = `https://raw.githubusercontent.com/${process.env.BOOK_DIGEST_REPO}/main/output/images`;
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[var(--background-primary)] bg-dot-matrix py-12 px-4 sm:px-6 lg:px-8">
+    <div className="page-surface page-surface-soft py-12 px-4 sm:px-6 lg:px-8">
       <div className="relative max-w-6xl mx-auto">
         {/* 返回链接 */}
         <Link

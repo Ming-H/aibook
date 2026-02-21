@@ -17,7 +17,7 @@ export default function SignInPage() {
   // 如果已登录，显示已登录状态和退出登录按钮
   if (status === 'loading') {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="page-surface page-surface-soft flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
           <p className="mt-4 text-gray-600">加载中...</p>
@@ -28,7 +28,7 @@ export default function SignInPage() {
 
   if (session) {
     return (
-      <div className="min-h-screen flex items-center justify-center px-4 py-12 sm:px-6 lg:px-8 bg-gradient-to-br from-indigo-50 via-white to-purple-50">
+      <div className="page-surface page-surface-soft flex items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
         <div className="max-w-md w-full">
           <div className="bg-white shadow-2xl rounded-3xl p-10 border-2 border-purple-100">
             <div className="text-center">
@@ -136,7 +136,7 @@ export default function SignInPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
+    <div className="page-surface page-surface-soft flex items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         {/* 标题 */}
         <div>

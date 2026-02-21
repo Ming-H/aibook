@@ -22,7 +22,7 @@ export default async function SeriesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[var(--background-primary)]">
+    <div className="page-surface page-surface-soft">
       {/* Header */}
       <section className="px-6 py-12 md:py-16">
         <div className="mx-auto max-w-7xl">
@@ -36,7 +36,7 @@ export default async function SeriesPage() {
       </section>
 
       {/* Stats Section */}
-      <section className="px-6 pb-8 bg-[var(--background-secondary)]">
+      <section className="page-section-panel px-6 pb-8">
         <div className="mx-auto max-w-7xl">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="card p-6 text-center">

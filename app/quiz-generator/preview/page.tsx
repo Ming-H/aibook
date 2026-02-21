@@ -197,7 +197,7 @@ export default function QuizPreviewPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="page-surface page-surface-soft flex items-center justify-center">
         <div className="text-center">
           <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--color-brand)]"></div>
           <p className="mt-4 text-[var(--text-secondary)]">加载中...</p>
@@ -211,7 +211,7 @@ export default function QuizPreviewPage() {
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="page-surface page-surface-soft">
       {/* 页面头部 */}
       <div className="max-w-4xl mx-auto px-6 py-12 sm:px-8">
         <Link
