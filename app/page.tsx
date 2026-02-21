@@ -97,9 +97,9 @@ const studioModules = [
   {
     title: 'DevFox Insight',
     description: '行业与模型动态的轻量洞察与提醒。',
-    status: 'Daily',
-    href: 'https://ming-h.github.io/ai-insights/daily/',
-    cta: '查看 Daily',
+    status: 'Active',
+    href: 'https://ming-h.github.io/ai-insights/',
+    cta: '查看 Insight',
   },
 ];
 
