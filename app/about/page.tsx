@@ -32,7 +32,7 @@ export default function AboutPage() {
       {/* Bio */}
       <div className="space-y-4 text-[var(--text-secondary)] leading-relaxed mb-10">
         <p>
-          你好，我是郝明，一个专注于 AI 技术的独立开发者。
+          你好，我是极客狐，一个专注于 AI 技术的独立开发者。
         </p>
         <p>
           在 AI 算法领域深耕多年，经历过从传统机器学习到大语言模型的技术演进。我相信技术的价值在于解决真实问题，所以一直在探索 AI 技术的落地应用。
