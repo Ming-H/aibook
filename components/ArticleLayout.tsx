@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { formatDate } from "@/lib/utils";
-import { TipJar } from "./TipJar";
 
 interface Heading {
   level: number;
@@ -124,9 +123,6 @@ export function ArticleLayout({
           </header>
 
           <div className="prose" dangerouslySetInnerHTML={{ __html: contentHtml }} />
-
-          {/* Tip Jar */}
-          <TipJar />
 
           {/* AdSense placeholder */}
           {process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID && (
