@@ -65,38 +65,6 @@ export default async function HomePage() {
         )}
       </section>
 
-      {/* Recent Investing Posts */}
-      <section className="pb-14">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-[11px] tracking-[0.15em] uppercase text-[var(--text-muted)] font-medium">Investing</h2>
-          <Link href="/investing" className="text-[12px] text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] transition-colors">
-            全部 →
-          </Link>
-        </div>
-        {investingPosts.length === 0 ? (
-          <p className="text-sm text-[var(--text-muted)]">暂无文章。</p>
-        ) : (
-          <div>
-            {investingPosts.slice(0, 5).map((post) => (
-              <Link
-                key={post.slug}
-                href={`/investing/${post.slug}`}
-                className="block py-4 group"
-              >
-                <div className="flex items-baseline justify-between gap-4">
-                  <span className="text-[15px] text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors leading-snug">
-                    {post.title}
-                  </span>
-                  <time className="text-[12px] text-[var(--text-muted)] whitespace-nowrap flex-shrink-0 tabular-nums">
-                    {post.date}
-                  </time>
-                </div>
-              </Link>
-            ))}
-          </div>
-        )}
-      </section>
-
       {/* Projects */}
       {tools.length > 0 && (
         <section className="pb-14">
