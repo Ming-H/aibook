@@ -1,8 +1,8 @@
 {
-  "name": "devfox-ai",
+  "name": "devfox-site",
   "version": "2.0.0",
   "private": true,
-  "description": "极客狐 DevFox — 个人知识网站",
+  "description": "DevFox AI — 个人知识网站",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
