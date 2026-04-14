@@ -29,7 +29,7 @@ export default async function HomePage() {
         >
           <Image src="/avatar.png" alt="DevFox" width={64} height={64} className="rounded-full" />
         </div>
-        <h1 className="text-2xl font-semibold mb-2 tracking-tight">DevFox</h1>
+        <h1 className="text-2xl font-semibold mb-2 tracking-tight">DevFox AI</h1>
         <p className="text-[14px] text-[var(--text-tertiary)] mb-6">独立开发者 · AI · 投资</p>
         <div className="flex justify-center">
           <SocialLinks />

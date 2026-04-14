@@ -39,7 +39,7 @@ export function Navbar() {
       <div className="mx-auto flex max-w-[720px] items-center justify-between px-5 sm:px-8 h-14">
         {/* Logo */}
         <Link href="/" className="text-[15px] font-semibold tracking-tight text-[var(--text-primary)]">
-          DevFox
+          DevFox AI
         </Link>
 
         {/* Desktop Nav */}
