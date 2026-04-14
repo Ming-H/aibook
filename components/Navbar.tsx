@@ -25,7 +25,6 @@ export function Navbar() {
     { href: '/', label: '首页' },
     { href: '/blog', label: '博客' },
     { href: '/gallery', label: '画廊' },
-    { href: '/prompts', label: '提示词' },
     { href: '/tools', label: '工具' },
     { href: '/daily', label: '日报' },
     { href: '/investing', label: '投资' },
