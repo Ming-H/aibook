@@ -4,6 +4,7 @@ import { getAllPosts } from "@/lib/content-loader";
 import { getAllTools } from "@/lib/tools-loader";
 import { getAllGalleryItems } from "@/lib/gallery-loader";
 import { getAllPrompts } from "@/lib/prompts-loader";
+import { getLatestDailyEntry } from "@/lib/daily-loader";
 import { SocialLinks } from "@/components/SocialLinks";
 
 export const revalidate = 3600;
@@ -19,6 +20,11 @@ export default async function HomePage() {
   const tools = getAllTools();
   const galleryItems = getAllGalleryItems();
   const prompts = getAllPrompts();
+
+  let latestDaily: Awaited<ReturnType<typeof getLatestDailyEntry>> = null;
+  try {
+    latestDaily = await getLatestDailyEntry();
+  } catch {}
 
   return (
     <div className="max-w-[720px] mx-auto px-5 sm:px-8">
@@ -63,6 +69,34 @@ export default async function HomePage() {
           </div>
         )}
       </section>
+
+      {/* AI Daily */}
+      {latestDaily && (
+        <section className="pb-12">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-xs tracking-widest uppercase text-[var(--text-muted)]">AI 日报</h2>
+            <Link href="/daily" className="text-xs text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] transition-colors">
+              全部 →
+            </Link>
+          </div>
+          <Link
+            href={`/daily/${latestDaily.date}`}
+            className="block p-5 rounded-lg border border-[var(--border-default)] hover:border-[var(--accent-color)] transition-colors group"
+          >
+            <div className="flex items-center gap-2 mb-2">
+              <time className="text-xs text-[var(--text-muted)]">
+                {latestDaily.date.slice(0, 4)}-{latestDaily.date.slice(4, 6)}-{latestDaily.date.slice(6, 8)}
+              </time>
+            </div>
+            <h3 className="text-sm font-medium text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors mb-1">
+              {latestDaily.title}
+            </h3>
+            <p className="text-xs text-[var(--text-muted)] line-clamp-2">
+              {latestDaily.content?.replace(/^#{1,6}\s+/gm, "").replace(/\*\*/g, "").split("\n").find(l => l.trim().startsWith(">"))?.replace(/^>\s*/, "").trim() || "每日 AI 行业动态速览"}
+            </p>
+          </Link>
+        </section>
+      )}
 
       {/* AI Gallery */}
       {galleryItems.length > 0 && (
