@@ -12,14 +12,14 @@ export default async function BlogPage() {
   const posts = await getAllPosts("blog");
 
   return (
-    <div className="max-w-[680px] mx-auto px-5 sm:px-8 py-16">
+    <div className="max-w-[720px] mx-auto px-5 sm:px-8 py-12">
       <header className="mb-10">
-        <h1 className="text-xl font-semibold tracking-tight mb-2">技术博客</h1>
-        <p className="text-xs text-[var(--text-muted)]">AI 技术的实践与思考</p>
+        <h1 className="text-2xl font-semibold tracking-tight mb-3">技术博客</h1>
+        <p className="text-[15px] text-[var(--text-tertiary)] leading-relaxed">AI 技术的实践与思考</p>
       </header>
 
       {posts.length === 0 ? (
-        <p className="text-sm text-[var(--text-muted)]">暂无文章。</p>
+        <p className="text-base text-[var(--text-muted)]">暂无文章。</p>
       ) : (
         <div>
           {posts.map((post) => (

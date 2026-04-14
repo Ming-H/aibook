@@ -18,8 +18,8 @@ const jetbrains = JetBrains_Mono({
 });
 
 export const metadata = {
-  title: "DevFox AI — AI 技术 · 工具 · 投资",
-  description: "DevFox AI 个人知识网站，分享 AI 技术文章、开源工具和投资理财思考。",
+  title: "DevFox AI — AI 技术 · 画廊 · 提示词 · 投资",
+  description: "DevFox AI：AI 技术博客、AI 画廊、提示词库、开源工具和投资思考。",
   metadataBase: new URL("https://devfox.ai"),
   openGraph: {
     title: "DevFox AI",

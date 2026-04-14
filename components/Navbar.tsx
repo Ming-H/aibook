@@ -23,10 +23,12 @@ export function Navbar() {
 
   const navItems = [
     { href: '/', label: '首页' },
-    { href: '/blog', label: '技术博客' },
-    { href: '/tools', label: '开源工具' },
-    { href: '/daily', label: 'AI日报' },
-    { href: '/investing', label: '投资笔记' },
+    { href: '/blog', label: '博客' },
+    { href: '/gallery', label: '画廊' },
+    { href: '/prompts', label: '提示词' },
+    { href: '/tools', label: '工具' },
+    { href: '/daily', label: '日报' },
+    { href: '/investing', label: '投资' },
     { href: '/about', label: '关于' },
   ];
 
@@ -40,7 +42,7 @@ export function Navbar() {
     >
       <div className="mx-auto flex max-w-[1200px] items-center justify-between px-5 sm:px-8 h-14">
         {/* Logo */}
-        <Link href="/" className="text-sm font-semibold tracking-tight text-[var(--text-primary)]">
+        <Link href="/" className="text-base font-semibold tracking-tight text-[var(--text-primary)]">
           DevFox AI
         </Link>
 
@@ -52,7 +54,7 @@ export function Navbar() {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`text-xs tracking-wide transition-colors duration-150 ${
+                className={`text-sm tracking-wide transition-colors duration-150 ${
                   active
                     ? 'text-[var(--text-primary)]'
                     : 'text-[var(--text-tertiary)] hover:text-[var(--text-secondary)]'

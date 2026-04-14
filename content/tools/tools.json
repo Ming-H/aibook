@@ -1,29 +1,62 @@
 [
   {
+    "slug": "devfox-pulse",
+    "title": "DevFox Pulse",
+    "description": "AI 内容生产工厂，自动创作并发布到公众号、小红书、Twitter。六阶段工作流，支持多 LLM。",
+    "type": "open-source",
+    "url": "https://github.com/Ming-H/devfox-pulse",
+    "tags": ["内容创作", "多平台发布", "Claude Skills"],
+    "icon": "📡",
+    "category": "内容创作"
+  },
+  {
+    "slug": "devfox-vision",
+    "title": "DevFox Vision",
+    "description": "AI 图片生成与发布系统，支持 3D 城市微缩地图、小红书/抖音自动发布。",
+    "type": "open-source",
+    "url": "https://github.com/Ming-H/devfox-vision",
+    "tags": ["图片生成", "小红书", "抖音"],
+    "icon": "🎨",
+    "category": "内容创作"
+  },
+  {
     "slug": "content-forge-ai",
     "title": "Content Forge AI",
     "description": "AI 驱动的内容生成流水线，自动生成每日 AI 行业简报和技术系列文章。",
     "type": "open-source",
     "url": "https://github.com/Ming-H/content-forge-ai",
-    "tags": ["AI", "自动化", "内容生成"],
-    "icon": "🔥"
+    "tags": ["AI", "自动化", "日报"],
+    "icon": "🔥",
+    "category": "自动化"
   },
   {
     "slug": "ai-insights",
     "title": "AI Insights",
     "description": "基于 Hugo 的 AI 洞察博客，展示每日 AI 简报和技术系列文章。",
     "type": "open-source",
-    "url": "https://github.com/Ming-H/ai-insights",
+    "url": "https://ming-h.github.io/ai-insights/",
     "tags": ["Hugo", "博客", "GitHub Pages"],
-    "icon": "📊"
+    "icon": "📊",
+    "category": "博客"
+  },
+  {
+    "slug": "my-skills",
+    "title": "Claude Code Skills",
+    "description": "Claude Code 技能集合：技术数据分析、教程生成、书籍排版、趣味角色扮演等。",
+    "type": "open-source",
+    "url": "https://github.com/Ming-H/my-skills",
+    "tags": ["Claude", "Skills", "数据分析"],
+    "icon": "🎯",
+    "category": "开发工具"
   },
   {
     "slug": "devfox-ai",
-    "title": "极客狐 DevFox",
-    "description": "个人知识网站，分享 AI 技术、工具和投资思考。基于 Next.js 构建。",
+    "title": "DevFox AI",
+    "description": "个人知识网站，分享 AI 技术、画廊、提示词和投资思考。",
     "type": "open-source",
     "url": "https://devfox.ai",
-    "tags": ["Next.js", "个人网站", "博客"],
-    "icon": "🦊"
+    "tags": ["Next.js", "个人网站"],
+    "icon": "🦊",
+    "category": "博客"
   }
 ]

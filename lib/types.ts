@@ -24,6 +24,7 @@ export interface Tool {
   tags: string[];
   icon: string;
   coverImage?: string;
+  category?: string;
 }
 
 export interface DailyEntry {
