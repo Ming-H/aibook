@@ -18,25 +18,27 @@ const jetbrains = JetBrains_Mono({
 });
 
 export const metadata = {
-  title: "极客狐 DevFox — AI 技术 · 工具 · 投资",
-  description: "极客狐 DevFox 的个人知识网站，分享 AI 技术文章、开源工具和投资理财思考。",
+  title: "DevFox AI — AI 技术 · 工具 · 投资",
+  description: "DevFox AI 个人知识网站，分享 AI 技术文章、开源工具和投资理财思考。",
   metadataBase: new URL("https://devfox.ai"),
   openGraph: {
-    title: "极客狐 DevFox",
+    title: "DevFox AI",
     description: "AI 技术 · 工具 · 投资",
     url: "https://devfox.ai",
-    siteName: "极客狐 DevFox",
+    siteName: "DevFox AI",
     locale: "zh_CN",
     type: "website",
   },
-  rss: "/rss.xml",
 };
 
 const themeScript = `
   (function() {
-    const theme = localStorage.getItem('theme') || 'system';
+    const theme = localStorage.getItem('theme') || 'dark';
     if (theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
       document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+      document.documentElement.classList.add('light');
     }
   })();
 `;

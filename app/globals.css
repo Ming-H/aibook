@@ -26,8 +26,8 @@
 }
 
 ::selection {
-  background: var(--color-accent-soft);
-  color: var(--text-strong);
+  background: rgba(255, 255, 255, 0.15);
+  color: var(--text-primary);
 }
 
 /* Scrollbar */

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { formatDate } from "@/lib/utils";
+import { TipJar } from "./TipJar";
 
 interface Heading {
   level: number;
@@ -46,9 +47,7 @@ export function ArticleLayout({
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setActiveId(entry.target.id);
-          }
+          if (entry.isIntersecting) setActiveId(entry.target.id);
         });
       },
       { rootMargin: "-80px 0px -60% 0px" }
@@ -60,44 +59,41 @@ export function ArticleLayout({
     return () => observer.disconnect();
   }, [headings]);
 
-  const scrollToHeading = (id: string) => {
-    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
-  };
-
   const filteredHeadings = headings.filter((h) => h.level === 2 || h.level === 3);
 
   return (
     <>
-      {/* Reading progress bar */}
-      <div className="fixed top-0 left-0 right-0 z-50 h-[2px] bg-transparent">
+      {/* Reading progress */}
+      <div className="fixed top-0 left-0 right-0 z-50 h-[1px]">
         <div
-          className="h-full bg-[var(--accent-color)] transition-[width] duration-150"
+          className="h-full bg-[var(--text-muted)] transition-[width] duration-100"
           style={{ width: `${scrollProgress}%` }}
         />
       </div>
 
-      <div className="max-w-[1200px] mx-auto px-4 md:px-6 py-8 flex gap-8">
-        {/* TOC sidebar - desktop only */}
+      <div className="max-w-[1000px] mx-auto px-5 sm:px-8 py-10 md:py-16 flex gap-10">
+        {/* TOC - desktop */}
         {filteredHeadings.length > 0 && (
-          <aside className="hidden md:block w-56 shrink-0">
-            <nav className="sticky top-24">
-              <h4 className="text-sm font-semibold mb-3 text-[var(--text-secondary)]">目录</h4>
-              <ul className="space-y-1.5 text-sm">
+          <aside className="hidden lg:block w-48 shrink-0">
+            <nav className="sticky top-20">
+              <p className="text-[10px] tracking-widest uppercase text-[var(--text-muted)] mb-3">目录</p>
+              <ul className="space-y-1">
                 {filteredHeadings.map((h) => (
-                  <li
-                    key={h.id}
-                    style={{ paddingLeft: `${(h.level - 2) * 12}px` }}
-                  >
-                    <button
-                      onClick={() => scrollToHeading(h.id)}
-                      className={`text-left w-full truncate transition-colors ${
+                  <li key={h.id} style={{ paddingLeft: `${(h.level - 2) * 10}px` }}>
+                    <a
+                      href={`#${h.id}`}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        document.getElementById(h.id)?.scrollIntoView({ behavior: "smooth" });
+                      }}
+                      className={`block text-xs truncate py-0.5 transition-colors ${
                         activeId === h.id
-                          ? "text-[var(--accent-color)] font-medium"
-                          : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+                          ? "text-[var(--text-primary)]"
+                          : "text-[var(--text-muted)] hover:text-[var(--text-tertiary)]"
                       }`}
                     >
                       {h.text}
-                    </button>
+                    </a>
                   </li>
                 ))}
               </ul>
@@ -105,16 +101,21 @@ export function ArticleLayout({
           </aside>
         )}
 
-        {/* Main content */}
-        <article className="flex-1 min-w-0">
-          <header className="mb-8">
-            <h1 className="text-3xl md:text-4xl font-bold mb-4">{title}</h1>
-            <div className="flex items-center gap-4 text-sm text-[var(--text-secondary)]">
+        {/* Content */}
+        <article className="flex-1 min-w-0 max-w-[680px]">
+          <header className="mb-10">
+            <h1 className="text-2xl md:text-3xl font-semibold mb-4 tracking-tight leading-tight">{title}</h1>
+            <div className="flex items-center gap-3 text-xs text-[var(--text-muted)]">
               {date && <time>{formatDate(date)}</time>}
-              {readingTime && <span>{readingTime}</span>}
+              {readingTime && (
+                <>
+                  <span className="text-[var(--border-medium)]">·</span>
+                  <span>{readingTime}</span>
+                </>
+              )}
             </div>
             {tags.length > 0 && (
-              <div className="flex gap-2 mt-3">
+              <div className="flex gap-1.5 mt-3">
                 {tags.map((tag) => (
                   <span key={tag} className="tag">{tag}</span>
                 ))}
@@ -122,13 +123,25 @@ export function ArticleLayout({
             )}
           </header>
 
-          <div
-            className="prose"
-            dangerouslySetInnerHTML={{ __html: contentHtml }}
-          />
+          <div className="prose" dangerouslySetInnerHTML={{ __html: contentHtml }} />
 
-          {/* Comment section */}
-          <div id="waline" className="mt-16 pt-8 border-t border-[var(--border-color)]" />
+          {/* Tip Jar */}
+          <TipJar />
+
+          {/* AdSense placeholder */}
+          {process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID && (
+            <div className="mt-8 border-t border-[var(--border-default)] pt-6">
+              <ins className="adsbygoogle"
+                style={{ display: "block" }}
+                data-ad-client={process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID}
+                data-ad-format="auto"
+                data-full-width-responsive="true"
+              />
+            </div>
+          )}
+
+          {/* Comments */}
+          <div id="waline" className="mt-12 pt-8 border-t border-[var(--border-default)]" />
         </article>
       </div>
 
@@ -136,7 +149,7 @@ export function ArticleLayout({
       {showBackTop && (
         <button
           onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-          className="fixed bottom-8 right-8 w-10 h-10 rounded-full bg-[var(--background-secondary)] border border-[var(--border-color)] flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors shadow-md"
+          className="fixed bottom-8 right-8 w-8 h-8 rounded-full bg-[var(--background-secondary)] border border-[var(--border-default)] flex items-center justify-center text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition-colors text-xs"
           aria-label="回到顶部"
         >
           ↑

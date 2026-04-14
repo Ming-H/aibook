@@ -12,26 +12,18 @@ interface ArticleCardProps {
 
 export function ArticleCard({ title, date, excerpt, readingTime, tags = [], href }: ArticleCardProps) {
   return (
-    <Link href={href} className="block group">
-      <article className="p-5 rounded-lg border border-[var(--border-color)] hover:border-[var(--accent-color)] transition-colors">
-        <h3 className="text-lg font-semibold group-hover:text-[var(--accent-color)] transition-colors mb-2">
+    <Link href={href} className="block py-4 border-b border-[var(--border-subtle)] group">
+      <div className="flex items-baseline justify-between gap-4 mb-1">
+        <h3 className="text-sm text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors">
           {title}
         </h3>
-        <div className="flex items-center gap-3 text-sm text-[var(--text-secondary)] mb-3">
-          <time>{formatDate(date)}</time>
-          {readingTime && <span>· {readingTime}</span>}
-        </div>
-        <p className="text-[var(--text-secondary)] text-sm line-clamp-2 mb-3">{excerpt}</p>
-        {tags.length > 0 && (
-          <div className="flex gap-1.5 flex-wrap">
-            {tags.map((tag) => (
-              <span key={tag} className="text-xs px-2 py-0.5 rounded-full bg-[var(--background-tertiary)] text-[var(--text-secondary)]">
-                {tag}
-              </span>
-            ))}
-          </div>
-        )}
-      </article>
+        <time className="text-xs text-[var(--text-muted)] whitespace-nowrap flex-shrink-0">
+          {formatDate(date)}
+        </time>
+      </div>
+      {excerpt && (
+        <p className="text-xs text-[var(--text-muted)] line-clamp-1 mt-1">{excerpt}</p>
+      )}
     </Link>
   );
 }

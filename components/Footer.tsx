@@ -2,33 +2,33 @@ import Link from "next/link";
 
 export function Footer() {
   return (
-    <footer className="border-t border-[var(--border-subtle)] bg-[var(--background-primary)]">
-      <div className="mx-auto max-w-wide px-5 sm:px-8 py-8">
+    <footer className="border-t border-[var(--border-default)] mt-24">
+      <div className="mx-auto max-w-[1200px] px-5 sm:px-8 py-10">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-sm text-[var(--text-muted)]">
-            &copy; 2026 极客狐 DevFox
+          <p className="text-xs text-[var(--text-muted)]">
+            &copy; 2026 DevFox AI
           </p>
 
-          <div className="flex items-center gap-5">
+          <div className="flex items-center gap-6">
             <a
-              href="https://x.com/devfox_ai"
+              href="https://twitter.com/MingFire520"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-sm text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors"
+              className="text-xs text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition-colors"
             >
               Twitter/X
             </a>
             <a
-              href="https://github.com/devfox-ai"
+              href="https://github.com/Ming-H"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-sm text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors"
+              className="text-xs text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition-colors"
             >
               GitHub
             </a>
             <Link
               href="/rss.xml"
-              className="text-sm text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors"
+              className="text-xs text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition-colors"
             >
               RSS
             </Link>

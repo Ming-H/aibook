@@ -22,41 +22,40 @@ export function Navbar() {
   };
 
   const navItems = [
-    { href: '/blog', label: 'Blog' },
-    { href: '/tools', label: 'Tools' },
-    { href: '/daily', label: 'Daily' },
-    { href: '/investing', label: 'Investing' },
-    { href: '/about', label: 'About' },
+    { href: '/', label: '首页' },
+    { href: '/blog', label: '技术博客' },
+    { href: '/tools', label: '开源工具' },
+    { href: '/daily', label: 'AI日报' },
+    { href: '/investing', label: '投资笔记' },
+    { href: '/about', label: '关于' },
   ];
 
   return (
     <header
       className={`sticky top-0 z-50 w-full transition-all duration-200 ${
         scrolled
-          ? 'bg-[var(--background-primary)]/80 backdrop-blur-lg border-b border-[var(--border-subtle)]'
+          ? 'bg-[var(--background-primary)]/90 backdrop-blur-md border-b border-[var(--border-default)]'
           : 'bg-transparent border-b border-transparent'
       }`}
     >
-      <div className="mx-auto flex max-w-wide items-center justify-between px-5 sm:px-8 py-4">
+      <div className="mx-auto flex max-w-[1200px] items-center justify-between px-5 sm:px-8 h-14">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2">
-          <span className="text-lg font-semibold tracking-tight text-[var(--text-primary)]">
-            极客狐 <span className="text-[var(--color-accent)]">DevFox</span>
-          </span>
+        <Link href="/" className="text-sm font-semibold tracking-tight text-[var(--text-primary)]">
+          DevFox AI
         </Link>
 
         {/* Desktop Nav */}
-        <nav className="hidden md:flex items-center gap-1">
+        <nav className="hidden md:flex items-center gap-6">
           {navItems.map((item) => {
             const active = isActive(item.href);
             return (
               <Link
                 key={item.href}
                 href={item.href}
-                className={`px-3.5 py-1.5 text-sm font-medium rounded-md transition-colors duration-150 ${
+                className={`text-xs tracking-wide transition-colors duration-150 ${
                   active
-                    ? 'text-[var(--color-accent)] bg-[var(--color-accent-soft)]'
-                    : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--background-secondary)]'
+                    ? 'text-[var(--text-primary)]'
+                    : 'text-[var(--text-tertiary)] hover:text-[var(--text-secondary)]'
                 }`}
               >
                 {item.label}
@@ -66,7 +65,7 @@ export function Navbar() {
         </nav>
 
         {/* Desktop Right */}
-        <div className="hidden md:flex items-center gap-2">
+        <div className="hidden md:flex items-center">
           <ThemeToggle />
         </div>
 
@@ -74,15 +73,15 @@ export function Navbar() {
         <div className="flex items-center gap-2 md:hidden">
           <ThemeToggle />
           <button
-            className="p-2 rounded-md hover:bg-[var(--background-secondary)] transition-colors"
+            className="p-2 transition-colors"
             onClick={() => setMobileOpen(!mobileOpen)}
             aria-label="菜单"
           >
-            <svg className="w-5 h-5 text-[var(--text-primary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5 text-[var(--text-secondary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               {mobileOpen ? (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" />
               ) : (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 6h16M4 12h16M4 18h16" />
               )}
             </svg>
           </button>
@@ -91,17 +90,17 @@ export function Navbar() {
 
       {/* Mobile Menu */}
       {mobileOpen && (
-        <div className="md:hidden border-t border-[var(--border-subtle)] bg-[var(--background-primary)] px-5 py-3 animate-fade-in-down">
-          <nav className="flex flex-col gap-0.5">
+        <div className="md:hidden border-t border-[var(--border-default)] bg-[var(--background-primary)] px-5 py-4">
+          <nav className="flex flex-col gap-4">
             {navItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
                 onClick={() => setMobileOpen(false)}
-                className={`px-3.5 py-2.5 rounded-md text-sm font-medium transition-colors ${
+                className={`text-sm transition-colors ${
                   isActive(item.href)
-                    ? 'text-[var(--color-accent)] bg-[var(--color-accent-soft)]'
-                    : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--background-secondary)]'
+                    ? 'text-[var(--text-primary)]'
+                    : 'text-[var(--text-tertiary)] hover:text-[var(--text-secondary)]'
                 }`}
               >
                 {item.label}
