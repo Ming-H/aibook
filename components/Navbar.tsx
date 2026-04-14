@@ -38,19 +38,19 @@ export function Navbar() {
     >
       <div className="mx-auto flex max-w-[720px] items-center justify-between px-5 sm:px-8 h-14">
         {/* Logo */}
-        <Link href="/" className="text-[15px] font-semibold tracking-tight text-[var(--text-primary)]">
+        <Link href="/" className="text-[16px] font-medium tracking-tight text-[var(--text-primary)]">
           DevFox AI
         </Link>
 
         {/* Desktop Nav */}
-        <nav className="hidden md:flex items-center gap-7">
+        <nav className="hidden md:flex items-center gap-8">
           {navItems.map((item) => {
             const active = isActive(item.href);
             return (
               <Link
                 key={item.href}
                 href={item.href}
-                className={`text-[13px] tracking-wide transition-colors duration-150 ${
+                className={`text-[14px] font-medium tracking-wide transition-colors duration-150 ${
                   active
                     ? 'text-[var(--text-primary)]'
                     : 'text-[var(--text-tertiary)] hover:text-[var(--text-secondary)]'
@@ -91,7 +91,7 @@ export function Navbar() {
                 key={item.href}
                 href={item.href}
                 onClick={() => setMobileOpen(false)}
-                className={`text-sm transition-colors ${
+                className={`text-[15px] transition-colors ${
                   isActive(item.href)
                     ? 'text-[var(--text-primary)]'
                     : 'text-[var(--text-tertiary)] hover:text-[var(--text-secondary)]'

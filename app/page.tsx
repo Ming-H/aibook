@@ -25,8 +25,8 @@ export default async function HomePage() {
         >
           <Image src="/avatar.png" alt="DevFox AI" width={64} height={64} className="rounded-full" />
         </div>
-        <h1 className="text-2xl font-semibold mb-2 tracking-tight">DevFox AI</h1>
-        <p className="text-base text-[var(--text-tertiary)] mb-6">独立开发者 · AI · 开源</p>
+        <h1 className="text-[28px] font-semibold mb-3 tracking-tight">DevFox AI</h1>
+        <p className="text-[17px] text-[var(--text-tertiary)] mb-6">独立开发者 · AI · 开源</p>
         <div className="flex justify-center">
           <SocialLinks />
         </div>
@@ -51,10 +51,10 @@ export default async function HomePage() {
                 className="block py-4 group"
               >
                 <div className="flex items-baseline justify-between gap-4">
-                  <span className="text-base text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors leading-snug">
+                  <span className="text-[17px] text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors leading-snug">
                     {post.title}
                   </span>
-                  <time className="text-sm text-[var(--text-muted)] whitespace-nowrap flex-shrink-0 tabular-nums">
+                  <time className="text-[14px] text-[var(--text-muted)] whitespace-nowrap flex-shrink-0 tabular-nums">
                     {post.date}
                   </time>
                 </div>
@@ -84,11 +84,11 @@ export default async function HomePage() {
               >
                 <div className="flex items-center gap-3">
                   <span className="text-lg">{tool.icon}</span>
-                  <span className="text-base text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors">
+                  <span className="text-[17px] text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors">
                     {tool.title}
                   </span>
                 </div>
-                <span className="text-[var(--text-muted)] text-sm ml-4">→</span>
+                <span className="text-[var(--text-muted)] text-[14px] ml-4">→</span>
               </a>
             ))}
           </div>
@@ -105,12 +105,12 @@ export default async function HomePage() {
           className="flex items-center justify-between py-4 group"
         >
           <div>
-            <span className="text-base text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors">
+            <span className="text-[17px] text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors">
               AI Insights
             </span>
-            <p className="text-sm text-[var(--text-muted)] mt-0.5">每日 AI 行业动态速览</p>
+            <p className="text-[14px] text-[var(--text-muted)] mt-0.5">每日 AI 行业动态速览</p>
           </div>
-          <span className="text-[var(--text-muted)] text-sm">→</span>
+          <span className="text-[var(--text-muted)] text-[14px]">→</span>
         </a>
       </section>
     </div>
