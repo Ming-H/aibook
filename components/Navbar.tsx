@@ -23,7 +23,6 @@ export function Navbar() {
 
   const navItems = [
     { href: '/blog', label: 'Blog' },
-    { href: '/investing', label: 'Investing' },
     { href: '/projects', label: 'Projects' },
     { href: '/about', label: 'About' },
   ];

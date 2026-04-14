@@ -4,17 +4,17 @@ import { SocialLinks } from "@/components/SocialLinks";
 export const dynamic = "force-static";
 
 export const metadata = {
-  title: "About — DevFox",
-  description: "独立开发者，专注于 AI 技术与投资研究。",
+  title: "About — DevFox AI",
+  description: "独立开发者，专注于 AI 技术研究。",
 };
 
 const interests = [
   "大语言模型",
   "开发者工具",
-  "价值投资",
+  "AI Agent",
   "技术写作",
+  "开源项目",
   "AI 应用",
-  "数据分析",
 ];
 
 export default function AboutPage() {
@@ -26,7 +26,7 @@ export default function AboutPage() {
           <Image src="/avatar.png" alt="DevFox AI" width={80} height={80} className="rounded-full" />
         </div>
         <h1 className="text-xl font-semibold mb-2 tracking-tight">DevFox AI</h1>
-        <p className="text-xs text-[var(--text-tertiary)] tracking-wide">独立开发者 · AI 技术 · 投资</p>
+        <p className="text-xs text-[var(--text-tertiary)] tracking-wide">独立开发者 · AI 技术</p>
       </div>
 
       {/* Bio */}
@@ -38,7 +38,7 @@ export default function AboutPage() {
           在 AI 算法领域深耕多年，经历过从传统机器学习到大语言模型的技术演进。相信技术的价值在于解决真实问题，所以一直在探索 AI 技术的落地应用。
         </p>
         <p>
-          这个网站是记录和分享的空间。你会在这里找到 AI 技术的深度文章、开发的开源工具、每日 AI 行业动态，以及投资理财方面的思考。
+          这个网站是记录和分享的空间。你会在这里找到 AI 技术的深度文章和我开发的开源工具。
         </p>
       </div>
 

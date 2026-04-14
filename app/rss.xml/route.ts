@@ -5,7 +5,6 @@ export const dynamic = "force-static";
 
 export async function GET() {
   const blogPosts = await getAllPosts("blog");
-  const investingPosts = await getAllPosts("investing");
   const tools = getAllTools();
 
   const items = [
@@ -16,28 +15,21 @@ export async function GET() {
       pubDate: new Date(post.date).toUTCString(),
       category: "Blog",
     })),
-    ...investingPosts.map((post) => ({
-      title: post.title,
-      link: `https://devfox.ai/investing/${post.slug}`,
-      description: post.excerpt,
-      pubDate: new Date(post.date).toUTCString(),
-      category: "投资",
-    })),
     ...tools.map((tool) => ({
-      title: `工具: ${tool.title}`,
+      title: `Project: ${tool.title}`,
       link: tool.url,
       description: tool.description,
       pubDate: new Date().toUTCString(),
-      category: "工具",
+      category: "Projects",
     })),
   ].sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime());
 
   const rss = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>极客狐 DevFox</title>
+    <title>DevFox AI</title>
     <link>https://devfox.ai</link>
-    <description>AI 技术 · 工具 · 投资</description>
+    <description>AI 技术与开源项目</description>
     <language>zh-CN</language>
     <atom:link href="https://devfox.ai/rss.xml" rel="self" type="application/rss+xml"/>
     ${items

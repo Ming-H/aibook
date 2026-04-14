@@ -14,7 +14,6 @@ export async function GET(request: Request) {
     revalidatePath("/");
     revalidatePath("/daily");
     revalidatePath("/blog");
-    revalidatePath("/investing");
 
     return NextResponse.json({
       revalidated: true,

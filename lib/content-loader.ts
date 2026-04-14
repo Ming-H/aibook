@@ -6,7 +6,7 @@ import type { Post, PostMetadata } from './types';
 
 const contentDirectory = path.join(process.cwd(), 'content');
 
-export async function getAllPosts(section: 'blog' | 'investing'): Promise<PostMetadata[]> {
+export async function getAllPosts(section: 'blog'): Promise<PostMetadata[]> {
   const dir = path.join(contentDirectory, section);
   if (!fs.existsSync(dir)) return [];
 
@@ -35,7 +35,7 @@ export async function getAllPosts(section: 'blog' | 'investing'): Promise<PostMe
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 }
 
-export async function getPostBySlug(section: 'blog' | 'investing', slug: string): Promise<Post | null> {
+export async function getPostBySlug(section: 'blog', slug: string): Promise<Post | null> {
   const dir = path.join(contentDirectory, section);
   if (!fs.existsSync(dir)) return null;
 
@@ -64,7 +64,7 @@ export async function getPostBySlug(section: 'blog' | 'investing', slug: string)
   };
 }
 
-export async function getAllTags(section: 'blog' | 'investing'): Promise<string[]> {
+export async function getAllTags(section: 'blog'): Promise<string[]> {
   const posts = await getAllPosts(section);
   const tagSet = new Set<string>();
   posts.forEach(p => p.tags.forEach(t => tagSet.add(t)));

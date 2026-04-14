@@ -7,13 +7,12 @@ import { SocialLinks } from "@/components/SocialLinks";
 export const revalidate = 3600;
 
 export const metadata = {
-  title: "DevFox AI — AI · 投资 · 开源",
-  description: "独立开发者，专注于 AI 技术与投资研究。",
+  title: "DevFox AI — AI 技术与开源",
+  description: "独立开发者，专注于 AI 技术研究与开源项目。",
 };
 
 export default async function HomePage() {
   const blogPosts = await getAllPosts("blog");
-  const investingPosts = await getAllPosts("investing");
   const tools = getAllTools();
 
   return (
@@ -27,7 +26,7 @@ export default async function HomePage() {
           <Image src="/avatar.png" alt="DevFox AI" width={64} height={64} className="rounded-full" />
         </div>
         <h1 className="text-2xl font-semibold mb-2 tracking-tight">DevFox AI</h1>
-        <p className="text-[14px] text-[var(--text-tertiary)] mb-6">独立开发者 · AI · 投资</p>
+        <p className="text-[14px] text-[var(--text-tertiary)] mb-6">独立开发者 · AI · 开源</p>
         <div className="flex justify-center">
           <SocialLinks />
         </div>
