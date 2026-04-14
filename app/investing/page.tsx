@@ -4,7 +4,7 @@ import { ArticleCard } from "@/components/ArticleCard";
 export const dynamic = "force-static";
 
 export const metadata = {
-  title: "投资笔记 — DevFox AI",
+  title: "Investing — DevFox AI",
   description: "价值投资与市场观察。",
 };
 
@@ -12,10 +12,10 @@ export default async function InvestingPage() {
   const posts = await getAllPosts("investing");
 
   return (
-    <div className="max-w-[680px] mx-auto px-5 sm:px-8 py-16">
+    <div className="max-w-[720px] mx-auto px-5 sm:px-8 py-12">
       <header className="mb-10">
-        <h1 className="text-xl font-semibold tracking-tight mb-2">投资笔记</h1>
-        <p className="text-xs text-[var(--text-muted)]">价值投资与市场观察</p>
+        <h1 className="text-2xl font-semibold tracking-tight mb-3">Investing</h1>
+        <p className="text-[14px] text-[var(--text-tertiary)]">价值投资与市场观察</p>
       </header>
 
       {posts.length === 0 ? (

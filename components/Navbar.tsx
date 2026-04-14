@@ -23,6 +23,7 @@ export function Navbar() {
 
   const navItems = [
     { href: '/blog', label: 'Blog' },
+    { href: '/investing', label: 'Investing' },
     { href: '/projects', label: 'Projects' },
     { href: '/about', label: 'About' },
   ];
@@ -43,7 +44,7 @@ export function Navbar() {
         </Link>
 
         {/* Desktop Nav */}
-        <nav className="hidden md:flex items-center gap-8">
+        <nav className="hidden md:flex items-center gap-7">
           {navItems.map((item) => {
             const active = isActive(item.href);
             return (
