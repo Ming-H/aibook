@@ -1,37 +1,37 @@
 import "./globals.css";
 import type { ReactNode } from "react";
 import { Navbar } from "@/components/Navbar";
-import { SessionProvider } from "@/components/providers";
+import { Footer } from "@/components/Footer";
 import { ThemeProvider } from "@/components/ThemeProvider";
-import { JetBrains_Mono, Manrope, Sora } from "next/font/google";
+import { Inter, JetBrains_Mono } from "next/font/google";
 
-const sora = Sora({
+const inter = Inter({
   subsets: ["latin"],
-  weight: ["400", "600", "700"],
-  variable: "--font-sora",
-  display: "swap",
-});
-
-const manrope = Manrope({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-manrope",
+  variable: "--font-inter",
   display: "swap",
 });
 
 const jetbrains = JetBrains_Mono({
   subsets: ["latin"],
-  weight: ["400", "500", "600"],
-  variable: "--font-jetbrains",
+  variable: "--font-mono",
   display: "swap",
 });
 
 export const metadata = {
-  title: "DevFox AI — AI 产品与开发者平台",
-  description: "DevFox AI 提供可组合的 AI 工具与工作流，为团队与独立开发者加速产品落地。",
+  title: "极客狐 DevFox — AI 技术 · 工具 · 投资",
+  description: "极客狐 DevFox 的个人知识网站，分享 AI 技术文章、开源工具和投资理财思考。",
+  metadataBase: new URL("https://devfox.ai"),
+  openGraph: {
+    title: "极客狐 DevFox",
+    description: "AI 技术 · 工具 · 投资",
+    url: "https://devfox.ai",
+    siteName: "极客狐 DevFox",
+    locale: "zh_CN",
+    type: "website",
+  },
+  rss: "/rss.xml",
 };
 
-// 防止主题闪烁的内联脚本
 const themeScript = `
   (function() {
     const theme = localStorage.getItem('theme') || 'system';
@@ -45,20 +45,19 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html
       lang="zh-CN"
-      className={`${sora.variable} ${manrope.variable} ${jetbrains.variable} scroll-smooth`}
+      className={`${inter.variable} ${jetbrains.variable} scroll-smooth`}
       suppressHydrationWarning
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
-      <body className="min-h-screen bg-[var(--background-primary)] text-[var(--text-primary)] antialiased">
+      <body className="min-h-screen bg-[var(--background-primary)] text-[var(--text-primary)] antialiased font-sans">
         <ThemeProvider>
-          <SessionProvider>
-            <div className="min-h-screen">
-              <Navbar />
-              <main>{children}</main>
-            </div>
-          </SessionProvider>
+          <div className="min-h-screen flex flex-col">
+            <Navbar />
+            <main className="flex-1">{children}</main>
+            <Footer />
+          </div>
         </ThemeProvider>
       </body>
     </html>

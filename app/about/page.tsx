@@ -1,153 +1,75 @@
-const principles = [
-  {
-    title: '极简体验',
-    description: '让复杂 AI 能力用最少的界面完成，保持专注与效率。',
-  },
-  {
-    title: '隐私与安全',
-    description: '坚持本地优先和最小化数据采集，降低数据风险。',
-  },
-  {
-    title: '工程化交付',
-    description: '标准化组件与流程，保证输出可控、可复用。',
-  },
-  {
-    title: '持续进化',
-    description: '快速迭代模型与工具，确保能力长期可用。',
-  },
-];
+import Image from "next/image";
+import { SocialLinks } from "@/components/SocialLinks";
 
-const pillars = [
-  {
-    title: '产品矩阵',
-    description: '从提示词库到创意工坊、智能出题与工具箱，覆盖核心场景。',
-  },
-  {
-    title: '平台能力',
-    description: '模型编排、工作流、SDK 接入，让能力快速落地。',
-  },
-  {
-    title: '协作治理',
-    description: '权限、审计与知识沉淀机制，帮助团队稳定交付。',
-  },
-];
+export const dynamic = "force-static";
 
-const highlights = [
-  {
-    title: '可组合架构',
-    description: '用模块化方式构建业务流程，降低维护成本。',
-  },
-  {
-    title: '统一体验',
-    description: '跨工具一致的交互语言，让团队协作更顺畅。',
-  },
-  {
-    title: '多模型适配',
-    description: '支持灵活切换模型与策略，确保输出质量。',
-  },
+export const metadata = {
+  title: "关于 — 极客狐 DevFox",
+  description: "极客狐 DevFox，独立开发者，专注于 AI 技术与投资研究。",
+};
+
+const interests = [
+  { icon: "🤖", label: "大语言模型" },
+  { icon: "🔧", label: "开发者工具" },
+  { icon: "📊", label: "价值投资" },
+  { icon: "📝", label: "技术写作" },
+  { icon: "🧪", label: "AI 应用开发" },
+  { icon: "📈", label: "数据分析" },
 ];
 
 export default function AboutPage() {
   return (
-    <div className="page-surface">
-      {/* Hero */}
-      <section className="relative">
-        <div className="px-6 pt-24 pb-16">
-          <div className="mx-auto max-w-5xl">
-            <p className="text-xs uppercase tracking-[0.3em] text-[var(--text-muted)]">About</p>
-            <h1 className="mt-4 text-4xl sm:text-5xl font-semibold text-[var(--text-primary)]">
-              关于 DevFox AI
-            </h1>
-            <p className="mt-5 text-lg text-[var(--text-secondary)] max-w-3xl">
-              DevFox AI 是面向开发者与增长团队的 AI 产品平台。我们聚合模型、工具与工作流，
-              帮助团队用更少的时间交付更高质量的 AI 产品。
-            </p>
-            <div className="mt-10 grid sm:grid-cols-3 gap-4">
-              {highlights.map((item) => (
-                <div key={item.title} className="card p-5">
-                  <h3 className="text-sm font-semibold text-[var(--text-primary)]">
-                    {item.title}
-                  </h3>
-                  <p className="mt-2 text-xs text-[var(--text-tertiary)] leading-relaxed">
-                    {item.description}
-                  </p>
-                </div>
-              ))}
+    <div className="max-w-[700px] mx-auto px-4 md:px-6 py-12">
+      {/* Avatar & Name */}
+      <div className="text-center mb-10">
+        <div className="w-28 h-28 rounded-full bg-[var(--background-secondary)] border border-[var(--border-color)] mx-auto mb-5 overflow-hidden">
+          <Image src="/avatar.png" alt="极客狐 DevFox" width={112} height={112} className="rounded-full" />
+        </div>
+        <h1 className="text-3xl font-bold mb-2">极客狐 DevFox</h1>
+        <p className="text-[var(--text-secondary)]">独立开发者 · AI 技术探索者 · 投资爱好者</p>
+      </div>
+
+      {/* Bio */}
+      <div className="space-y-4 text-[var(--text-secondary)] leading-relaxed mb-10">
+        <p>
+          你好，我是郝明，一个专注于 AI 技术的独立开发者。
+        </p>
+        <p>
+          在 AI 算法领域深耕多年，经历过从传统机器学习到大语言模型的技术演进。我相信技术的价值在于解决真实问题，所以一直在探索 AI 技术的落地应用。
+        </p>
+        <p>
+          这个网站是我记录和分享的空间。你会在这里找到 AI 技术的深度文章、我开发的开源工具、每日 AI 行业动态，以及一些投资理财方面的思考。
+        </p>
+      </div>
+
+      {/* Social Links */}
+      <section className="mb-10">
+        <h2 className="text-lg font-semibold mb-4">社交媒体</h2>
+        <SocialLinks />
+      </section>
+
+      {/* Interests */}
+      <section className="mb-10">
+        <h2 className="text-lg font-semibold mb-4">关注领域</h2>
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          {interests.map((item) => (
+            <div
+              key={item.label}
+              className="flex items-center gap-2 p-3 rounded-lg border border-[var(--border-color)] text-sm"
+            >
+              <span>{item.icon}</span>
+              <span>{item.label}</span>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Mission */}
-      <section className="px-6 py-16">
-        <div className="mx-auto max-w-6xl grid lg:grid-cols-[1.1fr_0.9fr] gap-10 items-start">
-          <div>
-            <p className="text-xs uppercase tracking-[0.3em] text-[var(--text-muted)]">Mission</p>
-            <h2 className="mt-4 text-3xl md:text-4xl font-semibold">品牌使命</h2>
-            <p className="mt-4 text-[var(--text-secondary)] leading-relaxed">
-              让 AI 真正融入产品交付流程，成为团队稳定可靠的生产力。DevFox AI 关注真实场景，
-              用工程化方式沉淀可复用的能力，让每一次输出都可控、可信、可演进。
-            </p>
-          </div>
-          <div className="grid gap-4">
-            {principles.map((item) => (
-              <div key={item.title} className="card p-5">
-                <h3 className="text-base font-semibold text-[var(--text-primary)]">
-                  {item.title}
-                </h3>
-                <p className="mt-2 text-sm text-[var(--text-secondary)] leading-relaxed">
-                  {item.description}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Pillars */}
-      <section className="page-section-panel px-6 py-16">
-        <div className="mx-auto max-w-6xl">
-          <p className="text-xs uppercase tracking-[0.3em] text-[var(--text-muted)]">Pillars</p>
-          <h2 className="mt-4 text-3xl md:text-4xl font-semibold">产品与平台支柱</h2>
-          <div className="mt-10 grid md:grid-cols-3 gap-6">
-            {pillars.map((item) => (
-              <div key={item.title} className="card p-6">
-                <h3 className="text-lg font-semibold text-[var(--text-primary)]">
-                  {item.title}
-                </h3>
-                <p className="mt-3 text-sm text-[var(--text-secondary)] leading-relaxed">
-                  {item.description}
-                </p>
-              </div>
-            ))}
-          </div>
+          ))}
         </div>
       </section>
 
       {/* Contact */}
-      <section className="px-6 py-16">
-        <div className="mx-auto max-w-4xl">
-          <div className="card p-8 md:p-10 text-center">
-            <p className="text-xs uppercase tracking-[0.3em] text-[var(--text-muted)]">Contact</p>
-            <h2 className="mt-4 text-2xl md:text-3xl font-semibold">与我们建立连接</h2>
-            <p className="mt-4 text-[var(--text-secondary)]">
-              无论是产品合作、场景咨询还是技术交流，欢迎随时联系 DevFox AI。
-            </p>
-            <div className="mt-6 flex flex-col sm:flex-row gap-4 justify-center">
-              <a href="mailto:1518246548@qq.com" className="btn-primary px-8 py-3 text-base inline-block">
-                1518246548@qq.com
-              </a>
-              <a
-                href="https://x.com/MingFire520"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn-secondary px-8 py-3 text-base inline-block"
-              >
-                关注 X
-              </a>
-            </div>
-          </div>
-        </div>
+      <section>
+        <h2 className="text-lg font-semibold mb-4">联系方式</h2>
+        <p className="text-[var(--text-secondary)]">
+          欢迎通过以下方式联系我：Twitter/X、微信公众号（极客狐DevFox）、小红书（极客狐DevFox）。
+        </p>
       </section>
     </div>
   );

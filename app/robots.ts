@@ -1,8 +1,5 @@
 import { MetadataRoute } from "next";
 
-/**
- * 动态生成 robots.txt
- */
 export default function robots(): MetadataRoute.Robots {
   return {
     rules: [
@@ -12,6 +9,6 @@ export default function robots(): MetadataRoute.Robots {
         disallow: ["/api/"],
       },
     ],
-    sitemap: "https://www.devfoxai.cn/sitemap.xml",
+    sitemap: "https://devfox.ai/sitemap.xml",
   };
 }

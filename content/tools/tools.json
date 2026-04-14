@@ -1,0 +1,29 @@
+[
+  {
+    "slug": "content-forge-ai",
+    "title": "Content Forge AI",
+    "description": "AI 驱动的内容生成流水线，自动生成每日 AI 行业简报和技术系列文章。",
+    "type": "open-source",
+    "url": "https://github.com/Ming-H/content-forge-ai",
+    "tags": ["AI", "自动化", "内容生成"],
+    "icon": "🔥"
+  },
+  {
+    "slug": "ai-insights",
+    "title": "AI Insights",
+    "description": "基于 Hugo 的 AI 洞察博客，展示每日 AI 简报和技术系列文章。",
+    "type": "open-source",
+    "url": "https://github.com/Ming-H/ai-insights",
+    "tags": ["Hugo", "博客", "GitHub Pages"],
+    "icon": "📊"
+  },
+  {
+    "slug": "devfox-ai",
+    "title": "极客狐 DevFox",
+    "description": "个人知识网站，分享 AI 技术、工具和投资思考。基于 Next.js 构建。",
+    "type": "open-source",
+    "url": "https://devfox.ai",
+    "tags": ["Next.js", "个人网站", "博客"],
+    "icon": "🦊"
+  }
+]

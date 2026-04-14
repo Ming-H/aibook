@@ -22,39 +22,30 @@ export function Navbar() {
   };
 
   const navItems = [
-    { href: '/', label: '首页' },
-    { href: '/products', label: '产品' },
-    { href: '/#capabilities', label: '能力' },
-    { href: '/#solutions', label: '解决方案' },
-    { href: '/about', label: '关于' },
+    { href: '/blog', label: 'Blog' },
+    { href: '/tools', label: 'Tools' },
+    { href: '/daily', label: 'Daily' },
+    { href: '/investing', label: 'Investing' },
+    { href: '/about', label: 'About' },
   ];
 
   return (
     <header
-      className={`sticky top-0 z-50 w-full transition-all duration-300 ${scrolled
-          ? 'bg-[var(--background-floating)] backdrop-blur-xl border-b border-[var(--border-subtle)] shadow-sm'
+      className={`sticky top-0 z-50 w-full transition-all duration-200 ${
+        scrolled
+          ? 'bg-[var(--background-primary)]/80 backdrop-blur-lg border-b border-[var(--border-subtle)]'
           : 'bg-transparent border-b border-transparent'
-        }`}
+      }`}
     >
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-5 sm:px-8 py-4">
-        <Link href="/" className="flex items-center gap-3 group">
-          <div className="relative h-9 w-9 overflow-hidden rounded-xl border border-[var(--border-subtle)] bg-[var(--background-tertiary)]">
-            <img
-              src="/avatar.png"
-              alt="DevFox AI"
-              className="h-full w-full object-cover"
-            />
-          </div>
-          <div className="flex flex-col leading-tight">
-            <span className="text-[17px] font-semibold tracking-tight text-[var(--text-primary)]">
-              DevFox AI
-            </span>
-            <span className="text-xs text-[var(--text-muted)] hidden sm:block">
-              AI Product Studio
-            </span>
-          </div>
+      <div className="mx-auto flex max-w-wide items-center justify-between px-5 sm:px-8 py-4">
+        {/* Logo */}
+        <Link href="/" className="flex items-center gap-2">
+          <span className="text-lg font-semibold tracking-tight text-[var(--text-primary)]">
+            极客狐 <span className="text-[var(--color-accent)]">DevFox</span>
+          </span>
         </Link>
 
+        {/* Desktop Nav */}
         <nav className="hidden md:flex items-center gap-1">
           {navItems.map((item) => {
             const active = isActive(item.href);
@@ -62,10 +53,11 @@ export function Navbar() {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`px-4 py-2 text-[15px] font-medium rounded-lg transition-colors duration-200 ${active
-                    ? 'text-[var(--text-primary)] bg-[var(--background-tertiary)]'
-                    : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--background-tertiary)]'
-                  }`}
+                className={`px-3.5 py-1.5 text-sm font-medium rounded-md transition-colors duration-150 ${
+                  active
+                    ? 'text-[var(--color-accent)] bg-[var(--color-accent-soft)]'
+                    : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--background-secondary)]'
+                }`}
               >
                 {item.label}
               </Link>
@@ -73,19 +65,16 @@ export function Navbar() {
           })}
         </nav>
 
-        <div className="hidden md:flex items-center gap-3">
+        {/* Desktop Right */}
+        <div className="hidden md:flex items-center gap-2">
           <ThemeToggle />
-          <a
-            href="mailto:1518246548@qq.com"
-            className="btn-primary px-4 py-2 text-sm"
-          >
-            获取演示
-          </a>
         </div>
+
+        {/* Mobile Right */}
         <div className="flex items-center gap-2 md:hidden">
           <ThemeToggle />
           <button
-            className="p-2.5 rounded-lg hover:bg-[var(--background-tertiary)] transition-colors"
+            className="p-2 rounded-md hover:bg-[var(--background-secondary)] transition-colors"
             onClick={() => setMobileOpen(!mobileOpen)}
             aria-label="菜单"
           >
@@ -100,29 +89,24 @@ export function Navbar() {
         </div>
       </div>
 
+      {/* Mobile Menu */}
       {mobileOpen && (
-        <div className="md:hidden border-t border-[var(--border-subtle)] bg-[var(--background-primary)] px-5 py-4">
-          <nav className="flex flex-col gap-1">
+        <div className="md:hidden border-t border-[var(--border-subtle)] bg-[var(--background-primary)] px-5 py-3 animate-fade-in-down">
+          <nav className="flex flex-col gap-0.5">
             {navItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
                 onClick={() => setMobileOpen(false)}
-                className={`px-4 py-3 rounded-lg text-[17px] font-medium ${isActive(item.href)
-                    ? 'text-[var(--text-primary)] bg-[var(--background-tertiary)]'
-                    : 'text-[var(--text-secondary)]'
-                  }`}
+                className={`px-3.5 py-2.5 rounded-md text-sm font-medium transition-colors ${
+                  isActive(item.href)
+                    ? 'text-[var(--color-accent)] bg-[var(--color-accent-soft)]'
+                    : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--background-secondary)]'
+                }`}
               >
                 {item.label}
               </Link>
             ))}
-            <a
-              href="mailto:1518246548@qq.com"
-              className="mt-2 btn-primary px-4 py-3 text-center text-sm"
-              onClick={() => setMobileOpen(false)}
-            >
-              获取演示
-            </a>
           </nav>
         </div>
       )}
