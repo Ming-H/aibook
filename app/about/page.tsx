@@ -4,8 +4,8 @@ import { SocialLinks } from "@/components/SocialLinks";
 export const dynamic = "force-static";
 
 export const metadata = {
-  title: "关于 — DevFox AI",
-  description: "DevFox AI，独立开发者，专注于 AI 技术与投资研究。",
+  title: "About — DevFox",
+  description: "独立开发者，专注于 AI 技术与投资研究。",
 };
 
 const interests = [

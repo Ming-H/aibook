@@ -4,7 +4,7 @@ import { ArticleCard } from "@/components/ArticleCard";
 export const dynamic = "force-static";
 
 export const metadata = {
-  title: "技术博客 — DevFox AI",
+  title: "Blog — DevFox",
   description: "AI 技术实践与深度思考。",
 };
 
@@ -14,7 +14,7 @@ export default async function BlogPage() {
   return (
     <div className="max-w-[720px] mx-auto px-5 sm:px-8 py-12">
       <header className="mb-10">
-        <h1 className="text-2xl font-semibold tracking-tight mb-3">技术博客</h1>
+        <h1 className="text-2xl font-semibold tracking-tight mb-3">Blog</h1>
         <p className="text-[15px] text-[var(--text-tertiary)] leading-relaxed">AI 技术的实践与思考</p>
       </header>
 

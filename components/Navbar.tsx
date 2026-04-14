@@ -22,38 +22,35 @@ export function Navbar() {
   };
 
   const navItems = [
-    { href: '/', label: '首页' },
-    { href: '/blog', label: '博客' },
-    { href: '/gallery', label: '画廊' },
-    { href: '/tools', label: '工具' },
-    { href: '/daily', label: '日报' },
-    { href: '/investing', label: '投资' },
-    { href: '/about', label: '关于' },
+    { href: '/blog', label: 'Blog' },
+    { href: '/projects', label: 'Projects' },
+    { href: '/about', label: 'About' },
   ];
 
   return (
     <header
       className={`sticky top-0 z-50 w-full transition-all duration-200 ${
         scrolled
-          ? 'bg-[var(--background-primary)]/90 backdrop-blur-md border-b border-[var(--border-default)]'
-          : 'bg-transparent border-b border-transparent'
+          ? 'bg-[var(--background-primary)]/90 backdrop-blur-md'
+          : 'bg-transparent'
       }`}
+      style={scrolled ? { boxShadow: '0px 0px 0px 1px var(--border-default)' } : undefined}
     >
-      <div className="mx-auto flex max-w-[1200px] items-center justify-between px-5 sm:px-8 h-14">
+      <div className="mx-auto flex max-w-[720px] items-center justify-between px-5 sm:px-8 h-14">
         {/* Logo */}
-        <Link href="/" className="text-base font-semibold tracking-tight text-[var(--text-primary)]">
-          DevFox AI
+        <Link href="/" className="text-[15px] font-semibold tracking-tight text-[var(--text-primary)]">
+          DevFox
         </Link>
 
         {/* Desktop Nav */}
-        <nav className="hidden md:flex items-center gap-6">
+        <nav className="hidden md:flex items-center gap-8">
           {navItems.map((item) => {
             const active = isActive(item.href);
             return (
               <Link
                 key={item.href}
                 href={item.href}
-                className={`text-sm tracking-wide transition-colors duration-150 ${
+                className={`text-[13px] tracking-wide transition-colors duration-150 ${
                   active
                     ? 'text-[var(--text-primary)]'
                     : 'text-[var(--text-tertiary)] hover:text-[var(--text-secondary)]'
@@ -63,12 +60,8 @@ export function Navbar() {
               </Link>
             );
           })}
-        </nav>
-
-        {/* Desktop Right */}
-        <div className="hidden md:flex items-center">
           <ThemeToggle />
-        </div>
+        </nav>
 
         {/* Mobile Right */}
         <div className="flex items-center gap-2 md:hidden">
@@ -91,7 +84,7 @@ export function Navbar() {
 
       {/* Mobile Menu */}
       {mobileOpen && (
-        <div className="md:hidden border-t border-[var(--border-default)] bg-[var(--background-primary)] px-5 py-4">
+        <div className="md:hidden bg-[var(--background-primary)] px-5 py-4">
           <nav className="flex flex-col gap-4">
             {navItems.map((item) => (
               <Link

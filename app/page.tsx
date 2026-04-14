@@ -2,67 +2,66 @@ import Link from "next/link";
 import Image from "next/image";
 import { getAllPosts } from "@/lib/content-loader";
 import { getAllTools } from "@/lib/tools-loader";
-import { getAllGalleryItems } from "@/lib/gallery-loader";
-import { getAllPrompts } from "@/lib/prompts-loader";
-import { getLatestDailyEntry } from "@/lib/daily-loader";
 import { SocialLinks } from "@/components/SocialLinks";
 
 export const revalidate = 3600;
 
 export const metadata = {
-  title: "DevFox AI — AI 技术 · 画廊 · 提示词 · 投资",
-  description: "DevFox AI 个人知识网站，AI 技术博客、AI 画廊、提示词库、开源工具和投资思考。",
+  title: "DevFox — AI · 投资 · 开源",
+  description: "独立开发者，专注于 AI 技术与投资研究。",
 };
 
 export default async function HomePage() {
   const blogPosts = await getAllPosts("blog");
   const investingPosts = await getAllPosts("investing");
   const tools = getAllTools();
-  const galleryItems = getAllGalleryItems();
-  const prompts = getAllPrompts();
 
-  let latestDaily: Awaited<ReturnType<typeof getLatestDailyEntry>> = null;
-  try {
-    latestDaily = await getLatestDailyEntry();
-  } catch {}
+  const allPosts = [...blogPosts, ...investingPosts]
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+    .slice(0, 8);
 
   return (
     <div className="max-w-[720px] mx-auto px-5 sm:px-8">
       {/* Hero */}
-      <section className="py-16 md:py-24 text-center">
-        <div className="w-20 h-20 rounded-full bg-[var(--background-secondary)] border border-[var(--border-default)] mx-auto mb-6 overflow-hidden">
-          <Image src="/avatar.png" alt="DevFox AI" width={80} height={80} className="rounded-full" />
+      <section className="py-20 md:py-28 text-center">
+        <div className="w-16 h-16 rounded-full bg-[var(--background-secondary)] mx-auto mb-6 overflow-hidden"
+          style={{ boxShadow: '0px 0px 0px 1px var(--border-default)' }}
+        >
+          <Image src="/avatar.png" alt="DevFox" width={64} height={64} className="rounded-full" />
         </div>
-        <h1 className="text-2xl font-semibold mb-3 tracking-tight">DevFox AI</h1>
-        <p className="text-sm text-[var(--text-tertiary)] mb-6">独立开发者 · AI 技术 · 投资</p>
+        <h1 className="text-2xl font-semibold mb-2 tracking-tight">DevFox</h1>
+        <p className="text-[14px] text-[var(--text-tertiary)] mb-6">独立开发者 · AI · 投资</p>
         <div className="flex justify-center">
           <SocialLinks />
         </div>
       </section>
 
-      {/* Latest Posts */}
-      <section className="pb-12">
+      {/* Recent Posts */}
+      <section className="pb-16">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xs tracking-widest uppercase text-[var(--text-muted)]">最新文章</h2>
-          <Link href="/blog" className="text-xs text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] transition-colors">
+          <h2 className="text-[11px] tracking-[0.15em] uppercase text-[var(--text-muted)] font-medium">Recent Posts</h2>
+          <Link href="/blog" className="text-[12px] text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] transition-colors">
             全部 →
           </Link>
         </div>
-        {blogPosts.length === 0 ? (
+        {allPosts.length === 0 ? (
           <p className="text-sm text-[var(--text-muted)]">暂无文章。</p>
         ) : (
           <div>
-            {blogPosts.slice(0, 5).map((post) => (
+            {allPosts.map((post) => (
               <Link
                 key={post.slug}
-                href={`/blog/${post.slug}`}
-                className="block py-4 border-b border-[var(--border-subtle)] group"
+                href={`/${post.tags?.includes('投资') ? 'investing' : 'blog'}/${post.slug}`}
+                className="block py-4 group"
+                style={{ boxShadow: '0 calc(-1 * var(--border-default)) 0 0 var(--border-subtle)' }}
               >
                 <div className="flex items-baseline justify-between gap-4">
-                  <span className="text-sm text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors">
+                  <span className="text-[15px] text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors leading-snug">
                     {post.title}
                   </span>
-                  <time className="text-xs text-[var(--text-muted)] whitespace-nowrap flex-shrink-0">{post.date}</time>
+                  <time className="text-[12px] text-[var(--text-muted)] whitespace-nowrap flex-shrink-0 tabular-nums">
+                    {post.date}
+                  </time>
                 </div>
               </Link>
             ))}
@@ -70,109 +69,60 @@ export default async function HomePage() {
         )}
       </section>
 
-      {/* AI Daily */}
-      {latestDaily && (
-        <section className="pb-12">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xs tracking-widest uppercase text-[var(--text-muted)]">AI 日报</h2>
-            <Link href="/daily" className="text-xs text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] transition-colors">
-              全部 →
-            </Link>
-          </div>
-          <Link
-            href={`/daily/${latestDaily.date}`}
-            className="block p-5 rounded-lg border border-[var(--border-default)] hover:border-[var(--accent-color)] transition-colors group"
-          >
-            <div className="flex items-center gap-2 mb-2">
-              <time className="text-xs text-[var(--text-muted)]">
-                {latestDaily.date.slice(0, 4)}-{latestDaily.date.slice(4, 6)}-{latestDaily.date.slice(6, 8)}
-              </time>
-            </div>
-            <h3 className="text-sm font-medium text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors mb-1">
-              {latestDaily.title}
-            </h3>
-            <p className="text-xs text-[var(--text-muted)] line-clamp-2">
-              {latestDaily.content?.replace(/^#{1,6}\s+/gm, "").replace(/\*\*/g, "").split("\n").find(l => l.trim().startsWith(">"))?.replace(/^>\s*/, "").trim() || "每日 AI 行业动态速览"}
-            </p>
-          </Link>
-        </section>
-      )}
-
-      {/* AI Gallery */}
-      {galleryItems.length > 0 && (
-        <section className="pb-12">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xs tracking-widest uppercase text-[var(--text-muted)]">AI 画廊</h2>
-            <Link href="/gallery" className="text-xs text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] transition-colors">
-              全部 →
-            </Link>
-          </div>
-          <div className="grid grid-cols-3 gap-3">
-            {galleryItems.slice(0, 6).map((item) => (
-              <div
-                key={item.slug}
-                className="aspect-[4/3] bg-[var(--background-secondary)] border border-[var(--border-default)] rounded flex items-center justify-center text-xs text-[var(--text-muted)] p-2 text-center"
-              >
-                {item.title}
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* Prompts */}
-      {prompts.length > 0 && (
-        <section className="pb-12">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xs tracking-widest uppercase text-[var(--text-muted)]">热门提示词</h2>
-            <Link href="/prompts" className="text-xs text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] transition-colors">
-              全部 →
-            </Link>
-          </div>
-          <div>
-            {prompts.slice(0, 3).map((p) => (
-              <Link
-                key={p.slug}
-                href="/prompts"
-                className="block py-4 border-b border-[var(--border-subtle)] group"
-              >
-                <div className="flex items-center justify-between gap-4">
-                  <span className="text-sm text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors">
-                    {p.title}
-                  </span>
-                  <span className="text-xs text-[var(--text-muted)]">{p.category}</span>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* Tools */}
+      {/* Projects */}
       {tools.length > 0 && (
-        <section className="pb-12">
+        <section className="pb-16">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xs tracking-widest uppercase text-[var(--text-muted)]">工具 & 项目</h2>
-            <Link href="/tools" className="text-xs text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] transition-colors">
+            <h2 className="text-[11px] tracking-[0.15em] uppercase text-[var(--text-muted)] font-medium">Projects</h2>
+            <Link href="/projects" className="text-[12px] text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] transition-colors">
               全部 →
             </Link>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          <div className="space-y-0">
             {tools.slice(0, 6).map((tool) => (
               <a
                 key={tool.slug}
                 href={tool.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-2 py-3 text-sm text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] transition-colors"
+                className="flex items-center justify-between py-4 group"
               >
-                <span>{tool.icon}</span>
-                <span className="truncate">{tool.title}</span>
+                <div className="flex items-center gap-3">
+                  <span className="text-base">{tool.icon}</span>
+                  <div>
+                    <span className="text-[14px] text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors">
+                      {tool.title}
+                    </span>
+                    <p className="text-[12px] text-[var(--text-muted)] mt-0.5">{tool.description}</p>
+                  </div>
+                </div>
+                <span className="text-[var(--text-muted)] text-[12px] ml-4">→</span>
               </a>
             ))}
           </div>
         </section>
       )}
+
+      {/* Links */}
+      <section className="pb-16">
+        <h2 className="text-[11px] tracking-[0.15em] uppercase text-[var(--text-muted)] font-medium mb-6">Links</h2>
+        <div className="space-y-0">
+          <a
+            href="https://Ming-H.github.io/ai-insights/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-between py-4 group"
+          >
+            <div>
+              <span className="text-[14px] text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors">
+                AI Insights
+              </span>
+              <p className="text-[12px] text-[var(--text-muted)] mt-0.5">每日 AI 行业动态速览</p>
+            </div>
+            <span className="text-[var(--text-muted)] text-[12px]">→</span>
+          </a>
+        </div>
+      </section>
     </div>
   );
 }
