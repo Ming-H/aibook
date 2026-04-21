@@ -3,27 +3,28 @@ import type { ReactNode } from "react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { ThemeProvider } from "@/components/ThemeProvider";
-import { Inter, JetBrains_Mono } from "next/font/google";
+import { Space_Grotesk, IBM_Plex_Mono } from "next/font/google";
 
-const inter = Inter({
+const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
-  variable: "--font-inter",
+  variable: "--font-sans-display",
   display: "swap",
 });
 
-const jetbrains = JetBrains_Mono({
+const plexMono = IBM_Plex_Mono({
   subsets: ["latin"],
-  variable: "--font-mono",
+  variable: "--font-mono-display",
+  weight: ["400", "500", "600"],
   display: "swap",
 });
 
 export const metadata = {
-  title: "DevFox AI — 用 AI 重新定义业务效率",
-  description: "专注 AI 落地应用和 Agent 系统开发。帮助企业设计、开发和部署 AI 应用与 Agent 系统。",
+  title: "DevFox AI — AI Agent 产品与自动化系统工作室",
+  description: "DevFox AI 帮助团队设计、开发并上线真正可用的 AI Agent、自动化工作流与智能产品体验。",
   metadataBase: new URL("https://devfox.ai"),
   openGraph: {
-    title: "DevFox AI — 用 AI 重新定义业务效率",
-    description: "专注 AI 落地应用和 Agent 系统开发。帮助企业设计、开发和部署 AI 应用与 Agent 系统。",
+    title: "DevFox AI — AI Agent 产品与自动化系统工作室",
+    description: "DevFox AI 帮助团队设计、开发并上线真正可用的 AI Agent、自动化工作流与智能产品体验。",
     url: "https://devfox.ai",
     siteName: "DevFox AI",
     locale: "zh_CN",
@@ -47,7 +48,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html
       lang="zh-CN"
-      className={`${inter.variable} ${jetbrains.variable} scroll-smooth`}
+      className={`${spaceGrotesk.variable} ${plexMono.variable} scroll-smooth`}
       suppressHydrationWarning
     >
       <head>

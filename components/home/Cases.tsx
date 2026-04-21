@@ -1,137 +1,149 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
 
 const cases = [
   {
     id: 'growth-pilot',
+    category: 'Growth system',
     name: 'GrowthPilot Agent',
-    tagline: '面向货运平台的 Multi-Agent 用户增长系统',
-    description: '基于 LangGraph 构建的 Multi-Agent 系统，集成因果推断和三层模型分级。6个专业Agent协同工作，实现用户获取、激活、留存的全链路自动化运营。',
-    highlights: ['6个专业Agent协同', '因果推断驱动决策', '三层模型分级体系', '全链路增长自动化'],
-    techStack: ['LangGraph', 'LightGBM', 'DoWhy', 'FastAPI'],
-    category: 'Multi-Agent',
+    summary: '面向货运平台的增长决策系统，用 Multi-Agent 协同完成用户获取、激活与留存策略执行。',
+    metrics: ['6 个专业 Agent', '因果推断策略层', '三层模型分级'],
+    stack: ['LangGraph', 'LightGBM', 'DoWhy', 'FastAPI'],
   },
   {
     id: 'smart-sales',
+    category: 'Sales orchestration',
     name: 'Smart Sales Agent',
-    tagline: '汽车销售 Multi-Agent 智能对话系统',
-    description: '5个Agent + 16个工具组成的汽车销售智能系统。通过 Scope 路由 DAG 实现精准意图识别和任务分发，支持 Checkpoint 持久化实现多轮对话状态管理。',
-    highlights: ['5Agent + 16工具', 'Scope路由DAG', 'Checkpoint持久化', '多轮对话状态管理'],
-    techStack: ['LangGraph', 'LangChain', 'OpenAI', 'FastAPI'],
-    category: 'Multi-Agent',
+    summary: '面向汽车销售场景的对话系统，完成意图路由、任务分发和多轮状态管理。',
+    metrics: ['5 Agent + 16 工具', 'Scope 路由 DAG', 'Checkpoint 持久化'],
+    stack: ['LangGraph', 'LangChain', 'OpenAI', 'FastAPI'],
   },
   {
     id: 'content-forge',
+    category: 'Content automation',
     name: 'ContentForge AI',
-    tagline: 'AI 内容自动化生产线',
-    description: '全自动 AI 内容生产系统，集成多个 LLM 实现从选题、创作到发布的完整流程。通过 GitHub Actions 实现定时触发，支持多平台自动发布。',
-    highlights: ['全自动内容生产线', '多LLM协同工作', '多平台自动发布', 'CI/CD驱动'],
-    techStack: ['Python', '多LLM', 'GitHub Actions', 'Markdown'],
-    category: 'Automation',
+    summary: '从选题、生成到发布的自动化内容生产线，把内容团队的低效重复工作压缩成可复用流程。',
+    metrics: ['全自动发布链路', '多模型协同', '定时工作流'],
+    stack: ['Python', 'GitHub Actions', 'Markdown', 'LLM workflow'],
   },
 ];
 
-function CaseCard({ caseItem, index }: { caseItem: typeof cases[0]; index: number }) {
-  const [expanded, setExpanded] = useState(false);
-
-  return (
-    <div
-      className="card p-7 md:p-9 flex flex-col animate-on-scroll"
-      style={{ transitionDelay: `${index * 0.12}s` }}
-    >
-      {/* Header */}
-      <div className="flex items-start justify-between gap-3 mb-5">
-        <div>
-          <div className="flex items-center gap-2 mb-2">
-            <span className="tag text-[0.65rem]">{caseItem.category}</span>
-          </div>
-          <h3 className="text-xl font-bold tracking-[-0.02em]">{caseItem.name}</h3>
-        </div>
-      </div>
-
-      {/* Tagline */}
-      <p className="text-sm text-[var(--text-secondary)] mb-5 leading-relaxed">
-        {caseItem.tagline}
-      </p>
-
-      {/* Description (expandable) */}
-      <div className={`overflow-hidden transition-all duration-500 ease-out ${expanded ? 'max-h-48 opacity-100' : 'max-h-0 opacity-0'}`}>
-        <p className="text-sm text-[var(--text-tertiary)] leading-relaxed mb-5">
-          {caseItem.description}
-        </p>
-      </div>
-
-      {/* Highlights */}
-      <div className="grid grid-cols-2 gap-3 mb-5">
-        {caseItem.highlights.map((h) => (
-          <div key={h} className="flex items-center gap-2.5 text-xs text-[var(--text-secondary)]">
-            <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-accent)] flex-shrink-0 opacity-70" />
-            {h}
-          </div>
-        ))}
-      </div>
-
-      {/* Tech stack */}
-      <div className="flex flex-wrap gap-1.5 mb-5 mt-auto">
-        {caseItem.techStack.map((tech) => (
-          <span key={tech} className="tag text-[0.65rem]">{tech}</span>
-        ))}
-      </div>
-
-      {/* Actions */}
-      <div className="flex items-center gap-5 pt-2">
-        <button
-          onClick={() => setExpanded(!expanded)}
-          className="text-xs font-medium text-[var(--color-accent-text)] hover:text-[var(--color-accent-hover)] transition-colors"
-        >
-          {expanded ? '收起' : '展开详情'}
-        </button>
-        <Link
-          href="/cases"
-          className="text-xs font-medium text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition-colors"
-        >
-          查看完整案例 →
-        </Link>
-      </div>
-    </div>
-  );
-}
-
 export function Cases() {
   return (
-    <section className="py-24 md:py-36 bg-[var(--background-secondary)]">
-      <div className="mx-auto max-w-section px-5 sm:px-8">
-        {/* Section header */}
-        <div className="text-center mb-20 animate-on-scroll">
-          <p className="text-sm font-medium text-[var(--color-accent-text)] tracking-widest uppercase mb-4">Cases</p>
-          <h2 className="text-4xl md:text-5xl font-extrabold tracking-[-0.03em] mb-5">
-            精选案例
-          </h2>
-          <p className="text-lg text-[var(--text-secondary)] max-w-2xl mx-auto leading-relaxed">
-            每个项目都经过深思熟虑的设计和严谨的工程实现
-          </p>
+    <section className="bg-[linear-gradient(180deg,transparent,rgba(82,167,255,0.06),transparent)] px-5 py-24 sm:px-8 md:py-32">
+      <div className="mx-auto max-w-section">
+        <div className="mb-14 flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+          <div className="max-w-3xl animate-on-scroll">
+            <span className="eyebrow">Selected work</span>
+            <h2 className="section-heading mt-8">项目展示必须像产品，而不是像简历附件。</h2>
+            <p className="section-copy mt-6 max-w-2xl">
+              我把案例从单纯的“技术栈罗列”改成更有说服力的结构：场景、系统设计、关键机制和结果信号一并呈现。
+            </p>
+          </div>
+
+          <div className="animate-on-scroll">
+            <Link href="/cases" className="btn-secondary rounded-full px-7 py-3 text-sm font-semibold">
+              查看全部案例
+            </Link>
+          </div>
         </div>
 
-        {/* Case cards */}
-        <div className="grid md:grid-cols-2 gap-6">
-          {cases.map((c, i) => (
-            <CaseCard key={c.id} caseItem={c} index={i} />
-          ))}
-        </div>
+        <div className="grid gap-5 xl:grid-cols-[1.15fr_0.85fr]">
+          <article className="card animate-on-scroll rounded-[34px] p-7 md:p-9">
+            <div className="mb-10 flex flex-wrap items-center gap-3">
+              <span className="rounded-full border border-[var(--border-brand)] bg-[var(--color-accent-soft)] px-3 py-1 text-xs text-[var(--color-accent-text)]">
+                Flagship case
+              </span>
+              <span className="font-mono text-[0.72rem] uppercase tracking-[0.24em] text-[var(--text-muted)]">
+                AI growth infrastructure
+              </span>
+            </div>
 
-        {/* View all link */}
-        <div className="text-center mt-14 animate-on-scroll">
-          <Link
-            href="/cases"
-            className="btn-secondary inline-flex items-center gap-2 px-8 py-3 rounded-xl"
-          >
-            查看所有案例
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-            </svg>
-          </Link>
+            <div className="grid gap-8 lg:grid-cols-[0.92fr_1.08fr]">
+              <div>
+                <p className="text-sm uppercase tracking-[0.26em] text-[var(--text-muted)]">
+                  {cases[0].category}
+                </p>
+                <h3 className="mt-4 text-4xl font-semibold tracking-[-0.05em]">
+                  {cases[0].name}
+                </h3>
+                <p className="mt-6 text-base leading-8 text-[var(--text-secondary)]">
+                  {cases[0].summary}
+                </p>
+              </div>
+
+              <div className="rounded-[28px] border border-[var(--border-default)] bg-[var(--background-secondary)] p-5">
+                <div className="grid gap-3 sm:grid-cols-3">
+                  {cases[0].metrics.map((metric) => (
+                    <div
+                      key={metric}
+                      className="rounded-[22px] border border-[var(--border-default)] bg-[var(--background-primary)] px-4 py-5"
+                    >
+                      <p className="text-sm leading-6 text-[var(--text-secondary)]">{metric}</p>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="mt-5 rounded-[24px] border border-[var(--border-default)] bg-[linear-gradient(135deg,rgba(102,231,213,0.08),transparent_60%)] p-5">
+                  <p className="font-mono text-[0.68rem] uppercase tracking-[0.22em] text-[var(--color-accent-text)]">
+                    Key engineering lens
+                  </p>
+                  <p className="mt-3 text-sm leading-7 text-[var(--text-secondary)]">
+                    通过因果推断和模型分层，把运营动作从经验驱动升级为具备决策逻辑的增长系统。
+                  </p>
+                  <div className="mt-5 flex flex-wrap gap-2">
+                    {cases[0].stack.map((item) => (
+                      <span
+                        key={item}
+                        className="rounded-full border border-[var(--border-default)] bg-[rgba(255,255,255,0.03)] px-3 py-2 text-xs text-[var(--text-secondary)]"
+                      >
+                        {item}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <div className="grid gap-5">
+            {cases.slice(1).map((item, index) => (
+              <article
+                key={item.id}
+                className="card animate-on-scroll rounded-[30px] p-7"
+                style={{ transitionDelay: `${(index + 1) * 0.1}s` }}
+              >
+                <div className="flex items-center justify-between">
+                  <span className="font-mono text-[0.68rem] uppercase tracking-[0.22em] text-[var(--color-accent-text)]">
+                    {item.category}
+                  </span>
+                  <span className="text-xs text-[var(--text-muted)]">Project</span>
+                </div>
+
+                <h3 className="mt-5 text-2xl font-semibold tracking-[-0.04em]">{item.name}</h3>
+                <p className="mt-4 text-sm leading-7 text-[var(--text-secondary)]">{item.summary}</p>
+
+                <div className="mt-6 flex flex-wrap gap-2">
+                  {item.metrics.map((metric) => (
+                    <span
+                      key={metric}
+                      className="rounded-full border border-[var(--border-default)] bg-[var(--background-secondary)] px-3 py-2 text-xs text-[var(--text-secondary)]"
+                    >
+                      {metric}
+                    </span>
+                  ))}
+                </div>
+
+                <div className="mt-6 border-t border-[var(--border-subtle)] pt-5">
+                  <p className="text-xs uppercase tracking-[0.2em] text-[var(--text-muted)]">Stack</p>
+                  <p className="mt-3 text-sm leading-7 text-[var(--text-secondary)]">
+                    {item.stack.join(' / ')}
+                  </p>
+                </div>
+              </article>
+            ))}
+          </div>
         </div>
       </div>
     </section>

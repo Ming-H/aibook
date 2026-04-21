@@ -1,112 +1,88 @@
 import Link from 'next/link';
-import Image from 'next/image';
 
 const footerLinks = {
-  services: [
-    { label: 'AI 落地应用 & Agent 开发', href: '/services#ai-application' },
-    { label: 'AI 培训 & 咨询', href: '/services#ai-training' },
-  ],
-  company: [
+  navigate: [
+    { label: '首页', href: '/' },
+    { label: '服务', href: '/services' },
     { label: '案例', href: '/cases' },
     { label: '关于', href: '/about' },
-    { label: '联系', href: '/contact' },
   ],
-  resources: [
-    { label: 'AI Insights', href: 'https://ming-h.github.io/ai-insights/' },
+  channels: [
+    { label: '联系', href: '/contact' },
     { label: 'GitHub', href: 'https://github.com/Ming-H' },
+    { label: 'AI Insights', href: 'https://ming-h.github.io/ai-insights/' },
   ],
 };
 
 export function Footer() {
   return (
-    <footer className="bg-[var(--background-primary)]">
-      {/* Gradient top border */}
-      <div className="divider-gradient" />
-
-      <div className="mx-auto max-w-nav px-5 sm:px-8 py-14 md:py-20">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-10 mb-14">
-          {/* Brand */}
-          <div className="col-span-2 md:col-span-1">
-            <Link href="/" className="flex items-center gap-2 text-[15px] font-semibold tracking-tight text-[var(--text-primary)]">
-              <Image src="/avatar.png" alt="DevFox AI" width={24} height={24} className="rounded-full" />
+    <footer className="px-5 pb-8 pt-6 sm:px-8">
+      <div className="mx-auto max-w-nav rounded-[32px] border border-[var(--border-default)] bg-[linear-gradient(180deg,rgba(255,255,255,0.04),transparent_24%),var(--background-secondary)] px-6 py-10 md:px-10">
+        <div className="grid gap-10 md:grid-cols-[1.2fr_0.8fr_0.8fr]">
+          <div>
+            <p className="font-mono text-[0.68rem] uppercase tracking-[0.24em] text-[var(--color-accent-text)]">
               DevFox AI
-            </Link>
-            <p className="mt-4 text-sm text-[var(--text-tertiary)] leading-relaxed">
-              用 AI 重新定义业务效率
+            </p>
+            <h2 className="mt-4 text-3xl font-semibold tracking-[-0.05em]">
+              专业呈现 AI Agent、自动化产品与工程能力。
+            </h2>
+            <p className="mt-5 max-w-xl text-sm leading-7 text-[var(--text-secondary)]">
+              面向客户、合作方和市场的官网，不该只有技术词汇，而应该让你的能力被快速理解、被认真对待。
             </p>
           </div>
 
-          {/* Services */}
           <div>
-            <h3 className="text-[0.7rem] font-semibold text-[var(--text-muted)] uppercase tracking-[0.15em] mb-4">
-              服务
-            </h3>
-            <ul className="space-y-3">
-              {footerLinks.services.map((link) => (
-                <li key={link.label}>
-                  <Link
-                    href={link.href}
-                    className="text-sm text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] transition-colors"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
+            <p className="font-mono text-[0.68rem] uppercase tracking-[0.22em] text-[var(--text-muted)]">
+              Navigate
+            </p>
+            <div className="mt-5 flex flex-col gap-3">
+              {footerLinks.navigate.map((link) => (
+                <Link
+                  key={link.label}
+                  href={link.href}
+                  className="text-sm text-[var(--text-secondary)] transition-colors hover:text-[var(--text-primary)]"
+                >
+                  {link.label}
+                </Link>
               ))}
-            </ul>
+            </div>
           </div>
 
-          {/* Company */}
           <div>
-            <h3 className="text-[0.7rem] font-semibold text-[var(--text-muted)] uppercase tracking-[0.15em] mb-4">
-              导航
-            </h3>
-            <ul className="space-y-3">
-              {footerLinks.company.map((link) => (
-                <li key={link.label}>
-                  <Link
-                    href={link.href}
-                    className="text-sm text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] transition-colors"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
+            <p className="font-mono text-[0.68rem] uppercase tracking-[0.22em] text-[var(--text-muted)]">
+              Channels
+            </p>
+            <div className="mt-5 flex flex-col gap-3">
+              {footerLinks.channels.map((link) => {
+                const isExternal = link.href.startsWith('http');
 
-          {/* Resources */}
-          <div>
-            <h3 className="text-[0.7rem] font-semibold text-[var(--text-muted)] uppercase tracking-[0.15em] mb-4">
-              资源
-            </h3>
-            <ul className="space-y-3">
-              {footerLinks.resources.map((link) => (
-                <li key={link.label}>
+                return isExternal ? (
                   <a
+                    key={link.label}
                     href={link.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-sm text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] transition-colors inline-flex items-center gap-1.5"
+                    className="text-sm text-[var(--text-secondary)] transition-colors hover:text-[var(--text-primary)]"
                   >
                     {link.label}
-                    <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
-                    </svg>
                   </a>
-                </li>
-              ))}
-            </ul>
+                ) : (
+                  <Link
+                    key={link.label}
+                    href={link.href}
+                    className="text-sm text-[var(--text-secondary)] transition-colors hover:text-[var(--text-primary)]"
+                  >
+                    {link.label}
+                  </Link>
+                );
+              })}
+            </div>
           </div>
         </div>
 
-        {/* Bottom bar */}
-        <div className="pt-10 border-t border-[var(--border-subtle)] flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-xs text-[var(--text-muted)]">
-            &copy; {new Date().getFullYear()} DevFox AI. All rights reserved.
-          </p>
-          <p className="text-xs text-[var(--text-muted)]">
-            Built with Next.js &middot; Deployed on Vercel
-          </p>
+        <div className="mt-10 flex flex-col gap-3 border-t border-[var(--border-subtle)] pt-6 text-xs text-[var(--text-muted)] md:flex-row md:items-center md:justify-between">
+          <p>&copy; {new Date().getFullYear()} DevFox AI. Built for credible product presentation.</p>
+          <p>Next.js · Tailwind CSS · Product-grade narrative system</p>
         </div>
       </div>
     </footer>

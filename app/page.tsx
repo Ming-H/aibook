@@ -9,25 +9,27 @@ import { ScrollAnimator } from '@/components/ScrollAnimator';
 export const dynamic = 'force-static';
 
 export const metadata = {
-  title: 'DevFox AI — 用 AI 重新定义业务效率',
+  title: 'DevFox AI — AI Agent 产品与自动化系统工作室',
   description:
-    '专注 AI 落地应用和 Agent 系统开发。帮助企业设计、开发和部署 AI 应用，从战略规划到落地交付，端到端的 AI 解决方案。',
+    '为外部团队打造专业的 AI Agent 产品官网、自动化系统与可落地的智能工作流，兼顾产品体验与工程质量。',
   openGraph: {
-    title: 'DevFox AI — 用 AI 重新定义业务效率',
+    title: 'DevFox AI — AI Agent 产品与自动化系统工作室',
     description:
-      '专注 AI 落地应用和 Agent 系统开发。帮助企业设计、开发和部署 AI 应用与 Agent 系统。',
+      '为外部团队打造专业的 AI Agent 产品官网、自动化系统与可落地的智能工作流。',
   },
 };
 
 export default function HomePage() {
   return (
-    <ScrollAnimator>
-      <Hero />
-      <Stats />
-      <Services />
-      <Cases />
-      <Process />
-      <CTA />
-    </ScrollAnimator>
+    <div className="page-shell">
+      <ScrollAnimator>
+        <Hero />
+        <Stats />
+        <Services />
+        <Cases />
+        <Process />
+        <CTA />
+      </ScrollAnimator>
+    </div>
   );
 }
