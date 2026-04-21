@@ -24,10 +24,11 @@ export function Footer() {
               DevFox AI
             </p>
             <h2 className="mt-4 text-3xl font-semibold tracking-[-0.05em]">
-              专业呈现 AI Agent、自动化产品与工程能力。
+              帮助企业与个人完成 AI Agent 和 AI 应用落地。
             </h2>
             <p className="mt-5 max-w-xl text-sm leading-7 text-[var(--text-secondary)]">
-              面向客户、合作方和市场的官网，不该只有技术词汇，而应该让你的能力被快速理解、被认真对待。
+              聚焦 Agent 系统、自动化工作流、知识检索和智能应用开发，
+              用务实工程方式把 AI 项目真正做出来。
             </p>
           </div>
 
@@ -81,8 +82,8 @@ export function Footer() {
         </div>
 
         <div className="mt-10 flex flex-col gap-3 border-t border-[var(--border-subtle)] pt-6 text-xs text-[var(--text-muted)] md:flex-row md:items-center md:justify-between">
-          <p>&copy; {new Date().getFullYear()} DevFox AI. Built for credible product presentation.</p>
-          <p>Next.js · Tailwind CSS · Product-grade narrative system</p>
+          <p>&copy; {new Date().getFullYear()} DevFox AI. AI Agent and application delivery.</p>
+          <p>Next.js · Tailwind CSS · AI project showcase</p>
         </div>
       </div>
     </footer>

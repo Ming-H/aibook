@@ -9,13 +9,13 @@ import { ScrollAnimator } from '@/components/ScrollAnimator';
 export const dynamic = 'force-static';
 
 export const metadata = {
-  title: 'DevFox AI — AI Agent 产品与自动化系统工作室',
+  title: 'DevFox AI — AI Agent 与 AI 应用落地交付',
   description:
-    '为外部团队打造专业的 AI Agent 产品官网、自动化系统与可落地的智能工作流，兼顾产品体验与工程质量。',
+    '面向企业与个人提供 AI Agent、自动化工作流、知识检索和智能应用的落地交付服务。',
   openGraph: {
-    title: 'DevFox AI — AI Agent 产品与自动化系统工作室',
+    title: 'DevFox AI — AI Agent 与 AI 应用落地交付',
     description:
-      '为外部团队打造专业的 AI Agent 产品官网、自动化系统与可落地的智能工作流。',
+      '面向企业与个人提供 AI Agent、自动化工作流、知识检索和智能应用的落地交付服务。',
   },
 };
 

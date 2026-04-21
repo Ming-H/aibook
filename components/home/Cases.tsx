@@ -68,7 +68,7 @@ export function Cases() {
                 <h3 className="mt-4 text-4xl font-semibold tracking-[-0.05em]">
                   {cases[0].name}
                 </h3>
-                <p className="mt-6 text-base leading-8 text-[var(--text-secondary)]">
+                <p className="mt-6 body-copy">
                   {cases[0].summary}
                 </p>
               </div>
@@ -89,7 +89,7 @@ export function Cases() {
                   <p className="font-mono text-[0.68rem] uppercase tracking-[0.22em] text-[var(--color-accent-text)]">
                     Key engineering lens
                   </p>
-                  <p className="mt-3 text-sm leading-7 text-[var(--text-secondary)]">
+                  <p className="mt-3 body-copy">
                     通过因果推断和模型分层，把运营动作从经验驱动升级为具备决策逻辑的增长系统。
                   </p>
                   <div className="mt-5 flex flex-wrap gap-2">
@@ -122,7 +122,7 @@ export function Cases() {
                 </div>
 
                 <h3 className="mt-5 text-2xl font-semibold tracking-[-0.04em]">{item.name}</h3>
-                <p className="mt-4 text-sm leading-7 text-[var(--text-secondary)]">{item.summary}</p>
+                <p className="mt-4 body-copy">{item.summary}</p>
 
                 <div className="mt-6 flex flex-wrap gap-2">
                   {item.metrics.map((metric) => (
@@ -137,7 +137,7 @@ export function Cases() {
 
                 <div className="mt-6 border-t border-[var(--border-subtle)] pt-5">
                   <p className="text-xs uppercase tracking-[0.2em] text-[var(--text-muted)]">Stack</p>
-                  <p className="mt-3 text-sm leading-7 text-[var(--text-secondary)]">
+                  <p className="mt-3 body-copy">
                     {item.stack.join(' / ')}
                   </p>
                 </div>

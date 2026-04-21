@@ -4,7 +4,7 @@ import { ScrollAnimator } from '@/components/ScrollAnimator';
 
 export const metadata: Metadata = {
   title: '案例 — DevFox AI',
-  description: 'DevFox AI 项目案例：AI Agent、销售对话系统、内容自动化工作流与产品化表达。',
+  description: 'DevFox AI 项目案例：AI Agent、销售对话系统、内容自动化工作流与落地交付。',
 };
 
 const cases = [
@@ -63,13 +63,13 @@ export default function CasesPage() {
               <h1 className="section-heading mt-8 animate-text-reveal">
                 案例页的重点不是“做过”，
                 <br />
-                而是“为什么这件事值得相信”。
+                而是“为什么这件事能真正落地”。
               </h1>
               <p
                 className="section-copy mt-8 max-w-2xl animate-fade-in-up"
                 style={{ animationDelay: '0.15s', opacity: 0 }}
               >
-                我把每个项目都按照更接近产品展示的方式来组织：场景、系统机制、关键亮点和架构表达都放进同一套版式里。
+                我把每个项目都按照更接近交付说明的方式来组织：场景、系统机制、关键亮点和架构表达都放进同一套版式里。
               </p>
             </div>
           </div>
@@ -90,8 +90,8 @@ export default function CasesPage() {
                       {item.category}
                     </p>
                     <h2 className="mt-5 text-4xl font-semibold tracking-[-0.05em]">{item.name}</h2>
-                    <p className="mt-4 text-lg text-[var(--text-secondary)]">{item.tagline}</p>
-                    <p className="mt-6 text-sm leading-7 text-[var(--text-secondary)]">{item.description}</p>
+                    <p className="mt-4 body-copy">{item.tagline}</p>
+                    <p className="mt-6 body-copy">{item.description}</p>
 
                     <div className="mt-6 flex flex-wrap gap-2">
                       {item.stack.map((tech) => (
@@ -114,7 +114,7 @@ export default function CasesPage() {
                         {item.details.map((detail) => (
                           <div
                             key={detail}
-                            className="rounded-[22px] border border-[var(--border-default)] bg-[var(--background-primary)] px-4 py-4 text-sm text-[var(--text-secondary)]"
+                            className="rounded-[22px] border border-[var(--border-default)] bg-[var(--background-primary)] px-4 py-4 body-copy"
                           >
                             {detail}
                           </div>
@@ -126,7 +126,7 @@ export default function CasesPage() {
                       <p className="font-mono text-[0.68rem] uppercase tracking-[0.22em] text-[var(--text-muted)]">
                         Architecture
                       </p>
-                      <p className="mt-5 font-mono text-sm leading-7 text-[var(--color-accent-text)]">
+                      <p className="mt-5 font-mono text-xs leading-7 text-[var(--color-accent-text)]">
                         {item.architecture}
                       </p>
                     </div>
@@ -143,7 +143,7 @@ export default function CasesPage() {
               <div className="relative z-10 flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
                 <div className="max-w-3xl">
                   <span className="eyebrow">Need a similar build</span>
-                  <h2 className="section-heading mt-8">如果你希望把项目也做成这种可信的展示方式，我们可以继续往前推进。</h2>
+                  <h2 className="section-heading mt-8">如果你希望把项目也做成这种可交付、可上线的状态，我们可以继续往前推进。</h2>
                 </div>
                 <Link href="/contact" className="btn-primary rounded-full px-8 py-3.5 text-sm font-semibold">
                   联系我讨论项目

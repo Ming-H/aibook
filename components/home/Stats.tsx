@@ -1,7 +1,7 @@
 'use client';
 
 const stats = [
-  { value: '10+', label: '交付项目', note: '覆盖官网、Agent 系统和自动化产品' },
+  { value: '10+', label: '交付项目', note: '覆盖 AI Agent、自动化系统和智能应用' },
   { value: '5+', label: '核心 Agent 系统', note: '从增长、销售到内容生产闭环' },
   { value: '3x', label: '价值层表达', note: '产品定位、界面质感、工程可信度同步升级' },
   { value: '0-1', label: '落地方式', note: '从概念、原型到上线站点一体推进' },

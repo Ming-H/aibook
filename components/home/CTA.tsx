@@ -11,20 +11,21 @@ export function CTA() {
 
           <div className="relative z-10 grid gap-10 lg:grid-cols-[1fr_auto] lg:items-end">
             <div className="max-w-3xl">
-              <span className="eyebrow">Start the rebuild</span>
+              <span className="eyebrow">Start the project</span>
               <h2 className="section-heading mt-8">
-                你的项目已经够强，
+                如果你想推进 AI Agent
                 <br />
-                网站不应该继续拖后腿。
+                或 AI 应用落地，现在就可以开始。
               </h2>
               <p className="section-copy mt-6 max-w-2xl">
-                如果你要把 AI Agent、自动化能力和产品思维更专业地展示给外界，现在就该让官网的表达能力追上你的实际水平。
+                无论是企业内部流程自动化、面向客户的智能产品，还是个人项目的 Agent 化落地，
+                都可以先把需求讲清楚，再一起推进交付。
               </p>
             </div>
 
             <div className="relative z-10 flex flex-col gap-4 sm:flex-row lg:flex-col">
               <Link href="/contact" className="btn-primary rounded-full px-8 py-3.5 text-sm font-semibold">
-                联系我开始重构
+                联系我聊项目
               </Link>
               <Link href="/about" className="btn-secondary rounded-full px-8 py-3.5 text-sm font-semibold">
                 先了解我的背景

@@ -38,7 +38,7 @@ export default function ContactPage() {
           <section className="max-w-3xl">
             <span className="eyebrow animate-fade-in-down">Contact</span>
             <h1 className="section-heading mt-8 animate-text-reveal">
-              如果你已经准备认真做官网，
+              如果你已经准备认真推进 AI 项目，
               <br />
               现在就可以开始联系。
             </h1>
@@ -46,7 +46,7 @@ export default function ContactPage() {
               className="section-copy mt-8 max-w-2xl animate-fade-in-up"
               style={{ animationDelay: '0.15s', opacity: 0 }}
             >
-              无论你是想重做个人官网、整理 AI Agent 项目表达，还是推进一个更完整的自动化产品，我都建议先把需求和目标讲清楚。
+              无论你是想做 AI Agent、自动化工作流，还是推进一个更完整的智能应用，我都建议先把需求和目标讲清楚。
             </p>
 
             <div
@@ -60,7 +60,7 @@ export default function ContactPage() {
                       {item.label}
                     </p>
                     <h2 className="mt-4 text-2xl font-semibold tracking-[-0.04em]">{item.title}</h2>
-                    <p className="mt-4 text-sm leading-7 text-[var(--text-secondary)]">{item.description}</p>
+                    <p className="mt-4 body-copy">{item.description}</p>
                     {item.href ? (
                       <a
                         href={item.href}
@@ -93,7 +93,7 @@ export default function ContactPage() {
                 Project inquiry
               </p>
               <h2 className="mt-4 text-3xl font-semibold tracking-[-0.05em]">发一条更明确的合作信息</h2>
-              <p className="mt-4 text-sm leading-7 text-[var(--text-secondary)]">
+              <p className="mt-4 body-copy">
                 建议直接说明你的项目类型、希望完成的目标、当前阶段，以及你最想先解决的问题。
               </p>
 
@@ -105,7 +105,7 @@ export default function ContactPage() {
                     </svg>
                   </div>
                   <h3 className="mt-5 text-2xl font-semibold tracking-[-0.04em]">信息已记录</h3>
-                  <p className="mt-4 text-sm leading-7 text-[var(--text-secondary)]">
+                  <p className="mt-4 body-copy">
                     当前表单仍是前端演示状态，但页面体验已经整理完毕。接下来如果你需要，我也可以继续接入真实提交逻辑。
                   </p>
                   <button
@@ -143,7 +143,7 @@ export default function ContactPage() {
                     <select
                       className="w-full rounded-[18px] border border-[var(--border-default)] bg-[var(--background-secondary)] px-4 py-3 text-sm text-[var(--text-primary)] focus:border-[var(--color-accent)] focus:outline-none"
                     >
-                      <option>AI Agent 官网升级</option>
+                      <option>AI Agent 项目落地</option>
                       <option>AI 产品 / 工作流开发</option>
                       <option>培训 / 咨询 / 评审</option>
                     </select>

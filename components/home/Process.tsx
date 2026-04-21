@@ -3,23 +3,23 @@
 const steps = [
   {
     step: '01',
-    title: '定义价值主张',
-    description: '先确认你希望别人记住什么，是技术能力、产品思维，还是垂直行业的交付经验。',
+    title: '理解业务场景',
+    description: '先明确使用对象、业务目标和需要 AI 解决的具体问题，而不是先堆技术方案。',
   },
   {
     step: '02',
-    title: '重构首页叙事',
-    description: '把首屏、能力模块、项目案例和 CTA 串成一个完整销售逻辑，而不是堆信息。',
+    title: '设计 Agent 与流程',
+    description: '拆解角色分工、工具链、知识源和执行步骤，建立真正可运行的 Agent 系统方案。',
   },
   {
     step: '03',
-    title: '把项目做成资产',
-    description: '用专业的版式、命名、技术解释和结果信号，让每个案例都成为可信的业务材料。',
+    title: '开发并完成集成',
+    description: '把模型、前后端、自动化流程和业务接口接起来，形成可用的 AI 应用或工作流。',
   },
   {
     step: '04',
-    title: '升级为可持续官网',
-    description: '保留可扩展代码结构，后续可以继续接入更多 Agent 项目、内容和转化入口。',
+    title: '上线与持续迭代',
+    description: '完成部署、验证和后续优化，让项目不是停在演示阶段，而是真正能长期使用。',
   },
 ];
 
@@ -29,9 +29,9 @@ export function Process() {
       <div className="mx-auto max-w-section">
         <div className="mb-14 max-w-3xl animate-on-scroll">
           <span className="eyebrow">Process</span>
-          <h2 className="section-heading mt-8">好的官网不是装饰，而是一种组织能力。</h2>
+          <h2 className="section-heading mt-8">我的工作方式，是把 AI 项目从想法推进到实际落地。</h2>
           <p className="section-copy mt-6 max-w-2xl">
-            我会把页面设计、内容排序和项目表达放在同一个框架内处理，这样整体才会显得专业，而不是局部漂亮。
+            从需求澄清、系统设计到开发部署，我更关注交付结果本身，而不是只停留在概念包装。
           </p>
         </div>
 
@@ -54,7 +54,7 @@ export function Process() {
                 </div>
               </div>
 
-              <p className="relative z-10 mt-5 text-sm leading-7 text-[var(--text-secondary)]">
+              <p className="relative z-10 mt-5 body-copy">
                 {step.description}
               </p>
             </div>

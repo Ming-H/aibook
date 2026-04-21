@@ -5,21 +5,21 @@ import Link from 'next/link';
 const services = [
   {
     index: '01',
-    title: '官网定位与品牌叙事',
-    description: '先把“你到底在卖什么能力”说清楚。整理项目矩阵、产品语言和信任信号，避免页面只是技术清单。',
-    bullets: ['价值主张重构', '首页信息架构', '项目定位梳理'],
+    title: 'AI Agent 方案设计与落地',
+    description: '围绕业务目标拆解需求，完成 Agent 角色设计、工具链路定义和系统落地方案。',
+    bullets: ['需求与场景梳理', 'Agent 架构设计', '落地路线规划'],
   },
   {
     index: '02',
-    title: 'AI Agent 产品化表达',
-    description: '把 Agent、工作流、自动化模块用更可感知的方式呈现出来，让客户看懂能力边界、应用场景和交付深度。',
-    bullets: ['Agent 系统说明', '案例界面包装', '能力模块拆解'],
+    title: '自动化工作流与智能应用开发',
+    description: '把模型、知识库、业务规则和产品界面整合起来，形成真正可使用的 AI 应用。',
+    bullets: ['工作流编排', '知识检索与 RAG', '前后端联动开发'],
   },
   {
     index: '03',
-    title: '设计与工程同步交付',
-    description: '不是单做视觉稿，而是在现有 Next.js 结构内直接升级为可上线的专业官网，兼顾性能、维护性和扩展性。',
-    bullets: ['Next.js 实装', '设计系统升级', '可持续迭代结构'],
+    title: '部署、迭代与交付支持',
+    description: '不止停留在原型层，覆盖部署上线、效果验证和后续演进，确保项目真正能跑起来。',
+    bullets: ['部署与上线', '稳定性验证', '后续迭代支持'],
   },
 ];
 
@@ -29,10 +29,10 @@ export function Services() {
       <div className="mx-auto max-w-section">
         <div className="mb-14 max-w-3xl animate-on-scroll">
           <span className="eyebrow">Capabilities</span>
-          <h2 className="section-heading mt-8">网站不该只是介绍你，而该替你成交。</h2>
+          <h2 className="section-heading mt-8">我交付的是 AI 项目，不是空泛的技术展示。</h2>
           <p className="section-copy mt-6 max-w-2xl">
-            一个专业的 AI 官网，需要同时具备产品视角、工程判断和可信的项目叙事。
-            我把这三层合并成一个统一的输出，而不是拆成彼此割裂的页面模块。
+            面向 to B 和 to C 场景，我更关注的是怎么把 AI Agent、自动化工作流和智能应用真正做出来，
+            并落到可用、可部署、可持续迭代的状态。
           </p>
         </div>
 
@@ -53,7 +53,7 @@ export function Services() {
               </div>
 
               <h3 className="mt-8 text-2xl font-semibold tracking-[-0.04em]">{service.title}</h3>
-              <p className="mt-5 text-sm leading-7 text-[var(--text-secondary)]">{service.description}</p>
+              <p className="mt-5 body-copy">{service.description}</p>
 
               <div className="mt-8 space-y-3">
                 {service.bullets.map((item) => (

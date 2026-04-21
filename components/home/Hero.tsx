@@ -5,13 +5,13 @@ import Link from 'next/link';
 const signalCards = [
   {
     label: 'Positioning',
-    title: 'AI Agent product studio',
-    detail: '把模型能力包装成真正可交付、可演示、可上线的产品体验。',
+    title: 'AI project delivery',
+    detail: '帮助企业或个人把 AI 想法落成真正可运行、可验证、可上线的应用。',
   },
   {
     label: 'Delivery',
-    title: 'Strategy + UX + engineering',
-    detail: '不是只做 Demo，而是覆盖架构、交互、自动化和运营闭环。',
+    title: 'Strategy + engineering + deployment',
+    detail: '不是只做 Demo，而是覆盖方案、架构、工作流、交付与部署闭环。',
   },
 ];
 
@@ -31,33 +31,33 @@ const featuredProjects = [
 
 export function Hero() {
   return (
-    <section className="relative overflow-hidden px-5 pb-24 pt-24 sm:px-8 md:pb-32 md:pt-32">
+    <section className="relative overflow-hidden px-5 pb-20 pt-14 sm:px-8 md:pb-28 md:pt-20">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(82,167,255,0.14),transparent_28%),radial-gradient(circle_at_80%_20%,rgba(184,242,119,0.12),transparent_22%),radial-gradient(circle_at_50%_100%,rgba(102,231,213,0.12),transparent_32%)]" />
-      <div className="absolute inset-x-0 top-24 h-px bg-gradient-to-r from-transparent via-[var(--border-medium)] to-transparent" />
+      <div className="absolute inset-x-0 top-16 h-px bg-gradient-to-r from-transparent via-[var(--border-medium)] to-transparent md:top-20" />
 
       <div className="relative mx-auto grid max-w-section gap-12 lg:grid-cols-[minmax(0,1.15fr)_minmax(360px,0.85fr)] lg:items-end">
         <div className="max-w-3xl">
           <span className="eyebrow animate-fade-in-down">
-            Product website for AI builders
+            AI Agent delivery for business and creator teams
           </span>
 
-          <h1 className="section-heading mt-8 animate-text-reveal">
-            把你的
-            <span className="gradient-text-animated"> AI Agent 能力</span>
+          <h1 className="section-heading mt-6 animate-text-reveal">
+            帮助企业和个人
+            <span className="gradient-text-animated"> 落地 AI Agent</span>
             <br />
-            做成值得被相信的产品官网
+            与实际可用的 AI 应用
           </h1>
 
           <p
-            className="section-copy mt-8 max-w-2xl animate-fade-in-up"
+            className="section-copy mt-6 max-w-2xl animate-fade-in-up"
             style={{ animationDelay: '0.15s', opacity: 0 }}
           >
-            DevFox AI 不是单纯展示技术名词，而是把你的 Agent 项目、自动化能力和产品判断，
-            用更专业的叙事、界面和交付方式呈现给客户、合作方和市场。
+            DevFox AI 聚焦 AI 项目落地交付，面向 to B 和 to C 场景，
+            帮助客户完成 Agent 系统、自动化工作流、知识检索和智能应用的设计、开发与上线。
           </p>
 
           <div
-            className="mt-10 flex flex-col gap-4 sm:flex-row animate-fade-in-up"
+            className="mt-8 flex flex-col gap-4 sm:flex-row animate-fade-in-up"
             style={{ animationDelay: '0.3s', opacity: 0 }}
           >
             <Link href="/cases" className="btn-primary rounded-full px-8 py-3.5 text-sm font-semibold">
@@ -69,7 +69,7 @@ export function Hero() {
           </div>
 
           <div
-            className="mt-12 grid gap-4 sm:grid-cols-2 animate-fade-in-up"
+            className="mt-10 grid gap-4 sm:grid-cols-2 animate-fade-in-up"
             style={{ animationDelay: '0.45s', opacity: 0 }}
           >
             {signalCards.map((card) => (
@@ -137,7 +137,7 @@ export function Hero() {
                       Agent systems
                     </p>
                     <p className="mt-2 text-sm text-[var(--text-secondary)]">
-                      多 Agent 编排、知识检索、自动化执行。
+                      多 Agent 编排、知识检索、自动化执行与业务集成。
                     </p>
                   </div>
                   <div className="rounded-[22px] border border-[var(--border-default)] bg-[var(--background-secondary)] p-4">
@@ -145,10 +145,10 @@ export function Hero() {
                       Output
                     </p>
                     <p className="mt-3 text-lg font-medium tracking-[-0.03em]">
-                      Market-ready site
+                      Real deployment
                     </p>
                     <p className="mt-2 text-sm text-[var(--text-secondary)]">
-                      专业官网、案例叙事、可信度包装同步完成。
+                      从需求梳理到交付上线，形成真正可用的 AI 项目成果。
                     </p>
                   </div>
                 </div>
@@ -181,7 +181,7 @@ export function Hero() {
                     What changes now
                   </p>
                   <p className="mt-3 text-sm leading-7 text-[var(--text-secondary)]">
-                    网站从“我会做什么”升级为“我做过什么、怎么做、为什么可信”。
+                    交付从“会用模型”升级为“能把 AI 项目真正落地并交付出去”。
                   </p>
                 </div>
               </div>
