@@ -23,7 +23,7 @@ export function Footer() {
             <p className="font-mono text-[0.68rem] uppercase tracking-[0.24em] text-[var(--color-accent-text)]">
               DevFox AI
             </p>
-            <h2 className="mt-4 text-3xl font-semibold tracking-[-0.05em]">
+            <h2 className="mt-4 text-xl font-semibold tracking-[-0.03em]">
               帮助企业与个人完成 AI Agent 和 AI 应用落地。
             </h2>
             <p className="mt-5 max-w-xl text-sm leading-7 text-[var(--text-secondary)]">

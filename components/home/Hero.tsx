@@ -6,12 +6,12 @@ const signalCards = [
   {
     label: 'Positioning',
     title: 'AI project delivery',
-    detail: '帮助企业或个人把 AI 想法落成真正可运行、可验证、可上线的应用。',
+    detail: '帮助企业或个人把 AI 想法落成真正可运行、可验证、可上线的应用',
   },
   {
     label: 'Delivery',
     title: 'Strategy + engineering + deployment',
-    detail: '不是只做 Demo，而是覆盖方案、架构、工作流、交付与部署闭环。',
+    detail: '不是只做 Demo，而是覆盖方案、架构、工作流、交付与部署闭环',
   },
 ];
 
@@ -31,7 +31,7 @@ const featuredProjects = [
 
 export function Hero() {
   return (
-    <section className="relative overflow-hidden px-5 pb-16 pt-10 sm:px-8 md:pb-24 md:pt-14">
+    <section className="relative overflow-hidden px-5 pb-12 pt-8 sm:px-8 md:pb-16 md:pt-12">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(82,167,255,0.14),transparent_28%),radial-gradient(circle_at_80%_20%,rgba(184,242,119,0.12),transparent_22%),radial-gradient(circle_at_50%_100%,rgba(102,231,213,0.12),transparent_32%)]" />
       <div className="absolute inset-x-0 top-16 h-px bg-gradient-to-r from-transparent via-[var(--border-medium)] to-transparent md:top-20" />
 
@@ -52,11 +52,11 @@ export function Hero() {
             className="section-copy mt-5 max-w-2xl animate-fade-in-up"
             style={{ animationDelay: '0.15s', opacity: 0 }}
           >
-            聚焦 AI 项目落地交付，面向企业与个人，覆盖 Agent、自动化工作流与智能应用。
+            从需求分析、Agent 架构设计到开发部署上线，帮助企业与个人完成 AI Agent、自动化工作流和智能应用的完整交付——不是 Demo，是真正可运行、可验证的项目成果
           </p>
 
           <div
-            className="mt-7 flex flex-col gap-4 sm:flex-row animate-fade-in-up"
+            className="mt-5 flex flex-col gap-4 sm:flex-row animate-fade-in-up"
             style={{ animationDelay: '0.3s', opacity: 0 }}
           >
             <Link href="/cases" className="btn-primary rounded-full px-8 py-3.5 text-sm font-semibold">
@@ -68,7 +68,7 @@ export function Hero() {
           </div>
 
           <div
-            className="mt-8 grid gap-4 sm:grid-cols-2 animate-fade-in-up"
+            className="mt-5 grid gap-4 sm:grid-cols-2 animate-fade-in-up"
             style={{ animationDelay: '0.45s', opacity: 0 }}
           >
             {signalCards.map((card) => (
@@ -77,7 +77,7 @@ export function Hero() {
                   <p className="font-mono text-[0.68rem] uppercase tracking-[0.22em] text-[var(--text-muted)]">
                     {card.label}
                   </p>
-                  <h2 className="mt-4 text-2xl font-semibold tracking-[-0.04em]">
+                  <h2 className="mt-4 text-xl font-semibold tracking-[-0.02em]">
                     {card.title}
                   </h2>
                   <p className="mt-4 text-sm leading-7 text-[var(--text-secondary)]">
@@ -90,7 +90,7 @@ export function Hero() {
         </div>
 
         <div
-          className="surface-panel animate-scale-in rounded-[32px] p-4 shadow-[var(--shadow-xl)]"
+          className="surface-panel animate-scale-in rounded-[28px] p-4 shadow-[var(--shadow-xl)]"
           style={{ animationDelay: '0.2s', opacity: 0 }}
         >
           <div className="relative z-10 overflow-hidden rounded-[28px] border border-[var(--border-default)] bg-[linear-gradient(180deg,rgba(255,255,255,0.04),transparent_32%),var(--background-secondary)] p-6 md:p-7">
@@ -99,7 +99,7 @@ export function Hero() {
                 <p className="font-mono text-[0.68rem] uppercase tracking-[0.24em] text-[var(--color-accent-text)]">
                   Live positioning board
                 </p>
-                <h2 className="mt-2 text-2xl font-semibold tracking-[-0.04em]">
+                <h2 className="mt-2 text-xl font-semibold tracking-[-0.02em]">
                   DevFox capability system
                 </h2>
               </div>
@@ -128,26 +128,26 @@ export function Hero() {
                 </div>
 
                 <div className="mt-6 grid grid-cols-2 gap-3">
-                  <div className="rounded-[22px] border border-[var(--border-default)] bg-[var(--background-secondary)] p-4">
+                  <div className="rounded-[20px] border border-[var(--border-default)] bg-[var(--background-secondary)] p-4">
                     <p className="font-mono text-[0.68rem] uppercase tracking-[0.2em] text-[var(--text-muted)]">
                       Focus
                     </p>
-                    <p className="mt-3 text-lg font-medium tracking-[-0.03em]">
+                    <p className="mt-3 text-base font-medium tracking-[-0.02em]">
                       Agent systems
                     </p>
-                    <p className="mt-2 text-sm text-[var(--text-secondary)]">
-                      Agent 编排、知识检索、自动化执行与业务集成。
+                    <p className="mt-2 text-xs text-[var(--text-tertiary)]">
+                      Agent 编排 · 知识检索 · 业务集成
                     </p>
                   </div>
-                  <div className="rounded-[22px] border border-[var(--border-default)] bg-[var(--background-secondary)] p-4">
+                  <div className="rounded-[20px] border border-[var(--border-default)] bg-[var(--background-secondary)] p-4">
                     <p className="font-mono text-[0.68rem] uppercase tracking-[0.2em] text-[var(--text-muted)]">
                       Output
                     </p>
-                    <p className="mt-3 text-lg font-medium tracking-[-0.03em]">
+                    <p className="mt-3 text-base font-medium tracking-[-0.02em]">
                       Real deployment
                     </p>
-                    <p className="mt-2 text-sm text-[var(--text-secondary)]">
-                      从需求到上线，交付可用的 AI 项目成果。
+                    <p className="mt-2 text-xs text-[var(--text-tertiary)]">
+                      需求到上线，交付可运行成果
                     </p>
                   </div>
                 </div>
@@ -175,12 +175,12 @@ export function Hero() {
                   ))}
                 </div>
 
-                <div className="mt-5 rounded-[22px] border border-[var(--border-brand)] bg-[var(--color-accent-soft)] px-4 py-4">
+                <div className="mt-5 rounded-[20px] border border-[var(--border-brand)] bg-[var(--color-accent-soft)] px-4 py-4">
                   <p className="font-mono text-[0.68rem] uppercase tracking-[0.22em] text-[var(--color-accent-text)]">
                     What changes now
                   </p>
                   <p className="mt-3 text-sm leading-7 text-[var(--text-secondary)]">
-                    目标是把 AI 项目直接做成可用成果。
+                    把 AI 项目直接做成可上线的产品级成果
                   </p>
                 </div>
               </div>

@@ -76,22 +76,22 @@
   }
 
   .section-heading {
-    font-size: clamp(2.2rem, 5vw, 4.6rem);
-    line-height: 0.96;
-    letter-spacing: -0.055em;
+    font-size: clamp(1.75rem, 3.5vw, 3rem);
+    line-height: 1.08;
+    letter-spacing: -0.04em;
     font-weight: 700;
   }
 
   .section-copy {
     color: var(--text-secondary);
-    font-size: clamp(0.84rem, 0.95vw, 0.92rem);
-    line-height: 1.62;
+    font-size: clamp(0.875rem, 1vw, 1rem);
+    line-height: 1.7;
   }
 
   .body-copy {
     color: var(--text-secondary);
-    font-size: 0.82rem;
-    line-height: 1.6;
+    font-size: 0.9375rem;
+    line-height: 1.7;
   }
 
   .surface-panel {
@@ -116,10 +116,10 @@
   }
 
   .metric-value {
-    font-size: clamp(2rem, 5vw, 4rem);
-    line-height: 0.9;
+    font-size: clamp(1.5rem, 3.5vw, 2.5rem);
+    line-height: 1;
     font-weight: 700;
-    letter-spacing: -0.07em;
+    letter-spacing: -0.05em;
   }
 }
 

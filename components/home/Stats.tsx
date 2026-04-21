@@ -9,9 +9,9 @@ const stats = [
 
 export function Stats() {
   return (
-    <section className="px-5 py-8 sm:px-8 md:py-12">
+    <section className="px-5 py-6 sm:px-8 md:py-10">
       <div className="mx-auto max-w-section">
-        <div className="surface-panel rounded-[32px] px-6 py-8 md:px-10 md:py-10">
+        <div className="surface-panel rounded-[28px] px-6 py-8 md:px-10 md:py-10">
           <div className="relative z-10 grid gap-8 md:grid-cols-4">
             {stats.map((stat, index) => (
               <div
@@ -21,7 +21,7 @@ export function Stats() {
               >
                 <div className="metric-value gradient-text">{stat.value}</div>
                 <h2 className="mt-3 text-lg font-semibold tracking-[-0.03em]">{stat.label}</h2>
-                <p className="mt-3 text-sm leading-7 text-[var(--text-secondary)]">{stat.note}</p>
+                <p className="mt-3 body-copy">{stat.note}</p>
               </div>
             ))}
           </div>

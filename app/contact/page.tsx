@@ -7,18 +7,18 @@ const contactCards = [
   {
     label: 'WeChat',
     title: 'randforest0102',
-    description: '最快的沟通方式，适合直接聊项目需求和合作节奏。',
+    description: '最快的沟通方式，适合直接聊项目需求和合作节奏',
   },
   {
     label: 'GitHub',
     title: 'github.com/Ming-H',
-    description: '查看公开项目、代码风格和持续输出。',
+    description: '查看公开项目、代码风格和持续输出',
     href: 'https://github.com/Ming-H',
   },
   {
     label: 'AI Insights',
     title: '内容与技术输出',
-    description: '适合先了解我的长期思考、写作和项目背景。',
+    description: '适合先了解我的长期思考、写作和项目背景',
     href: 'https://ming-h.github.io/ai-insights/',
   },
 ];
@@ -32,12 +32,12 @@ export default function ContactPage() {
   }
 
   return (
-    <div className="page-shell px-5 pb-16 pt-16 sm:px-8 md:pb-20 md:pt-20">
+    <div className="page-shell px-5 pb-12 pt-14 sm:px-8 md:pb-16 md:pt-16">
       <div className="mx-auto max-w-section">
         <div className="grid gap-8 xl:grid-cols-[0.88fr_1.12fr]">
           <section className="max-w-3xl">
             <span className="eyebrow animate-fade-in-down">Contact</span>
-            <h1 className="section-heading mt-8 animate-text-reveal">
+            <h1 className="section-heading mt-5 animate-text-reveal">
               如果你已经准备认真推进 AI 项目，
               <br />
               现在就可以开始联系。
@@ -46,7 +46,7 @@ export default function ContactPage() {
               className="section-copy mt-5 max-w-2xl animate-fade-in-up"
               style={{ animationDelay: '0.15s', opacity: 0 }}
             >
-              如果你要推进 AI 项目落地，可以直接联系我。
+              无论是 AI Agent 开发、自动化工作流搭建，还是 AI 项目咨询，都可以直接联系我。
             </p>
 
             <div
@@ -59,7 +59,7 @@ export default function ContactPage() {
                     <p className="font-mono text-[0.68rem] uppercase tracking-[0.22em] text-[var(--color-accent-text)]">
                       {item.label}
                     </p>
-                    <h2 className="mt-4 text-2xl font-semibold tracking-[-0.04em]">{item.title}</h2>
+                    <h2 className="mt-4 text-lg font-semibold tracking-[-0.02em]">{item.title}</h2>
                     <p className="mt-4 body-copy">{item.description}</p>
                     {item.href ? (
                       <a
@@ -85,26 +85,26 @@ export default function ContactPage() {
           </section>
 
           <section
-            className="surface-panel animate-scale-in rounded-[34px] p-7 md:p-8"
+            className="surface-panel animate-scale-in rounded-[28px] p-6 md:p-7"
             style={{ animationDelay: '0.2s', opacity: 0 }}
           >
             <div className="relative z-10">
               <p className="font-mono text-[0.68rem] uppercase tracking-[0.24em] text-[var(--color-accent-text)]">
                 Project inquiry
               </p>
-              <h2 className="mt-4 text-2xl font-semibold tracking-[-0.05em]">发一条更明确的合作信息</h2>
-              <p className="mt-4 body-copy">说明项目类型、目标和当前阶段即可。</p>
+              <h2 className="mt-3 text-lg font-semibold tracking-[-0.02em]">告诉我你的项目需求</h2>
+              <p className="mt-3 body-copy">简要说明项目类型、目标和当前阶段，我会在 24 小时内回复</p>
 
               {submitted ? (
-                <div className="mt-10 rounded-[28px] border border-[var(--border-brand)] bg-[var(--color-accent-soft)] p-8 text-center">
+                <div className="mt-10 rounded-[24px] border border-[var(--border-brand)] bg-[var(--color-accent-soft)] p-8 text-center">
                   <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[linear-gradient(135deg,var(--color-gradient-start),var(--color-gradient-end))] text-[var(--background-primary)]">
                     <svg className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                     </svg>
                   </div>
-                  <h3 className="mt-5 text-2xl font-semibold tracking-[-0.04em]">信息已记录</h3>
+                  <h3 className="mt-5 text-lg font-semibold tracking-[-0.02em]">信息已记录</h3>
                   <p className="mt-4 body-copy">
-                    当前表单仍是前端演示状态，但页面体验已经整理完毕。接下来如果你需要，我也可以继续接入真实提交逻辑。
+                    感谢你的信息，我会在 24 小时内回复。
                   </p>
                   <button
                     onClick={() => setSubmitted(false)}
@@ -122,7 +122,7 @@ export default function ContactPage() {
                         type="text"
                         required
                         placeholder="你的名字"
-                        className="w-full rounded-[18px] border border-[var(--border-default)] bg-[var(--background-secondary)] px-4 py-3 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:border-[var(--color-accent)] focus:outline-none"
+                        className="w-full rounded-[16px] border border-[var(--border-default)] bg-[var(--background-secondary)] px-4 py-3 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:border-[var(--color-accent)] focus:outline-none"
                       />
                     </div>
                     <div>
@@ -131,7 +131,7 @@ export default function ContactPage() {
                         type="email"
                         required
                         placeholder="your@email.com"
-                        className="w-full rounded-[18px] border border-[var(--border-default)] bg-[var(--background-secondary)] px-4 py-3 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:border-[var(--color-accent)] focus:outline-none"
+                        className="w-full rounded-[16px] border border-[var(--border-default)] bg-[var(--background-secondary)] px-4 py-3 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:border-[var(--color-accent)] focus:outline-none"
                       />
                     </div>
                   </div>
@@ -139,7 +139,7 @@ export default function ContactPage() {
                   <div>
                     <label className="mb-2 block text-sm font-medium">项目类型</label>
                     <select
-                      className="w-full rounded-[18px] border border-[var(--border-default)] bg-[var(--background-secondary)] px-4 py-3 text-sm text-[var(--text-primary)] focus:border-[var(--color-accent)] focus:outline-none"
+                      className="w-full rounded-[16px] border border-[var(--border-default)] bg-[var(--background-secondary)] px-4 py-3 text-sm text-[var(--text-primary)] focus:border-[var(--color-accent)] focus:outline-none"
                     >
                       <option>AI Agent 项目落地</option>
                       <option>AI 产品 / 工作流开发</option>
@@ -153,7 +153,7 @@ export default function ContactPage() {
                       required
                       rows={6}
                       placeholder="你现在的网站或项目处于什么阶段？想达成什么目标？"
-                      className="w-full resize-none rounded-[18px] border border-[var(--border-default)] bg-[var(--background-secondary)] px-4 py-3 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:border-[var(--color-accent)] focus:outline-none"
+                      className="w-full resize-none rounded-[16px] border border-[var(--border-default)] bg-[var(--background-secondary)] px-4 py-3 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:border-[var(--color-accent)] focus:outline-none"
                     />
                   </div>
 

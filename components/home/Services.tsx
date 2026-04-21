@@ -6,38 +6,38 @@ const services = [
   {
     index: '01',
     title: 'AI Agent 方案设计与落地',
-    description: '围绕业务目标拆解需求，完成 Agent 角色设计、工具链路定义和系统落地方案。',
+    description: '围绕业务目标拆解需求，完成 Agent 角色设计、工具链路定义和系统落地方案',
     bullets: ['需求与场景梳理', 'Agent 架构设计', '落地路线规划'],
   },
   {
     index: '02',
     title: '自动化工作流与智能应用开发',
-    description: '把模型、知识库、业务规则和产品界面整合起来，形成真正可使用的 AI 应用。',
+    description: '把模型、知识库、业务规则和产品界面整合起来，形成真正可使用的 AI 应用',
     bullets: ['工作流编排', '知识检索与 RAG', '前后端联动开发'],
   },
   {
     index: '03',
     title: '部署、迭代与交付支持',
-    description: '不止停留在原型层，覆盖部署上线、效果验证和后续演进，确保项目真正能跑起来。',
+    description: '不止停留在原型层，覆盖部署上线、效果验证和后续演进，确保项目真正能跑起来',
     bullets: ['部署与上线', '稳定性验证', '后续迭代支持'],
   },
   {
     index: '04',
     title: 'AI 咨询与方案评审',
-    description: '帮助企业或个人判断怎么做 AI，减少试错成本，提升落地效率。',
+    description: '帮助企业或个人判断怎么做 AI，减少试错成本，提升落地效率',
     bullets: ['场景与需求梳理', '方案选型建议', '落地路径评审'],
   },
 ];
 
 export function Services() {
   return (
-    <section className="px-5 py-24 sm:px-8 md:py-32">
+    <section className="px-5 py-14 sm:px-8 md:py-20">
       <div className="mx-auto max-w-section">
-        <div className="mb-14 max-w-3xl animate-on-scroll">
+        <div className="mb-8 max-w-3xl animate-on-scroll">
           <span className="eyebrow">Capabilities</span>
-          <h2 className="section-heading mt-8">交付 AI 项目，不做空泛展示。</h2>
-          <p className="section-copy mt-5 max-w-2xl">
-            面向企业与个人，重点是把 Agent、自动化工作流和智能应用做成可用成果。
+          <h2 className="section-heading mt-5">交付 AI 项目，不做空泛展示</h2>
+          <p className="section-copy mt-3 max-w-2xl">
+            每一项服务都指向可交付的成果——从 Agent 系统设计到自动化工作流开发，从部署上线到持续迭代
           </p>
         </div>
 
@@ -45,7 +45,7 @@ export function Services() {
           {services.map((service, index) => (
             <div
               key={service.title}
-              className="card animate-on-scroll flex h-full flex-col rounded-[30px] p-7 md:p-8"
+              className="card animate-on-scroll flex flex-col rounded-[28px] p-6"
               style={{ transitionDelay: `${index * 0.1}s` }}
             >
               <div className="flex items-center justify-between">
@@ -57,10 +57,10 @@ export function Services() {
                 </span>
               </div>
 
-              <h3 className="mt-8 text-xl font-semibold tracking-[-0.04em]">{service.title}</h3>
-              <p className="mt-5 body-copy">{service.description}</p>
+              <h3 className="mt-4 text-xl font-semibold tracking-[-0.02em]">{service.title}</h3>
+              <p className="mt-3 body-copy flex-1">{service.description}</p>
 
-              <div className="mt-8 space-y-3">
+              <div className="mt-auto space-y-3 pt-4">
                 {service.bullets.map((item) => (
                   <div
                     key={item}
@@ -75,7 +75,7 @@ export function Services() {
           ))}
         </div>
 
-        <div className="mt-10 animate-on-scroll">
+        <div className="mt-6 animate-on-scroll">
           <Link href="/services" className="btn-secondary rounded-full px-7 py-3 text-sm font-semibold">
             查看完整服务说明
           </Link>

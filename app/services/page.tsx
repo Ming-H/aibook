@@ -12,7 +12,7 @@ const services = [
     id: 'agent-build',
     label: '01',
     title: 'AI Agent 与智能应用开发',
-    summary: '把模型能力、业务流程、知识源和产品界面整合成真正可运行、可上线的 AI 应用。',
+    summary: '把模型能力、业务流程、知识源和产品界面整合成真正可运行、可上线的 AI 应用',
     points: [
       'Multi-Agent 架构设计与实现',
       'RAG / 检索增强知识系统',
@@ -25,7 +25,7 @@ const services = [
     id: 'training',
     label: '02',
     title: 'AI 培训、评审与落地咨询',
-    summary: '帮助团队缩短从“想做 AI”到“知道该怎么做”的距离，避免在错误方向上消耗时间。',
+    summary: '帮助团队缩短从”想做 AI”到”知道该怎么做”的距离，避免在错误方向上消耗时间',
     points: [
       '团队 AI 能力培训',
       '技术路线评估与选型',
@@ -37,24 +37,24 @@ const services = [
 ];
 
 const process = [
-  { step: '01', title: 'Clarify', description: '先明确业务目标、用户场景和需要 AI 真正解决的问题。' },
-  { step: '02', title: 'Design', description: '设计 Agent 分工、工作流、知识检索和系统边界。' },
-  { step: '03', title: 'Build', description: '完成模型集成、前后端开发和业务流程联调。' },
-  { step: '04', title: 'Launch', description: '部署上线并根据实际反馈迭代，让项目稳定运行。' },
+  { step: '01', title: 'Clarify', description: '先明确业务目标、用户场景和需要 AI 真正解决的问题' },
+  { step: '02', title: 'Design', description: '设计 Agent 分工、工作流、知识检索和系统边界' },
+  { step: '03', title: 'Build', description: '完成模型集成、前后端开发和业务流程联调' },
+  { step: '04', title: 'Launch', description: '部署上线并根据实际反馈迭代，让项目稳定运行' },
 ];
 
 const faqs = [
   {
     q: '你更适合做哪类项目？',
-    a: '适合需要落地 AI Agent、自动化工作流、知识检索或智能应用的项目，尤其是需要从方案走到上线的场景。',
+    a: '适合需要落地 AI Agent、自动化工作流、知识检索或智能应用的项目，尤其是需要从方案走到上线的场景',
   },
   {
     q: '你主要提供什么交付？',
-    a: '核心是 AI 项目落地交付，包括方案设计、系统开发、部署上线，以及必要的培训和评审支持。',
+    a: '核心是 AI 项目落地交付，包括方案设计、系统开发、部署上线，以及必要的培训和评审支持',
   },
   {
     q: '合作周期通常多久？',
-    a: '取决于复杂度。轻量原型通常 1-2 周，完整的 Agent 系统或更复杂的业务集成项目一般需要 4-8 周。',
+    a: '取决于复杂度：轻量原型通常 1-2 周，完整的 Agent 系统或更复杂的业务集成项目一般需要 4-8 周',
   },
 ];
 
@@ -62,31 +62,31 @@ export default function ServicesPage() {
   return (
     <div className="page-shell">
       <ScrollAnimator>
-        <section className="px-5 pb-14 pt-16 sm:px-8 md:pb-20 md:pt-20">
+        <section className="px-5 pb-10 pt-14 sm:px-8 md:pb-14 md:pt-16">
           <div className="mx-auto max-w-section">
             <div className="max-w-3xl">
               <span className="eyebrow animate-fade-in-down">Services</span>
-              <h1 className="section-heading mt-8 animate-text-reveal">
+              <h1 className="section-heading mt-5 animate-text-reveal">
                 我提供的不是概念展示，
                 <br />
-                而是 AI 项目的真实落地能力。
+                而是 AI 项目的真实落地能力
               </h1>
               <p
                 className="section-copy mt-5 max-w-2xl animate-fade-in-up"
                 style={{ animationDelay: '0.15s', opacity: 0 }}
               >
-                面向企业和个人，提供 AI Agent、自动化工作流与智能应用落地。
+                从 Agent 架构设计到自动化工作流开发，从部署上线到团队赋能，每一步都指向可交付、可上线的项目成果
               </p>
             </div>
           </div>
         </section>
 
-        <section className="px-5 py-6 sm:px-8 md:py-8">
+        <section className="px-5 py-4 sm:px-8 md:py-6">
           <div className="mx-auto max-w-section grid gap-5">
             {services.map((service, index) => (
               <article
                 key={service.id}
-                className="surface-panel animate-on-scroll rounded-[34px] p-8 md:p-10"
+                className="surface-panel animate-on-scroll rounded-[28px] p-6 md:p-8"
                 style={{ transitionDelay: `${index * 0.1}s` }}
               >
                 <div className="relative z-10 grid gap-8 lg:grid-cols-[0.9fr_1.1fr]">
@@ -94,12 +94,12 @@ export default function ServicesPage() {
                     <p className="font-mono text-[0.72rem] uppercase tracking-[0.24em] text-[var(--color-accent-text)]">
                       Service {service.label}
                     </p>
-                    <h2 className="mt-6 text-4xl font-semibold tracking-[-0.05em]">{service.title}</h2>
-                    <p className="mt-6 body-copy">{service.summary}</p>
+                    <h2 className="mt-4 text-2xl font-semibold tracking-[-0.03em]">{service.title}</h2>
+                    <p className="mt-4 body-copy">{service.summary}</p>
                   </div>
 
                   <div className="grid gap-5 md:grid-cols-[1fr_0.85fr]">
-                    <div className="rounded-[28px] border border-[var(--border-default)] bg-[var(--background-secondary)] p-6">
+                    <div className="rounded-[24px] border border-[var(--border-default)] bg-[var(--background-secondary)] p-6">
                       <p className="font-mono text-[0.68rem] uppercase tracking-[0.22em] text-[var(--text-muted)]">
                         What is included
                       </p>
@@ -116,7 +116,7 @@ export default function ServicesPage() {
                       </div>
                     </div>
 
-                    <div className="rounded-[28px] border border-[var(--border-default)] bg-[linear-gradient(180deg,rgba(82,167,255,0.14),transparent_46%),var(--background-secondary)] p-6">
+                    <div className="rounded-[24px] border border-[var(--border-default)] bg-[linear-gradient(180deg,rgba(82,167,255,0.14),transparent_46%),var(--background-secondary)] p-6">
                       <p className="font-mono text-[0.68rem] uppercase tracking-[0.22em] text-[var(--text-muted)]">
                         Deliverables
                       </p>
@@ -138,47 +138,47 @@ export default function ServicesPage() {
           </div>
         </section>
 
-        <section className="px-5 py-16 sm:px-8 md:py-20">
+        <section className="px-5 py-12 sm:px-8 md:py-16">
           <div className="mx-auto max-w-section">
-            <div className="mb-14 max-w-3xl animate-on-scroll">
+            <div className="mb-8 max-w-3xl animate-on-scroll">
               <span className="eyebrow">Process</span>
-              <h2 className="section-heading mt-8">合作流程很直接，但每一步都服务于最终落地结果。</h2>
+              <h2 className="section-heading mt-5">四步协作流程，每一步都产出可验证的交付物</h2>
             </div>
 
             <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
               {process.map((item, index) => (
                 <article
                   key={item.step}
-                  className="card animate-on-scroll rounded-[30px] p-7"
+                  className="card animate-on-scroll rounded-[28px] p-6"
                   style={{ transitionDelay: `${index * 0.1}s` }}
                 >
                   <p className="font-mono text-[0.72rem] uppercase tracking-[0.24em] text-[var(--color-accent-text)]">
                     {item.step}
                   </p>
-                  <h3 className="mt-6 text-2xl font-semibold tracking-[-0.04em]">{item.title}</h3>
-                  <p className="mt-5 body-copy">{item.description}</p>
+                  <h3 className="mt-4 text-xl font-semibold tracking-[-0.02em]">{item.title}</h3>
+                  <p className="mt-3 body-copy">{item.description}</p>
                 </article>
               ))}
             </div>
           </div>
         </section>
 
-        <section className="px-5 py-16 sm:px-8 md:py-20">
+        <section className="px-5 py-12 sm:px-8 md:py-16">
           <div className="mx-auto max-w-section">
-            <div className="mb-14 max-w-3xl animate-on-scroll">
+            <div className="mb-8 max-w-3xl animate-on-scroll">
               <span className="eyebrow">FAQ</span>
-              <h2 className="section-heading mt-8">合作前最常见的几个问题。</h2>
+              <h2 className="section-heading mt-5">合作前最常见的几个问题</h2>
             </div>
 
             <div className="grid gap-5">
               {faqs.map((item, index) => (
                 <article
                   key={item.q}
-                  className="surface-panel animate-on-scroll rounded-[30px] p-7"
+                  className="surface-panel animate-on-scroll rounded-[28px] p-6"
                   style={{ transitionDelay: `${index * 0.1}s` }}
                 >
                   <div className="relative z-10">
-                    <h3 className="text-2xl font-semibold tracking-[-0.04em]">{item.q}</h3>
+                    <h3 className="text-xl font-semibold tracking-[-0.02em]">{item.q}</h3>
                     <p className="mt-4 body-copy">{item.a}</p>
                   </div>
                 </article>
@@ -187,13 +187,13 @@ export default function ServicesPage() {
           </div>
         </section>
 
-        <section className="px-5 pb-16 sm:px-8 md:pb-20">
+        <section className="px-5 pb-12 sm:px-8 md:pb-16">
           <div className="mx-auto max-w-section">
-            <div className="surface-panel overflow-hidden rounded-[36px] p-8 md:p-12">
+            <div className="surface-panel overflow-hidden rounded-[28px] p-8 md:p-10">
               <div className="relative z-10 flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
                 <div className="max-w-3xl">
                   <span className="eyebrow">Next step</span>
-                  <h2 className="section-heading mt-8">如果你已经有 AI 项目方向，下一步就是把它真正做出来并上线。</h2>
+                  <h2 className="section-heading mt-5">有了 AI 项目方向？下一步就是把它变成可上线的成果</h2>
                 </div>
                 <Link href="/contact" className="btn-primary rounded-full px-8 py-3.5 text-sm font-semibold">
                   联系我开始合作
