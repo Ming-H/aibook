@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 
 export function Hero() {
   return (
@@ -36,7 +37,15 @@ export function Hero() {
       <div className="relative mx-auto max-w-section px-5 sm:px-8">
         <div className="max-w-3xl mx-auto text-center">
           {/* Badge */}
-          <div className="animate-fade-in-down mb-10">
+          <div className="animate-fade-in-down mb-10 flex items-center justify-center gap-3">
+            <Image
+              src="/avatar.png"
+              alt="DevFox AI"
+              width={36}
+              height={36}
+              className="rounded-full ring-2 ring-[var(--color-accent)]/20"
+              priority
+            />
             <span className="tag-brand tag text-xs px-3.5 py-1">
               <span className="mr-1.5 inline-block w-1.5 h-1.5 rounded-full bg-[var(--color-accent)] animate-pulse" />
               AI Engineering & Agent Development

@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 
 const footerLinks = {
   services: [
@@ -26,7 +27,8 @@ export function Footer() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-10 mb-14">
           {/* Brand */}
           <div className="col-span-2 md:col-span-1">
-            <Link href="/" className="text-[15px] font-bold tracking-tight text-[var(--text-primary)]">
+            <Link href="/" className="flex items-center gap-2 text-[15px] font-semibold tracking-tight text-[var(--text-primary)]">
+              <Image src="/avatar.png" alt="DevFox AI" width={24} height={24} className="rounded-full" />
               DevFox AI
             </Link>
             <p className="mt-4 text-sm text-[var(--text-tertiary)] leading-relaxed">

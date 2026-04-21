@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { ThemeToggle } from './ThemeToggle';
@@ -42,9 +43,17 @@ export function Navbar() {
         {/* Logo */}
         <Link
           href="/"
-          className="text-[15px] font-bold tracking-tight text-[var(--text-primary)] hover:text-[var(--color-accent-text)] transition-colors"
+          className="flex items-center gap-2.5 text-[15px] font-bold tracking-tight text-[var(--text-primary)] hover:text-[var(--color-accent-text)] transition-colors"
         >
-          DevFox AI
+          <Image
+            src="/avatar.png"
+            alt="DevFox AI"
+            width={32}
+            height={32}
+            className="rounded-full"
+            priority
+          />
+          <span>DevFox AI</span>
         </Link>
 
         {/* Desktop Nav */}
@@ -65,19 +74,6 @@ export function Navbar() {
               </Link>
             );
           })}
-
-          {/* AI Insights external link */}
-          <a
-            href="https://ming-h.github.io/ai-insights/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="ml-1 px-3.5 py-1.5 text-[13px] font-medium rounded-lg text-[var(--color-accent-text)] hover:bg-[var(--color-accent-soft)] transition-all duration-200 inline-flex items-center gap-1.5"
-          >
-            AI Insights
-            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
-            </svg>
-          </a>
 
           <div className="ml-1.5 pl-2 border-l border-[var(--border-subtle)]">
             <ThemeToggle />
@@ -125,17 +121,6 @@ export function Navbar() {
                 </Link>
               );
             })}
-            <a
-              href="https://ming-h.github.io/ai-insights/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-3 py-2.5 text-sm font-medium rounded-lg text-[var(--color-accent-text)] hover:bg-[var(--color-accent-soft)] transition-colors inline-flex items-center gap-1.5"
-            >
-              AI Insights
-              <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
-              </svg>
-            </a>
           </nav>
         </div>
       )}
