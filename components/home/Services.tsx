@@ -24,7 +24,7 @@ const services = [
   {
     index: '04',
     title: 'AI 咨询与方案评审',
-    description: '帮助企业或个人判断该怎么做 AI、先做什么、怎么选型，减少试错成本并提升落地效率。',
+    description: '帮助企业或个人判断怎么做 AI，减少试错成本，提升落地效率。',
     bullets: ['场景与需求梳理', '方案选型建议', '落地路径评审'],
   },
 ];
@@ -35,11 +35,10 @@ export function Services() {
       <div className="mx-auto max-w-section">
         <div className="mb-14 max-w-3xl animate-on-scroll">
           <span className="eyebrow">Capabilities</span>
-          <h2 className="section-heading mt-8">我交付的是 AI 项目，不是空泛的技术展示。</h2>
-              <p className="section-copy mt-5 max-w-2xl">
-                面向 to B 和 to C 场景，我更关注的是怎么把 AI Agent、自动化工作流和智能应用真正做出来，
-                并落到可用、可部署、可持续迭代的状态。
-              </p>
+          <h2 className="section-heading mt-8">交付 AI 项目，不做空泛展示。</h2>
+          <p className="section-copy mt-5 max-w-2xl">
+            面向企业与个人，重点是把 Agent、自动化工作流和智能应用做成可用成果。
+          </p>
         </div>
 
         <div className="grid gap-5 lg:grid-cols-2 xl:grid-cols-4">

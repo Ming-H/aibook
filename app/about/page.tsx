@@ -56,8 +56,7 @@ export default function AboutPage() {
                   className="section-copy mt-5 max-w-2xl animate-fade-in-up"
                   style={{ animationDelay: '0.15s', opacity: 0 }}
                 >
-                  DevFox AI 背后的工作方式，是把 Agent 系统、自动化流程、产品体验和业务目标放在一个统一框架里处理。
-                  这让项目不只是能跑，而且能被真正使用和交付。
+                  负责 AI 项目落地、Agent 系统和智能应用交付。
                 </p>
               </div>
 
@@ -111,7 +110,7 @@ export default function AboutPage() {
               <span className="eyebrow">Capability matrix</span>
               <h2 className="section-heading mt-8">我擅长把技术能力变成可交付的 AI 项目资产。</h2>
               <p className="section-copy mt-5 max-w-2xl">
-                技术栈对我来说不是标签墙，而是支撑交付的工具集合。真正重要的是它们如何共同服务于项目结果。
+                技术栈只是工具，关键是结果。
               </p>
             </div>
 

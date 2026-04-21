@@ -75,8 +75,7 @@ export default function ServicesPage() {
                 className="section-copy mt-5 max-w-2xl animate-fade-in-up"
                 style={{ animationDelay: '0.15s', opacity: 0 }}
               >
-                面向企业和个人，我更关注 AI Agent、自动化工作流和智能应用怎么真正落到业务和使用场景里，
-                而不是停在 PPT 或 Demo 阶段。
+                面向企业和个人，提供 AI Agent、自动化工作流与智能应用落地。
               </p>
             </div>
           </div>

@@ -45,15 +45,14 @@ export function Hero() {
             帮助企业和个人
             <span className="gradient-text-animated"> 落地 AI Agent</span>
             <br />
-            与实际可用的 AI 应用
+            与可用的 AI 应用
           </h1>
 
           <p
             className="section-copy mt-5 max-w-2xl animate-fade-in-up"
             style={{ animationDelay: '0.15s', opacity: 0 }}
           >
-            DevFox AI 聚焦 AI 项目落地交付，面向 to B 和 to C 场景，
-            帮助客户完成 Agent 系统、自动化工作流、知识检索和智能应用的设计、开发与上线。
+            聚焦 AI 项目落地交付，面向企业与个人，覆盖 Agent、自动化工作流与智能应用。
           </p>
 
           <div
@@ -137,7 +136,7 @@ export function Hero() {
                       Agent systems
                     </p>
                     <p className="mt-2 text-sm text-[var(--text-secondary)]">
-                      多 Agent 编排、知识检索、自动化执行与业务集成。
+                      Agent 编排、知识检索、自动化执行与业务集成。
                     </p>
                   </div>
                   <div className="rounded-[22px] border border-[var(--border-default)] bg-[var(--background-secondary)] p-4">
@@ -148,7 +147,7 @@ export function Hero() {
                       Real deployment
                     </p>
                     <p className="mt-2 text-sm text-[var(--text-secondary)]">
-                      从需求梳理到交付上线，形成真正可用的 AI 项目成果。
+                      从需求到上线，交付可用的 AI 项目成果。
                     </p>
                   </div>
                 </div>
@@ -181,7 +180,7 @@ export function Hero() {
                     What changes now
                   </p>
                   <p className="mt-3 text-sm leading-7 text-[var(--text-secondary)]">
-                    交付从“会用模型”升级为“能把 AI 项目真正落地并交付出去”。
+                    目标是把 AI 项目直接做成可用成果。
                   </p>
                 </div>
               </div>

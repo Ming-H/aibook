@@ -46,7 +46,7 @@ export default function ContactPage() {
               className="section-copy mt-5 max-w-2xl animate-fade-in-up"
               style={{ animationDelay: '0.15s', opacity: 0 }}
             >
-              无论你是想做 AI Agent、自动化工作流，还是推进一个更完整的智能应用，我都建议先把需求和目标讲清楚。
+              如果你要推进 AI 项目落地，可以直接联系我。
             </p>
 
             <div
@@ -93,9 +93,7 @@ export default function ContactPage() {
                 Project inquiry
               </p>
               <h2 className="mt-4 text-2xl font-semibold tracking-[-0.05em]">发一条更明确的合作信息</h2>
-              <p className="mt-4 body-copy">
-                建议直接说明你的项目类型、希望完成的目标、当前阶段，以及你最想先解决的问题。
-              </p>
+              <p className="mt-4 body-copy">说明项目类型、目标和当前阶段即可。</p>
 
               {submitted ? (
                 <div className="mt-10 rounded-[28px] border border-[var(--border-brand)] bg-[var(--color-accent-soft)] p-8 text-center">

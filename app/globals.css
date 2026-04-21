@@ -84,14 +84,14 @@
 
   .section-copy {
     color: var(--text-secondary);
-    font-size: clamp(0.88rem, 1vw, 0.96rem);
-    line-height: 1.68;
+    font-size: clamp(0.84rem, 0.95vw, 0.92rem);
+    line-height: 1.62;
   }
 
   .body-copy {
     color: var(--text-secondary);
-    font-size: 0.88rem;
-    line-height: 1.68;
+    font-size: 0.82rem;
+    line-height: 1.6;
   }
 
   .surface-panel {

@@ -18,8 +18,7 @@ export function CTA() {
                 或 AI 应用落地，现在就可以开始。
               </h2>
               <p className="section-copy mt-6 max-w-2xl">
-                无论是企业内部流程自动化、面向客户的智能产品，还是个人项目的 Agent 化落地，
-                都可以先把需求讲清楚，再一起推进交付。
+                企业与个人的 AI Agent、自动化和智能应用，都可以直接推进落地。
               </p>
             </div>
 

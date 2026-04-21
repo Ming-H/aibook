@@ -38,7 +38,7 @@ export function Cases() {
             <span className="eyebrow">Selected work</span>
             <h2 className="section-heading mt-8">项目展示必须像产品，而不是像简历附件。</h2>
             <p className="section-copy mt-6 max-w-2xl">
-              我把案例从单纯的“技术栈罗列”改成更有说服力的结构：场景、系统设计、关键机制和结果信号一并呈现。
+              用场景、架构和结果说明每个项目的落地能力。
             </p>
           </div>
 
@@ -89,9 +89,7 @@ export function Cases() {
                   <p className="font-mono text-[0.68rem] uppercase tracking-[0.22em] text-[var(--color-accent-text)]">
                     Key engineering lens
                   </p>
-                  <p className="mt-3 body-copy">
-                    通过因果推断和模型分层，把运营动作从经验驱动升级为具备决策逻辑的增长系统。
-                  </p>
+                  <p className="mt-3 body-copy">通过因果推断和模型分层，提升增长决策质量。</p>
                   <div className="mt-5 flex flex-wrap gap-2">
                     {cases[0].stack.map((item) => (
                       <span
@@ -137,9 +135,7 @@ export function Cases() {
 
                 <div className="mt-6 border-t border-[var(--border-subtle)] pt-5">
                   <p className="text-xs uppercase tracking-[0.2em] text-[var(--text-muted)]">Stack</p>
-                  <p className="mt-3 body-copy">
-                    {item.stack.join(' / ')}
-                  </p>
+                  <p className="mt-3 body-copy">{item.stack.join(' / ')}</p>
                 </div>
               </article>
             ))}

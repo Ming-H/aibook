@@ -69,7 +69,7 @@ export default function CasesPage() {
                 className="section-copy mt-5 max-w-2xl animate-fade-in-up"
                 style={{ animationDelay: '0.15s', opacity: 0 }}
               >
-                我把每个项目都按照更接近交付说明的方式来组织：场景、系统机制、关键亮点和架构表达都放进同一套版式里。
+                以场景、架构和结果展示 AI 项目落地能力。
               </p>
             </div>
           </div>
