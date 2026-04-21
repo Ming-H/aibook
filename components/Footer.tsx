@@ -18,25 +18,28 @@ const footerLinks = {
 
 export function Footer() {
   return (
-    <footer className="border-t border-[var(--border-default)] bg-[var(--background-primary)]">
-      <div className="mx-auto max-w-nav px-5 sm:px-8 py-12 md:py-16">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
+    <footer className="bg-[var(--background-primary)]">
+      {/* Gradient top border */}
+      <div className="divider-gradient" />
+
+      <div className="mx-auto max-w-nav px-5 sm:px-8 py-14 md:py-20">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-10 mb-14">
           {/* Brand */}
           <div className="col-span-2 md:col-span-1">
-            <Link href="/" className="text-[15px] font-semibold tracking-tight text-[var(--text-primary)]">
+            <Link href="/" className="text-[15px] font-bold tracking-tight text-[var(--text-primary)]">
               DevFox AI
             </Link>
-            <p className="mt-3 text-sm text-[var(--text-tertiary)] leading-relaxed">
+            <p className="mt-4 text-sm text-[var(--text-tertiary)] leading-relaxed">
               用 AI 重新定义业务效率
             </p>
           </div>
 
           {/* Services */}
           <div>
-            <h3 className="text-xs font-semibold text-[var(--text-tertiary)] uppercase tracking-wider mb-3">
+            <h3 className="text-[0.7rem] font-semibold text-[var(--text-muted)] uppercase tracking-[0.15em] mb-4">
               服务
             </h3>
-            <ul className="space-y-2">
+            <ul className="space-y-3">
               {footerLinks.services.map((link) => (
                 <li key={link.label}>
                   <Link
@@ -52,10 +55,10 @@ export function Footer() {
 
           {/* Company */}
           <div>
-            <h3 className="text-xs font-semibold text-[var(--text-tertiary)] uppercase tracking-wider mb-3">
+            <h3 className="text-[0.7rem] font-semibold text-[var(--text-muted)] uppercase tracking-[0.15em] mb-4">
               导航
             </h3>
-            <ul className="space-y-2">
+            <ul className="space-y-3">
               {footerLinks.company.map((link) => (
                 <li key={link.label}>
                   <Link
@@ -71,17 +74,17 @@ export function Footer() {
 
           {/* Resources */}
           <div>
-            <h3 className="text-xs font-semibold text-[var(--text-tertiary)] uppercase tracking-wider mb-3">
+            <h3 className="text-[0.7rem] font-semibold text-[var(--text-muted)] uppercase tracking-[0.15em] mb-4">
               资源
             </h3>
-            <ul className="space-y-2">
+            <ul className="space-y-3">
               {footerLinks.resources.map((link) => (
                 <li key={link.label}>
                   <a
                     href={link.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-sm text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] transition-colors inline-flex items-center gap-1"
+                    className="text-sm text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] transition-colors inline-flex items-center gap-1.5"
                   >
                     {link.label}
                     <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -95,7 +98,7 @@ export function Footer() {
         </div>
 
         {/* Bottom bar */}
-        <div className="pt-8 border-t border-[var(--border-subtle)] flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="pt-10 border-t border-[var(--border-subtle)] flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-xs text-[var(--text-muted)]">
             &copy; {new Date().getFullYear()} DevFox AI. All rights reserved.
           </p>

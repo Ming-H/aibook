@@ -9,23 +9,30 @@ const stats = [
 
 export function Stats() {
   return (
-    <section className="py-16 md:py-20">
+    <section className="py-20 md:py-24">
       <div className="mx-auto max-w-section px-5 sm:px-8">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-6">
+        <div className="relative">
+          {/* Top separator */}
+          <div className="section-separator mb-20 md:mb-24" />
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-10 md:gap-8">
           {stats.map((stat, i) => (
             <div
               key={stat.label}
               className="text-center animate-on-scroll"
               style={{ transitionDelay: `${i * 0.1}s` }}
             >
-              <div className="text-3xl md:text-4xl font-bold tracking-tight mb-2">
+              <div className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-[-0.04em] mb-3 leading-none">
                 <span className="gradient-text">{stat.value}</span>
               </div>
-              <div className="text-sm text-[var(--text-tertiary)]">
+              <div className="text-sm text-[var(--text-tertiary)] font-medium tracking-wide">
                 {stat.label}
               </div>
             </div>
           ))}
+        </div>
+        <div className="relative mt-20 md:mt-24">
+          <div className="section-separator" />
         </div>
       </div>
     </section>

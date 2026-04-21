@@ -1,6 +1,6 @@
 /**
- * DevFox AI - Professional Animation System
- * Clean, purposeful animations inspired by Linear/Vercel
+ * DevFox AI — Refined Animation System
+ * Purposeful motion inspired by Linear/Vercel/Stripe
  */
 
 /* ==================== Keyframes ==================== */
@@ -13,7 +13,7 @@
 @keyframes fadeInUp {
   from {
     opacity: 0;
-    transform: translateY(24px);
+    transform: translateY(30px);
   }
   to {
     opacity: 1;
@@ -24,7 +24,7 @@
 @keyframes fadeInDown {
   from {
     opacity: 0;
-    transform: translateY(-16px);
+    transform: translateY(-20px);
   }
   to {
     opacity: 1;
@@ -35,7 +35,7 @@
 @keyframes scaleIn {
   from {
     opacity: 0;
-    transform: scale(0.96);
+    transform: scale(0.94);
   }
   to {
     opacity: 1;
@@ -57,24 +57,71 @@
     transform: translateY(0);
   }
   50% {
-    transform: translateY(-6px);
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+@keyframes orbFloat {
+  0%, 100% {
+    transform: translate(-50%, -50%) scale(1);
+  }
+  33% {
+    transform: translate(-50%, -52%) scale(1.05);
+  }
+  66% {
+    transform: translate(-50%, -48%) scale(0.95);
+  }
+}
+
+@keyframes textReveal {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+    filter: blur(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
   }
 }
 
 /* ==================== Utility Classes ==================== */
 
-.animate-fade-in { animation: fadeIn 0.4s ease forwards; }
-.animate-fade-in-up { animation: fadeInUp 0.6s ease forwards; }
-.animate-fade-in-down { animation: fadeInDown 0.5s ease forwards; }
-.animate-scale-in { animation: scaleIn 0.4s ease forwards; }
+.animate-fade-in { animation: fadeIn 0.5s ease forwards; }
+.animate-fade-in-up { animation: fadeInUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+.animate-fade-in-down { animation: fadeInDown 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+.animate-scale-in { animation: scaleIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
 .animate-float { animation: float 6s ease-in-out infinite; }
+
+.animate-text-reveal {
+  animation: textReveal 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
 
 /* ==================== Scroll-triggered Animations ==================== */
 
 .animate-on-scroll {
   opacity: 0;
-  transform: translateY(24px);
-  transition: opacity 0.6s ease, transform 0.6s ease;
+  transform: translateY(30px);
+  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .animate-on-scroll.is-visible {
@@ -83,27 +130,38 @@
 }
 
 /* Staggered delays for child elements */
-.stagger-1 { transition-delay: 0.1s; }
-.stagger-2 { transition-delay: 0.2s; }
-.stagger-3 { transition-delay: 0.3s; }
-.stagger-4 { transition-delay: 0.4s; }
+.stagger-1 { transition-delay: 0.08s; }
+.stagger-2 { transition-delay: 0.16s; }
+.stagger-3 { transition-delay: 0.24s; }
+.stagger-4 { transition-delay: 0.32s; }
+.stagger-5 { transition-delay: 0.40s; }
 
 /* ==================== Gradient Animation ==================== */
 
 .gradient-text {
-  background: linear-gradient(135deg, var(--color-gradient-start), var(--color-gradient-end));
+  background: linear-gradient(135deg, var(--color-gradient-start), var(--color-gradient-mid), var(--color-gradient-end));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  background-size: 200% auto;
+}
+
+.gradient-text-animated {
+  background: linear-gradient(135deg, var(--color-gradient-start), var(--color-gradient-mid), var(--color-gradient-end), var(--color-gradient-mid), var(--color-gradient-start));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  background-size: 300% auto;
+  animation: gradientShift 6s ease infinite;
 }
 
 .gradient-bg {
-  background: linear-gradient(135deg, var(--color-gradient-start), var(--color-gradient-end));
+  background: linear-gradient(135deg, var(--color-gradient-start), var(--color-gradient-mid));
 }
 
 .gradient-bg-animated {
-  background: linear-gradient(135deg, var(--color-gradient-start), var(--color-gradient-end), var(--color-gradient-start));
-  background-size: 200% 200%;
+  background: linear-gradient(135deg, var(--color-gradient-start), var(--color-gradient-mid), var(--color-gradient-end), var(--color-gradient-start));
+  background-size: 300% 300%;
   animation: gradientShift 8s ease infinite;
 }
 
@@ -113,19 +171,55 @@
   background-image:
     linear-gradient(var(--border-subtle) 1px, transparent 1px),
     linear-gradient(90deg, var(--border-subtle) 1px, transparent 1px);
-  background-size: 64px 64px;
+  background-size: 80px 80px;
+}
+
+.grid-pattern-fine {
+  background-image:
+    radial-gradient(circle, var(--border-medium) 1px, transparent 1px);
+  background-size: 32px 32px;
 }
 
 /* ==================== Glassmorphism ==================== */
 
 .glass {
   background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   border: 1px solid var(--border-default);
 }
 
 .light .glass {
   background: rgba(255, 255, 255, 0.7);
   border: 1px solid var(--border-default);
+}
+
+/* ==================== Shimmer Effect ==================== */
+
+.shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+.shimmer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.04) 50%,
+    transparent 100%
+  );
+  animation: shimmer 3s ease-in-out infinite;
+}
+
+/* ==================== Orb Glow ==================== */
+
+.orb {
+  animation: orbFloat 8s ease-in-out infinite;
+}
+
+.orb-pulse {
+  animation: pulseGlow 4s ease-in-out infinite;
 }

@@ -18,7 +18,7 @@ export function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 16);
+    const handleScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
@@ -32,34 +32,33 @@ export function Navbar() {
 
   return (
     <header
-      className={`sticky top-0 z-50 w-full transition-all duration-200 ${
+      className={`sticky top-0 z-50 w-full transition-all duration-300 ${
         scrolled
-          ? 'bg-[var(--background-primary)]/90 backdrop-blur-md'
+          ? 'bg-[var(--background-primary)]/80 backdrop-blur-xl border-b border-[var(--border-subtle)]'
           : 'bg-transparent'
       }`}
-      style={scrolled ? { boxShadow: '0px 0px 0px 1px var(--border-default)' } : undefined}
     >
-      <div className="mx-auto flex max-w-nav items-center justify-between px-5 sm:px-8 h-14">
+      <div className="mx-auto flex max-w-nav items-center justify-between px-5 sm:px-8 h-16">
         {/* Logo */}
         <Link
           href="/"
-          className="text-[15px] font-semibold tracking-tight text-[var(--text-primary)] hover:text-[var(--color-accent-text)] transition-colors"
+          className="text-[15px] font-bold tracking-tight text-[var(--text-primary)] hover:text-[var(--color-accent-text)] transition-colors"
         >
           DevFox AI
         </Link>
 
         {/* Desktop Nav */}
-        <nav className="hidden md:flex items-center gap-1">
+        <nav className="hidden md:flex items-center gap-0.5">
           {navItems.map((item) => {
             const active = isActive(item.href);
             return (
               <Link
                 key={item.href}
                 href={item.href}
-                className={`px-3 py-1.5 text-[13px] font-medium rounded-lg transition-colors ${
+                className={`px-3.5 py-1.5 text-[13px] font-medium rounded-lg transition-all duration-200 ${
                   active
                     ? 'text-[var(--text-primary)] bg-[var(--background-secondary)]'
-                    : 'text-[var(--text-tertiary)] hover:text-[var(--text-secondary)]'
+                    : 'text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] hover:bg-[var(--background-secondary)]'
                 }`}
               >
                 {item.label}
@@ -72,7 +71,7 @@ export function Navbar() {
             href="https://ming-h.github.io/ai-insights/"
             target="_blank"
             rel="noopener noreferrer"
-            className="ml-2 px-3 py-1.5 text-[13px] font-medium rounded-lg text-[var(--color-accent-text)] hover:bg-[var(--color-accent-soft)] transition-colors inline-flex items-center gap-1"
+            className="ml-1 px-3.5 py-1.5 text-[13px] font-medium rounded-lg text-[var(--color-accent-text)] hover:bg-[var(--color-accent-soft)] transition-all duration-200 inline-flex items-center gap-1.5"
           >
             AI Insights
             <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -80,7 +79,7 @@ export function Navbar() {
             </svg>
           </a>
 
-          <div className="ml-2">
+          <div className="ml-1.5 pl-2 border-l border-[var(--border-subtle)]">
             <ThemeToggle />
           </div>
         </nav>
@@ -108,18 +107,18 @@ export function Navbar() {
 
       {/* Mobile menu */}
       {mobileOpen && (
-        <div className="md:hidden border-t border-[var(--border-default)] bg-[var(--background-primary)] pb-4">
-          <nav className="flex flex-col px-5 pt-3 gap-1">
+        <div className="md:hidden border-t border-[var(--border-subtle)] bg-[var(--background-primary)]/95 backdrop-blur-xl pb-4">
+          <nav className="flex flex-col px-5 pt-3 gap-0.5">
             {navItems.map((item) => {
               const active = isActive(item.href);
               return (
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
+                  className={`px-3 py-2.5 text-sm font-medium rounded-lg transition-colors ${
                     active
                       ? 'text-[var(--text-primary)] bg-[var(--background-secondary)]'
-                      : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+                      : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--background-secondary)]'
                   }`}
                 >
                   {item.label}
@@ -130,7 +129,7 @@ export function Navbar() {
               href="https://ming-h.github.io/ai-insights/"
               target="_blank"
               rel="noopener noreferrer"
-              className="px-3 py-2 text-sm font-medium rounded-lg text-[var(--color-accent-text)] hover:bg-[var(--color-accent-soft)] transition-colors inline-flex items-center gap-1"
+              className="px-3 py-2.5 text-sm font-medium rounded-lg text-[var(--color-accent-text)] hover:bg-[var(--color-accent-soft)] transition-colors inline-flex items-center gap-1.5"
             >
               AI Insights
               <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

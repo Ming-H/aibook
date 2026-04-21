@@ -22,7 +22,7 @@ const cases = [
     techStack: ['LangGraph', 'LangChain', 'OpenAI', 'FastAPI'],
     category: 'Multi-Agent',
   },
-{
+  {
     id: 'content-forge',
     name: 'ContentForge AI',
     tagline: 'AI 内容自动化生产线',
@@ -38,59 +38,59 @@ function CaseCard({ caseItem, index }: { caseItem: typeof cases[0]; index: numbe
 
   return (
     <div
-      className="card p-6 md:p-8 flex flex-col animate-on-scroll"
-      style={{ transitionDelay: `${index * 0.1}s` }}
+      className="card p-7 md:p-9 flex flex-col animate-on-scroll"
+      style={{ transitionDelay: `${index * 0.12}s` }}
     >
       {/* Header */}
-      <div className="flex items-start justify-between gap-3 mb-4">
+      <div className="flex items-start justify-between gap-3 mb-5">
         <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="tag text-xs">{caseItem.category}</span>
+          <div className="flex items-center gap-2 mb-2">
+            <span className="tag text-[0.65rem]">{caseItem.category}</span>
           </div>
-          <h3 className="text-lg font-semibold">{caseItem.name}</h3>
+          <h3 className="text-xl font-bold tracking-[-0.02em]">{caseItem.name}</h3>
         </div>
       </div>
 
       {/* Tagline */}
-      <p className="text-sm text-[var(--text-secondary)] mb-4">
+      <p className="text-sm text-[var(--text-secondary)] mb-5 leading-relaxed">
         {caseItem.tagline}
       </p>
 
       {/* Description (expandable) */}
-      <div className={`overflow-hidden transition-all duration-300 ${expanded ? 'max-h-40' : 'max-h-0'}`}>
-        <p className="text-sm text-[var(--text-tertiary)] leading-relaxed mb-4">
+      <div className={`overflow-hidden transition-all duration-500 ease-out ${expanded ? 'max-h-48 opacity-100' : 'max-h-0 opacity-0'}`}>
+        <p className="text-sm text-[var(--text-tertiary)] leading-relaxed mb-5">
           {caseItem.description}
         </p>
       </div>
 
       {/* Highlights */}
-      <div className="grid grid-cols-2 gap-2 mb-4">
+      <div className="grid grid-cols-2 gap-3 mb-5">
         {caseItem.highlights.map((h) => (
-          <div key={h} className="flex items-center gap-2 text-xs text-[var(--text-secondary)]">
-            <span className="w-1 h-1 rounded-full bg-[var(--color-accent)] flex-shrink-0" />
+          <div key={h} className="flex items-center gap-2.5 text-xs text-[var(--text-secondary)]">
+            <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-accent)] flex-shrink-0 opacity-70" />
             {h}
           </div>
         ))}
       </div>
 
       {/* Tech stack */}
-      <div className="flex flex-wrap gap-1.5 mb-4 mt-auto">
+      <div className="flex flex-wrap gap-1.5 mb-5 mt-auto">
         {caseItem.techStack.map((tech) => (
-          <span key={tech} className="tag text-xs">{tech}</span>
+          <span key={tech} className="tag text-[0.65rem]">{tech}</span>
         ))}
       </div>
 
       {/* Actions */}
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-5 pt-2">
         <button
           onClick={() => setExpanded(!expanded)}
-          className="text-xs font-medium text-[var(--color-accent-text)] hover:underline transition-colors"
+          className="text-xs font-medium text-[var(--color-accent-text)] hover:text-[var(--color-accent-hover)] transition-colors"
         >
           {expanded ? '收起' : '展开详情'}
         </button>
         <Link
           href="/cases"
-          className="text-xs font-medium text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] transition-colors"
+          className="text-xs font-medium text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition-colors"
         >
           查看完整案例 →
         </Link>
@@ -101,14 +101,15 @@ function CaseCard({ caseItem, index }: { caseItem: typeof cases[0]; index: numbe
 
 export function Cases() {
   return (
-    <section className="py-24 md:py-32 bg-[var(--background-secondary)]">
+    <section className="py-24 md:py-36 bg-[var(--background-secondary)]">
       <div className="mx-auto max-w-section px-5 sm:px-8">
         {/* Section header */}
-        <div className="text-center mb-16 animate-on-scroll">
-          <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">
+        <div className="text-center mb-20 animate-on-scroll">
+          <p className="text-sm font-medium text-[var(--color-accent-text)] tracking-widest uppercase mb-4">Cases</p>
+          <h2 className="text-4xl md:text-5xl font-extrabold tracking-[-0.03em] mb-5">
             精选案例
           </h2>
-          <p className="text-lg text-[var(--text-secondary)] max-w-2xl mx-auto">
+          <p className="text-lg text-[var(--text-secondary)] max-w-2xl mx-auto leading-relaxed">
             每个项目都经过深思熟虑的设计和严谨的工程实现
           </p>
         </div>
@@ -121,10 +122,10 @@ export function Cases() {
         </div>
 
         {/* View all link */}
-        <div className="text-center mt-12 animate-on-scroll">
+        <div className="text-center mt-14 animate-on-scroll">
           <Link
             href="/cases"
-            className="btn-secondary inline-flex items-center gap-2"
+            className="btn-secondary inline-flex items-center gap-2 px-8 py-3 rounded-xl"
           >
             查看所有案例
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

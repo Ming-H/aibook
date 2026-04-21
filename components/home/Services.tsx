@@ -5,7 +5,7 @@ import Link from 'next/link';
 const services = [
   {
     icon: (
-      <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+      <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 00-2.455 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z" />
       </svg>
     ),
@@ -22,7 +22,7 @@ const services = [
   },
   {
     icon: (
-      <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+      <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M4.26 10.147a60.436 60.436 0 00-.491 6.347A48.627 48.627 0 0112 20.904a48.627 48.627 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.697 50.697 0 0112 13.489a50.702 50.702 0 017.74-3.342M6.75 15a.75.75 0 100-1.5.75.75 0 000 1.5zm0 0v-3.675A55.378 55.378 0 0112 8.443m-7.007 11.55A5.981 5.981 0 006.75 15.75v-1.5" />
       </svg>
     ),
@@ -41,14 +41,15 @@ const services = [
 
 export function Services() {
   return (
-    <section className="py-24 md:py-32">
+    <section className="py-24 md:py-36">
       <div className="mx-auto max-w-section px-5 sm:px-8">
         {/* Section header */}
-        <div className="text-center mb-16 animate-on-scroll">
-          <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">
+        <div className="text-center mb-20 animate-on-scroll">
+          <p className="text-sm font-medium text-[var(--color-accent-text)] tracking-widest uppercase mb-4">Services</p>
+          <h2 className="text-4xl md:text-5xl font-extrabold tracking-[-0.03em] mb-5">
             核心服务
           </h2>
-          <p className="text-lg text-[var(--text-secondary)] max-w-2xl mx-auto">
+          <p className="text-lg text-[var(--text-secondary)] max-w-2xl mx-auto leading-relaxed">
             专注 AI 应用落地，提供从战略到交付的完整解决方案
           </p>
         </div>
@@ -59,29 +60,29 @@ export function Services() {
             <Link
               key={service.title}
               href={service.href}
-              className="card group p-8 flex flex-col animate-on-scroll"
+              className="card group p-8 md:p-10 flex flex-col animate-on-scroll"
               style={{ transitionDelay: `${i * 0.15}s` }}
             >
               {/* Icon */}
-              <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-6 text-[var(--color-accent-text)] bg-[var(--color-accent-soft)]">
+              <div className="w-14 h-14 rounded-2xl flex items-center justify-center mb-7 text-[var(--color-accent-text)] bg-[var(--color-accent-soft)] border border-[var(--border-brand)] transition-all group-hover:shadow-[var(--shadow-brand)] group-hover:border-[var(--color-accent)]">
                 {service.icon}
               </div>
 
               {/* Title */}
-              <h3 className="text-xl font-semibold mb-3 group-hover:text-[var(--color-accent-text)] transition-colors">
+              <h3 className="text-xl md:text-2xl font-bold mb-3 group-hover:text-[var(--color-accent-text)] transition-colors tracking-[-0.02em]">
                 {service.title}
               </h3>
 
               {/* Description */}
-              <p className="text-[var(--text-secondary)] text-base leading-relaxed mb-6">
+              <p className="text-[var(--text-secondary)] text-base leading-relaxed mb-8">
                 {service.description}
               </p>
 
               {/* Capabilities */}
-              <ul className="space-y-3 mt-auto">
+              <ul className="space-y-3.5 mt-auto">
                 {service.capabilities.map((cap) => (
                   <li key={cap} className="flex items-start gap-3 text-sm text-[var(--text-secondary)]">
-                    <svg className="w-4 h-4 mt-0.5 flex-shrink-0 text-[var(--color-accent)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <svg className="w-4 h-4 mt-0.5 flex-shrink-0 text-[var(--color-accent)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                     </svg>
                     {cap}
@@ -90,9 +91,9 @@ export function Services() {
               </ul>
 
               {/* Arrow */}
-              <div className="mt-6 flex items-center text-sm font-medium text-[var(--text-tertiary)] group-hover:text-[var(--color-accent-text)] transition-colors">
+              <div className="mt-8 flex items-center text-sm font-medium text-[var(--text-muted)] group-hover:text-[var(--color-accent-text)] transition-colors">
                 了解更多
-                <svg className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <svg className="w-4 h-4 ml-1.5 group-hover:translate-x-1.5 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
                 </svg>
               </div>

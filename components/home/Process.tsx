@@ -45,47 +45,50 @@ const steps = [
 
 export function Process() {
   return (
-    <section className="py-24 md:py-32">
+    <section className="py-24 md:py-36">
       <div className="mx-auto max-w-section px-5 sm:px-8">
         {/* Section header */}
-        <div className="text-center mb-16 animate-on-scroll">
-          <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">
+        <div className="text-center mb-20 animate-on-scroll">
+          <p className="text-sm font-medium text-[var(--color-accent-text)] tracking-widest uppercase mb-4">Process</p>
+          <h2 className="text-4xl md:text-5xl font-extrabold tracking-[-0.03em] mb-5">
             合作流程
           </h2>
-          <p className="text-lg text-[var(--text-secondary)] max-w-2xl mx-auto">
+          <p className="text-lg text-[var(--text-secondary)] max-w-2xl mx-auto leading-relaxed">
             清晰透明的工作方式，确保每个项目高效推进
           </p>
         </div>
 
         {/* Steps */}
-        <div className="grid md:grid-cols-4 gap-8">
+        <div className="grid md:grid-cols-4 gap-10 md:gap-6">
           {steps.map((step, i) => (
             <div
               key={step.step}
               className="relative animate-on-scroll"
-              style={{ transitionDelay: `${i * 0.15}s` }}
+              style={{ transitionDelay: `${i * 0.12}s` }}
             >
               {/* Connector line */}
               {i < steps.length - 1 && (
-                <div className="hidden md:block absolute top-8 left-[calc(50%+32px)] w-[calc(100%-64px)] h-px bg-[var(--border-default)]" />
+                <div className="hidden md:block absolute top-9 left-[calc(50%+36px)] w-[calc(100%-72px)] h-px">
+                  <div className="w-full h-full bg-gradient-to-r from-[var(--border-medium)] to-transparent" />
+                </div>
               )}
 
               <div className="text-center">
                 {/* Icon circle */}
-                <div className="w-16 h-16 rounded-2xl mx-auto mb-5 flex items-center justify-center bg-[var(--background-secondary)] border border-[var(--border-default)] text-[var(--color-accent-text)]">
+                <div className="w-[72px] h-[72px] rounded-2xl mx-auto mb-6 flex items-center justify-center bg-[var(--background-secondary)] border border-[var(--border-default)] text-[var(--color-accent-text)] transition-all hover:border-[var(--border-brand)] hover:shadow-[var(--shadow-brand)]">
                   {step.icon}
                 </div>
 
                 {/* Step number */}
-                <div className="text-xs font-mono text-[var(--text-tertiary)] mb-2">
-                  STEP {step.step}
+                <div className="text-[0.65rem] font-mono text-[var(--text-muted)] tracking-[0.2em] uppercase mb-2.5">
+                  Step {step.step}
                 </div>
 
                 {/* Title */}
-                <h3 className="text-lg font-semibold mb-2">{step.title}</h3>
+                <h3 className="text-lg font-bold mb-2.5 tracking-[-0.02em]">{step.title}</h3>
 
                 {/* Description */}
-                <p className="text-sm text-[var(--text-secondary)] leading-relaxed">
+                <p className="text-sm text-[var(--text-tertiary)] leading-relaxed">
                   {step.description}
                 </p>
               </div>
