@@ -32,7 +32,7 @@ export default function ContactPage() {
   }
 
   return (
-    <div className="page-shell px-5 pb-24 pt-24 sm:px-8 md:pb-32 md:pt-28">
+    <div className="page-shell px-5 pb-16 pt-16 sm:px-8 md:pb-20 md:pt-20">
       <div className="mx-auto max-w-section">
         <div className="grid gap-8 xl:grid-cols-[0.88fr_1.12fr]">
           <section className="max-w-3xl">
@@ -43,14 +43,14 @@ export default function ContactPage() {
               现在就可以开始联系。
             </h1>
             <p
-              className="section-copy mt-8 max-w-2xl animate-fade-in-up"
+              className="section-copy mt-5 max-w-2xl animate-fade-in-up"
               style={{ animationDelay: '0.15s', opacity: 0 }}
             >
               无论你是想做 AI Agent、自动化工作流，还是推进一个更完整的智能应用，我都建议先把需求和目标讲清楚。
             </p>
 
             <div
-              className="mt-10 grid gap-4 animate-fade-in-up"
+              className="mt-8 grid gap-4 animate-fade-in-up"
               style={{ animationDelay: '0.3s', opacity: 0 }}
             >
               {contactCards.map((item) => (
@@ -92,7 +92,7 @@ export default function ContactPage() {
               <p className="font-mono text-[0.68rem] uppercase tracking-[0.24em] text-[var(--color-accent-text)]">
                 Project inquiry
               </p>
-              <h2 className="mt-4 text-3xl font-semibold tracking-[-0.05em]">发一条更明确的合作信息</h2>
+              <h2 className="mt-4 text-2xl font-semibold tracking-[-0.05em]">发一条更明确的合作信息</h2>
               <p className="mt-4 body-copy">
                 建议直接说明你的项目类型、希望完成的目标、当前阶段，以及你最想先解决的问题。
               </p>

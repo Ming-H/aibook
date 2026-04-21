@@ -56,7 +56,7 @@ export default function CasesPage() {
   return (
     <div className="page-shell">
       <ScrollAnimator>
-        <section className="px-5 pb-16 pt-24 sm:px-8 md:pb-24 md:pt-28">
+        <section className="px-5 pb-14 pt-16 sm:px-8 md:pb-20 md:pt-20">
           <div className="mx-auto max-w-section">
             <div className="max-w-3xl">
               <span className="eyebrow animate-fade-in-down">Selected work</span>
@@ -66,7 +66,7 @@ export default function CasesPage() {
                 而是“为什么这件事能真正落地”。
               </h1>
               <p
-                className="section-copy mt-8 max-w-2xl animate-fade-in-up"
+                className="section-copy mt-5 max-w-2xl animate-fade-in-up"
                 style={{ animationDelay: '0.15s', opacity: 0 }}
               >
                 我把每个项目都按照更接近交付说明的方式来组织：场景、系统机制、关键亮点和架构表达都放进同一套版式里。
@@ -75,7 +75,7 @@ export default function CasesPage() {
           </div>
         </section>
 
-        <section className="px-5 py-8 sm:px-8 md:py-12">
+        <section className="px-5 py-6 sm:px-8 md:py-8">
           <div className="mx-auto max-w-section grid gap-6">
             {cases.map((item, index) => (
               <article
@@ -137,7 +137,7 @@ export default function CasesPage() {
           </div>
         </section>
 
-        <section className="px-5 pb-24 pt-24 sm:px-8 md:pb-32 md:pt-32">
+        <section className="px-5 pb-16 pt-16 sm:px-8 md:pb-20 md:pt-20">
           <div className="mx-auto max-w-section">
             <div className="surface-panel overflow-hidden rounded-[36px] p-8 md:p-12">
               <div className="relative z-10 flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">

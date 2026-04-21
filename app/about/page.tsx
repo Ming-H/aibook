@@ -42,7 +42,7 @@ export default function AboutPage() {
   return (
     <div className="page-shell">
       <ScrollAnimator>
-        <section className="px-5 pb-16 pt-24 sm:px-8 md:pb-24 md:pt-28">
+        <section className="px-5 pb-14 pt-16 sm:px-8 md:pb-20 md:pt-20">
           <div className="mx-auto max-w-section">
             <div className="grid gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-end">
               <div className="max-w-3xl">
@@ -53,7 +53,7 @@ export default function AboutPage() {
                   也是它们真正落地的方式。
                 </h1>
                 <p
-                  className="section-copy mt-8 max-w-2xl animate-fade-in-up"
+                  className="section-copy mt-5 max-w-2xl animate-fade-in-up"
                   style={{ animationDelay: '0.15s', opacity: 0 }}
                 >
                   DevFox AI 背后的工作方式，是把 Agent 系统、自动化流程、产品体验和业务目标放在一个统一框架里处理。
@@ -85,7 +85,7 @@ export default function AboutPage() {
           </div>
         </section>
 
-        <section className="px-5 py-8 sm:px-8 md:py-12">
+        <section className="px-5 py-6 sm:px-8 md:py-8">
           <div className="mx-auto max-w-section">
             <div className="grid gap-5 md:grid-cols-3">
               {principles.map((item, index) => (
@@ -105,12 +105,12 @@ export default function AboutPage() {
           </div>
         </section>
 
-        <section className="px-5 py-24 sm:px-8 md:py-32">
+        <section className="px-5 py-16 sm:px-8 md:py-20">
           <div className="mx-auto max-w-section">
             <div className="mb-14 max-w-3xl animate-on-scroll">
               <span className="eyebrow">Capability matrix</span>
               <h2 className="section-heading mt-8">我擅长把技术能力变成可交付的 AI 项目资产。</h2>
-              <p className="section-copy mt-6 max-w-2xl">
+              <p className="section-copy mt-5 max-w-2xl">
                 技术栈对我来说不是标签墙，而是支撑交付的工具集合。真正重要的是它们如何共同服务于项目结果。
               </p>
             </div>
@@ -143,7 +143,7 @@ export default function AboutPage() {
           </div>
         </section>
 
-        <section className="px-5 py-24 sm:px-8 md:py-32">
+        <section className="px-5 py-16 sm:px-8 md:py-20">
           <div className="mx-auto max-w-section">
             <div className="mb-14 max-w-3xl animate-on-scroll">
               <span className="eyebrow">Timeline</span>
@@ -170,7 +170,7 @@ export default function AboutPage() {
           </div>
         </section>
 
-        <section className="px-5 pb-24 sm:px-8 md:pb-32">
+        <section className="px-5 pb-16 sm:px-8 md:pb-20">
           <div className="mx-auto max-w-section">
             <div className="surface-panel overflow-hidden rounded-[36px] p-8 md:p-12">
               <div className="relative z-10 flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">

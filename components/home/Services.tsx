@@ -21,6 +21,12 @@ const services = [
     description: '不止停留在原型层，覆盖部署上线、效果验证和后续演进，确保项目真正能跑起来。',
     bullets: ['部署与上线', '稳定性验证', '后续迭代支持'],
   },
+  {
+    index: '04',
+    title: 'AI 咨询与方案评审',
+    description: '帮助企业或个人判断该怎么做 AI、先做什么、怎么选型，减少试错成本并提升落地效率。',
+    bullets: ['场景与需求梳理', '方案选型建议', '落地路径评审'],
+  },
 ];
 
 export function Services() {
@@ -30,13 +36,13 @@ export function Services() {
         <div className="mb-14 max-w-3xl animate-on-scroll">
           <span className="eyebrow">Capabilities</span>
           <h2 className="section-heading mt-8">我交付的是 AI 项目，不是空泛的技术展示。</h2>
-          <p className="section-copy mt-6 max-w-2xl">
-            面向 to B 和 to C 场景，我更关注的是怎么把 AI Agent、自动化工作流和智能应用真正做出来，
-            并落到可用、可部署、可持续迭代的状态。
-          </p>
+              <p className="section-copy mt-5 max-w-2xl">
+                面向 to B 和 to C 场景，我更关注的是怎么把 AI Agent、自动化工作流和智能应用真正做出来，
+                并落到可用、可部署、可持续迭代的状态。
+              </p>
         </div>
 
-        <div className="grid gap-5 lg:grid-cols-3">
+        <div className="grid gap-5 lg:grid-cols-2 xl:grid-cols-4">
           {services.map((service, index) => (
             <div
               key={service.title}
@@ -52,7 +58,7 @@ export function Services() {
                 </span>
               </div>
 
-              <h3 className="mt-8 text-2xl font-semibold tracking-[-0.04em]">{service.title}</h3>
+              <h3 className="mt-8 text-xl font-semibold tracking-[-0.04em]">{service.title}</h3>
               <p className="mt-5 body-copy">{service.description}</p>
 
               <div className="mt-8 space-y-3">

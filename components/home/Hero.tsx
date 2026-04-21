@@ -31,17 +31,17 @@ const featuredProjects = [
 
 export function Hero() {
   return (
-    <section className="relative overflow-hidden px-5 pb-20 pt-14 sm:px-8 md:pb-28 md:pt-20">
+    <section className="relative overflow-hidden px-5 pb-16 pt-10 sm:px-8 md:pb-24 md:pt-14">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(82,167,255,0.14),transparent_28%),radial-gradient(circle_at_80%_20%,rgba(184,242,119,0.12),transparent_22%),radial-gradient(circle_at_50%_100%,rgba(102,231,213,0.12),transparent_32%)]" />
       <div className="absolute inset-x-0 top-16 h-px bg-gradient-to-r from-transparent via-[var(--border-medium)] to-transparent md:top-20" />
 
-      <div className="relative mx-auto grid max-w-section gap-12 lg:grid-cols-[minmax(0,1.15fr)_minmax(360px,0.85fr)] lg:items-end">
+      <div className="relative mx-auto grid max-w-section gap-10 lg:grid-cols-[minmax(0,1.15fr)_minmax(360px,0.85fr)] lg:items-start">
         <div className="max-w-3xl">
           <span className="eyebrow animate-fade-in-down">
             AI Agent delivery for business and creator teams
           </span>
 
-          <h1 className="section-heading mt-6 animate-text-reveal">
+          <h1 className="section-heading mt-5 animate-text-reveal">
             帮助企业和个人
             <span className="gradient-text-animated"> 落地 AI Agent</span>
             <br />
@@ -49,7 +49,7 @@ export function Hero() {
           </h1>
 
           <p
-            className="section-copy mt-6 max-w-2xl animate-fade-in-up"
+            className="section-copy mt-5 max-w-2xl animate-fade-in-up"
             style={{ animationDelay: '0.15s', opacity: 0 }}
           >
             DevFox AI 聚焦 AI 项目落地交付，面向 to B 和 to C 场景，
@@ -57,7 +57,7 @@ export function Hero() {
           </p>
 
           <div
-            className="mt-8 flex flex-col gap-4 sm:flex-row animate-fade-in-up"
+            className="mt-7 flex flex-col gap-4 sm:flex-row animate-fade-in-up"
             style={{ animationDelay: '0.3s', opacity: 0 }}
           >
             <Link href="/cases" className="btn-primary rounded-full px-8 py-3.5 text-sm font-semibold">
@@ -69,7 +69,7 @@ export function Hero() {
           </div>
 
           <div
-            className="mt-10 grid gap-4 sm:grid-cols-2 animate-fade-in-up"
+            className="mt-8 grid gap-4 sm:grid-cols-2 animate-fade-in-up"
             style={{ animationDelay: '0.45s', opacity: 0 }}
           >
             {signalCards.map((card) => (
