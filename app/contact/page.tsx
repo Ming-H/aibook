@@ -2,14 +2,13 @@
 
 import { useState } from 'react';
 import type { FormEvent } from 'react';
+import Image from 'next/image';
 
 export default function ContactPage() {
   const [submitted, setSubmitted] = useState(false);
 
   function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    // In production, this would send to an API endpoint
-    // For now, show success state
     setSubmitted(true);
   }
 
@@ -30,54 +29,110 @@ export default function ContactPage() {
             </p>
 
             {/* Contact methods */}
-            <div className="space-y-4 animate-fade-in-up stagger-3">
-              <div className="card p-4 flex items-center gap-4">
-                <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-[var(--color-accent-soft)] text-[var(--color-accent-text)]">
+            <div className="space-y-3 animate-fade-in-up stagger-3">
+              {/* WeChat */}
+              <div className="card p-5 flex items-start gap-4">
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-[#07C160]/10 text-[#07C160] flex-shrink-0">
+                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M8.691 2.188C3.891 2.188 0 5.476 0 9.53c0 2.212 1.17 4.203 3.002 5.55a.59.59 0 01.213.665l-.39 1.48c-.019.07-.048.141-.048.213 0 .163.13.295.29.295a.326.326 0 00.167-.054l1.903-1.114a.864.864 0 01.717-.098 10.16 10.16 0 002.837.403c.276 0 .543-.027.811-.05-.857-2.578.157-4.972 1.932-6.446 1.703-1.415 3.882-1.98 5.853-1.838-.576-3.583-4.196-6.348-8.596-6.348zM5.785 5.991c.642 0 1.162.529 1.162 1.18a1.17 1.17 0 01-1.162 1.178A1.17 1.17 0 014.623 7.17c0-.651.52-1.18 1.162-1.18zm5.813 0c.642 0 1.162.529 1.162 1.18a1.17 1.17 0 01-1.162 1.178 1.17 1.17 0 01-1.162-1.178c0-.651.52-1.18 1.162-1.18zm5.34 2.867c-1.797-.052-3.746.512-5.28 1.786-1.72 1.428-2.687 3.72-1.78 6.22.942 2.453 3.666 4.229 6.884 4.229.826 0 1.622-.12 2.361-.336a.722.722 0 01.598.082l1.584.926a.272.272 0 00.14.047c.134 0 .24-.111.24-.247 0-.06-.023-.12-.038-.177l-.327-1.233a.582.582 0 01-.023-.156.49.49 0 01.201-.398C23.024 18.48 24 16.82 24 14.98c0-3.21-2.931-5.837-7.062-6.122zM14.033 13.4c.535 0 .969.44.969.982a.976.976 0 01-.969.983.976.976 0 01-.969-.983c0-.542.434-.982.97-.982zm4.844 0c.535 0 .969.44.969.982a.976.976 0 01-.969.983.976.976 0 01-.969-.983c0-.542.434-.982.97-.982z" />
+                  </svg>
+                </div>
+                <div>
+                  <div className="text-sm font-medium mb-0.5">微信</div>
+                  <div className="flex items-center gap-2">
+                    <code className="text-sm text-[var(--color-accent-text)] bg-[var(--color-accent-soft)] px-2 py-0.5 rounded-md font-mono">randforest0102</code>
+                    <button
+                      onClick={() => navigator.clipboard?.writeText('randforest0102')}
+                      className="text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] transition-colors"
+                      title="复制微信号"
+                    >
+                      <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M15.666 3.888A2.25 2.25 0 0013.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 01-.75.75H9.75a.75.75 0 01-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 011.927-.184" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* X / Twitter */}
+              <div className="card p-5 flex items-start gap-4">
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-[var(--color-accent-soft)] text-[var(--color-accent-text)] flex-shrink-0">
+                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                  </svg>
+                </div>
+                <div>
+                  <div className="text-sm font-medium mb-0.5">X (Twitter)</div>
+                  <a
+                    href="https://x.com/MingFire520"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm text-[var(--color-accent-text)] hover:underline inline-flex items-center gap-1"
+                  >
+                    @MingFire520
+                    <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+                    </svg>
+                  </a>
+                </div>
+              </div>
+
+              {/* GitHub */}
+              <div className="card p-5 flex items-start gap-4">
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-[var(--color-accent-soft)] text-[var(--color-accent-text)] flex-shrink-0">
                   <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
                   </svg>
                 </div>
                 <div>
-                  <div className="text-sm font-medium">GitHub</div>
+                  <div className="text-sm font-medium mb-0.5">GitHub</div>
                   <a
                     href="https://github.com/Ming-H"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-sm text-[var(--color-accent-text)] hover:underline"
+                    className="text-sm text-[var(--color-accent-text)] hover:underline inline-flex items-center gap-1"
                   >
                     @Ming-H
+                    <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+                    </svg>
                   </a>
                 </div>
               </div>
 
-              <div className="card p-4 flex items-center gap-4">
-                <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-[var(--color-accent-soft)] text-[var(--color-accent-text)]">
+              {/* AI Insights */}
+              <div className="card p-5 flex items-start gap-4">
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-[var(--color-accent-soft)] text-[var(--color-accent-text)] flex-shrink-0">
                   <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418" />
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
                   </svg>
                 </div>
                 <div>
-                  <div className="text-sm font-medium">AI Insights</div>
+                  <div className="text-sm font-medium mb-0.5">AI Insights</div>
                   <a
                     href="https://ming-h.github.io/ai-insights/"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-sm text-[var(--color-accent-text)] hover:underline"
+                    className="text-sm text-[var(--color-accent-text)] hover:underline inline-flex items-center gap-1"
                   >
                     ming-h.github.io/ai-insights
+                    <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+                    </svg>
                   </a>
                 </div>
               </div>
 
-              <div className="card p-4 flex items-center gap-4">
-                <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-[var(--color-accent-soft)] text-[var(--color-accent-text)]">
+              {/* Email */}
+              <div className="card p-5 flex items-start gap-4">
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-[var(--color-accent-soft)] text-[var(--color-accent-text)] flex-shrink-0">
                   <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
                   </svg>
                 </div>
                 <div>
-                  <div className="text-sm font-medium">Email</div>
-                  <span className="text-sm text-[var(--text-tertiary)]">通过表单联系</span>
+                  <div className="text-sm font-medium mb-0.5">Email</div>
+                  <span className="text-sm text-[var(--text-tertiary)]">通过右侧表单联系</span>
                 </div>
               </div>
             </div>
@@ -86,6 +141,9 @@ export default function ContactPage() {
           {/* Right: Form */}
           <div className="md:col-span-3">
             <div className="card p-8 animate-fade-in-up stagger-2">
+              <h2 className="text-lg font-semibold mb-1">发送消息</h2>
+              <p className="text-sm text-[var(--text-tertiary)] mb-6">填写以下信息，我会尽快回复你</p>
+
               {submitted ? (
                 <div className="text-center py-12">
                   <div className="w-16 h-16 rounded-full gradient-bg flex items-center justify-center mx-auto mb-4">

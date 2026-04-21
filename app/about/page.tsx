@@ -163,6 +163,17 @@ export default function AboutPage() {
               GitHub
             </a>
             <a
+              href="https://x.com/MingFire520"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-secondary px-6 py-2.5 text-sm inline-flex items-center gap-2"
+            >
+              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+              </svg>
+              X (Twitter)
+            </a>
+            <a
               href="https://ming-h.github.io/ai-insights/"
               target="_blank"
               rel="noopener noreferrer"
@@ -172,6 +183,15 @@ export default function AboutPage() {
               <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
               </svg>
+            </a>
+            <a
+              href="/contact"
+              className="btn-secondary px-6 py-2.5 text-sm inline-flex items-center gap-2"
+            >
+              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M8.691 2.188C3.891 2.188 0 5.476 0 9.53c0 2.212 1.17 4.203 3.002 5.55a.59.59 0 01.213.665l-.39 1.48c-.019.07-.048.141-.048.213 0 .163.13.295.29.295a.326.326 0 00.167-.054l1.903-1.114a.864.864 0 01.717-.098 10.16 10.16 0 002.837.403c.276 0 .543-.027.811-.05-.857-2.578.157-4.972 1.932-6.446 1.703-1.415 3.882-1.98 5.853-1.838-.576-3.583-4.196-6.348-8.596-6.348z" />
+              </svg>
+              微信 randforest0102
             </a>
           </div>
         </div>
