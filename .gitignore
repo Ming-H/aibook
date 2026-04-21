@@ -91,3 +91,4 @@ Thumbs.db
 
 /generated/prisma
 .env.production
+.env.r2

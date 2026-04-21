@@ -1,0 +1,2996 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claude 源码解析</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=Noto+Sans+SC:wght@300;400;500;600&family=Inter:wght@300;400;500;600&display=swap');
+
+        :root {
+            /* Technology Blue theme palette (default) */
+            --primary: #5dade2;
+            --primary-dark: #3498db;
+            --accent-teal: #48c9b0;
+            --accent-blue: #5dade2;
+            --accent-amber: #f5b041;
+            --accent-pink: #ec7063;
+
+            --text: #2c3e50;
+            --text-light: #7f8c8d;
+            --text-muted: #95a5a6;
+
+            --bg: #fafafa;
+            --bg-white: #ffffff;
+            --border: #e0e0e0;
+            --code-bg: #f8f9fa;
+            --callout-bg: #f3e5f5;
+            --callout-border: #85c1e9;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans SC', 'Inter', -apple-system, sans-serif;
+            font-size: 11pt;
+            line-height: 1.7;
+            color: var(--text);
+            background: var(--bg);
+        }
+
+        /* Print Settings - Golden Ratio Margins (top:right:bottom:left = 16:24:20:18) */
+        @page {
+            size: A4;
+            margin: 16mm 24mm 20mm 18mm;
+        }
+
+        @media print {
+            body {
+                background: white;
+            }
+            .page-break {
+                page-break-before: always;
+                break-before: page;
+            }
+            .no-print {
+                display: none;
+            }
+
+            /* Ensure background colors print */
+            * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+
+            /* Avoid breaking inside block elements */
+            pre, blockquote, .info-box, .warning-box, .success-box, .tip-box, .highlight-box, table {
+                page-break-inside: avoid;
+                break-inside: avoid;
+            }
+
+            /* Keep section headers with their first paragraph */
+            .section-header, .part-header {
+                page-break-after: avoid;
+                break-after: avoid;
+            }
+
+            /* Ensure at least 2 lines of content after a header (orphan control) */
+            .section-header + p,
+            .section-header + h3 {
+                page-break-after: avoid;
+                break-after: avoid;
+            }
+
+            /* Keep code blocks together with their preceding paragraph */
+            p + .code-block,
+            p + pre {
+                page-break-before: avoid;
+                break-before: avoid;
+            }
+
+            /* Avoid page break right before a blockquote */
+            p + blockquote {
+                page-break-before: avoid;
+                break-before: avoid;
+            }
+
+            /* Avoid page break between h3 and its first paragraph */
+            h3 + p,
+            h4 + p {
+                page-break-before: avoid;
+                break-before: avoid;
+            }
+
+            /* Print-friendly code blocks */
+            .code-block {
+                border: 1px solid #ccc !important;
+            }
+            .code-block-header {
+                background: #e8e8e8 !important;
+                border-bottom: 1px solid #ccc !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            .code-block pre {
+                background: #f5f5f5 !important;
+            }
+            .code-block pre code {
+                color: #333 !important;
+            }
+            .code-block-lang {
+                color: #555 !important;
+            }
+            pre:not(.code-block pre) {
+                background: #f5f5f5 !important;
+                border: 1px solid #ccc !important;
+            }
+            pre:not(.code-block pre) code {
+                color: #333 !important;
+            }
+
+            /* Wrap long lines in code blocks for PDF */
+            .code-block {
+                overflow: visible !important;
+            }
+            pre {
+                overflow: visible !important;
+                white-space: pre-wrap !important;
+                word-break: break-all !important;
+                overflow-wrap: break-word !important;
+            }
+            pre code {
+                white-space: pre-wrap !important;
+                word-break: break-all !important;
+                overflow-wrap: break-word !important;
+            }
+        }
+
+        /* Container */
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Cover Page */
+        .cover-page {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 60px 40px;
+            background: linear-gradient(135deg, #fff 0%, #fafafa 100%);
+            position: relative;
+        }
+
+        .cover-page::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 8px;
+            background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+        }
+
+        .series-name {
+            font-family: 'Noto Sans SC', sans-serif;
+            font-size: 14pt;
+            font-weight: 600;
+            color: var(--primary);
+            letter-spacing: 0;
+            word-spacing: 0.5em;
+            margin-bottom: 40px;
+            text-transform: uppercase;
+        }
+
+        .cover-title {
+            font-family: 'Noto Sans SC', sans-serif;
+            font-size: 32pt;
+            font-weight: 700;
+            line-height: 1.4;
+            color: var(--text);
+            margin-bottom: 20px;
+            max-width: 600px;
+            letter-spacing: -0.02em;
+        }
+
+        .cover-subtitle {
+            font-family: 'Noto Sans SC', sans-serif;
+            font-size: 16pt;
+            font-weight: 400;
+            color: var(--text-light);
+            margin-bottom: 60px;
+            max-width: 500px;
+            line-height: 1.5;
+        }
+
+        .cover-meta {
+            margin-top: 60px;
+            padding: 30px;
+            background: var(--bg-white);
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .cover-keywords {
+            font-size: 10pt;
+            color: var(--text-light);
+            margin-bottom: 8px;
+        }
+
+        .cover-audience {
+            font-size: 10pt;
+            color: var(--text-light);
+            margin-bottom: 8px;
+        }
+
+        .cover-version {
+            font-size: 9pt;
+            color: var(--text-light);
+            font-family: 'Inter', monospace;
+        }
+
+        .cover-author {
+            margin-top: 40px;
+            font-size: 12pt;
+            color: var(--text);
+        }
+
+        .cover-footer {
+            position: absolute;
+            bottom: 30px;
+            font-size: 8pt;
+            color: var(--text-light);
+            max-width: 400px;
+            line-height: 1.5;
+        }
+
+        /* TOC Page */
+        .toc-page {
+            padding: 60px 0;
+            min-height: 100vh;
+        }
+
+        .toc-title {
+            font-family: 'Noto Sans SC', sans-serif;
+            font-size: 24pt;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 10px;
+            color: var(--text);
+            letter-spacing: -0.01em;
+        }
+
+        .toc-subtitle {
+            font-family: 'Inter', sans-serif;
+            font-size: 10pt;
+            font-weight: 500;
+            text-align: center;
+            letter-spacing: 4px;
+            color: var(--text-light);
+            margin-bottom: 60px;
+            text-transform: uppercase;
+        }
+
+        .toc-part {
+            margin-bottom: 30px;
+        }
+
+        .toc-part-title {
+            font-family: 'Noto Sans SC', sans-serif;
+            font-size: 12pt;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+
+        .toc-item {
+            display: flex;
+            align-items: baseline;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .toc-item-number {
+            font-family: 'Inter', monospace;
+            font-size: 10pt;
+            color: var(--primary);
+            margin-right: 15px;
+            min-width: 60px;
+        }
+
+        .toc-item-title {
+            font-size: 11pt;
+            color: var(--text);
+        }
+
+        .toc-item-page {
+            margin-left: auto;
+            font-size: 10pt;
+            color: var(--text-light);
+        }
+
+        /* Content Page */
+        .content-page {
+            padding: 40px 0;
+        }
+
+        /* ============================================================
+           PART TITLE PAGE — O'Reilly / Manning style
+           Standalone divider page, content starts on next page.
+           ============================================================ */
+        .part-header {
+            text-align: left;
+            margin: 0;
+            padding: 60px 0 40px 0;      /* compact padding, no min-height */
+            /* removed page-break-after to prevent blank pages */
+        }
+
+        .part-header.page-break {
+            page-break-before: always;
+        }
+
+        .part-number {
+            font-family: 'Inter', sans-serif;
+            font-size: 11pt;
+            font-weight: 500;
+            color: var(--text-light);
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 16px;
+        }
+
+        .part-rule {
+            width: 48px;
+            height: 3px;
+            background: var(--primary);
+            margin: 20px 0;
+            border: none;
+        }
+
+        .part-title {
+            font-family: 'Noto Sans SC', sans-serif;
+            font-size: 26pt;
+            font-weight: 700;
+            color: var(--text);
+            letter-spacing: -0.02em;
+            line-height: 1.3;
+        }
+
+        /* ============================================================
+           SECTION (CHAPTER) HEADERS — clean, professional
+           ============================================================ */
+        .section-header {
+            margin: 0 0 20px 0;
+            padding-top: 8px;
+            page-break-after: avoid;
+        }
+
+        .section-number {
+            font-family: 'Inter', sans-serif;
+            font-size: 11pt;
+            font-weight: 500;
+            color: var(--primary);
+            letter-spacing: 1px;
+            margin-bottom: 6px;
+        }
+
+        .section-title {
+            font-family: 'Noto Sans SC', sans-serif;
+            font-size: 20pt;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 4px;
+            line-height: 1.3;
+            letter-spacing: -0.01em;
+        }
+
+        .section-subtitle {
+            font-family: 'Inter', sans-serif;
+            font-size: 10.5pt;
+            font-weight: 400;
+            color: var(--text-light);
+            letter-spacing: 0.3px;
+        }
+
+        /* Content Elements */
+        h3 {
+            font-family: 'Noto Sans SC', sans-serif;
+            font-size: 16pt;
+            font-weight: 600;
+            color: var(--text);
+            margin: 40px 0 20px 0;
+            page-break-after: avoid;
+            letter-spacing: -0.01em;
+        }
+
+        h4 {
+            font-family: 'Noto Sans SC', sans-serif;
+            font-size: 13pt;
+            font-weight: 500;
+            color: var(--text);
+            margin: 30px 0 15px 0;
+            page-break-after: avoid;
+        }
+
+        p {
+            margin-bottom: 1em;
+            text-align: justify;
+            orphans: 4;
+            widows: 4;
+        }
+
+        a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        /* Lists */
+        ul, ol {
+            margin: 1.2em 0;
+            padding-left: 2em;
+        }
+
+        li {
+            margin-bottom: 0.6em;
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 2em 0;
+            font-size: 10pt;
+            page-break-inside: avoid;
+            border-radius: 6px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        th, td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            font-family: 'Noto Sans SC', sans-serif;
+            font-weight: 600;
+            background: #f8f9fa;
+            color: var(--text);
+            border-bottom: 2px solid var(--primary);
+            font-size: 0.95em;
+        }
+
+        td {
+            vertical-align: top;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:nth-child(even) {
+            background: rgba(0,0,0,0.015);
+        }
+
+        tr:hover {
+            background: rgba(52, 152, 219, 0.04);
+        }
+
+        /* Code Blocks */
+        code {
+            font-family: 'JetBrains Mono', 'Fira Code', 'Monaco', 'Consolas', 'Courier New', monospace;
+            font-size: 0.88em;
+            background: rgba(0,0,0,0.06);
+            padding: 2px 7px;
+            border-radius: 4px;
+            color: #d63384;
+        }
+
+        /* Code Block Wrapper — O'Reilly style: clean, functional */
+        .code-block {
+            margin: 1.5em 0;
+            border-radius: 4px;
+            overflow: hidden;
+            border: 1px solid #dee2e6;
+            page-break-inside: avoid;
+        }
+
+        .code-block-header {
+            background: #f1f3f5;
+            padding: 4px 12px;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .code-block-lang {
+            font-family: 'Inter', 'Noto Sans SC', sans-serif;
+            font-size: 0.7em;
+            color: #868e96;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            font-weight: 500;
+        }
+
+        .code-block pre {
+            margin: 0;
+            border: none;
+            border-radius: 0;
+        }
+
+        pre {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 12px 16px;
+            margin: 1.5em 0;
+            overflow-x: auto;
+            page-break-inside: avoid;
+            line-height: 1.5;
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+            font-size: 0.85em;
+            line-height: 1.5;
+            color: #495057;
+        }
+
+        /* Syntax highlighting - Light theme (print-friendly) */
+        .syntax-keyword { color: #d6336c; font-weight: 600; }
+        .syntax-string { color: #2b8a3e; }
+        .syntax-number { color: #e8590c; }
+        .syntax-comment { color: #868e96; font-style: italic; }
+        .syntax-function { color: #1971c2; }
+        .syntax-class { color: #9c36b5; }
+        .syntax-operator { color: #0c8599; }
+        .syntax-variable { color: #c92a2a; }
+        .syntax-property { color: #e8590c; }
+
+        /* Blockquotes (核心建议 etc.) */
+        blockquote {
+            margin: 2em 0;
+            padding: 20px 24px;
+            background: linear-gradient(135deg, rgba(52, 152, 219, 0.04), rgba(52, 152, 219, 0.08));
+            border-left: 4px solid var(--primary);
+            border-radius: 0 8px 8px 0;
+            page-break-inside: avoid;
+            font-size: 0.96em;
+        }
+
+        blockquote strong {
+            color: var(--primary-dark);
+            font-weight: 700;
+        }
+
+        blockquote p {
+            margin-bottom: 0.6em;
+        }
+
+        blockquote p:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Horizontal Rule */
+        hr {
+            border: none;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--border), transparent);
+            margin: 3em 0;
+        }
+
+        /* Emphasis */
+        strong {
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        em {
+            font-style: italic;
+            color: var(--text-light);
+        }
+
+        /* Footer */
+        .content-footer {
+            margin-top: 60px;
+            padding-top: 30px;
+            border-top: 1px solid var(--border);
+            text-align: center;
+            font-size: 9pt;
+            color: var(--text-light);
+        }
+
+        /* Flowchart / Diagram */
+        .flowchart {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin: 2em 0;
+            flex-wrap: wrap;
+        }
+
+        .flowchart-arrow {
+            color: var(--text-light);
+            font-size: 1.3em;
+            font-weight: 400;
+        }
+
+        .flowchart-box {
+            background: var(--bg-white);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 10px 16px;
+            font-family: 'Noto Sans SC', sans-serif;
+            font-weight: 500;
+            font-size: 0.9em;
+            color: var(--text);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+        }
+
+        /* File Tree */
+        .file-tree {
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin: 2em 0;
+            font-family: 'Fira Code', 'Monaco', 'Consolas', monospace;
+            font-size: 0.85em;
+        }
+
+        .file-tree-line {
+            padding: 4px 0;
+            color: var(--text);
+        }
+
+        .file-tree-dir {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .file-tree-file {
+            color: var(--text-light);
+        }
+
+        /* Info Box */
+        .info-box {
+            margin: 2em 0;
+            padding: 18px 20px;
+            background: #f0fdfa;
+            border-left: 3px solid var(--accent-teal);
+            border-radius: 0 4px 4px 0;
+            page-break-inside: avoid;
+        }
+
+        /* Success Box */
+        .success-box {
+            margin: 2em 0;
+            padding: 18px 20px;
+            background: #f0fdf4;
+            border-left: 3px solid #22c55e;
+            border-radius: 0 4px 4px 0;
+            page-break-inside: avoid;
+        }
+
+        /* Warning Box */
+        .warning-box {
+            margin: 2em 0;
+            padding: 18px 20px;
+            background: #fffbeb;
+            border-left: 3px solid #eab308;
+            border-radius: 0 4px 4px 0;
+            page-break-inside: avoid;
+        }
+
+        /* Danger Box */
+        .danger-box {
+            margin: 2em 0;
+            padding: 18px 20px;
+            background: #fef2f2;
+            border-left: 3px solid #ef4444;
+            border-radius: 0 4px 4px 0;
+            page-break-inside: avoid;
+        }
+
+        /* Tip Box */
+        .tip-box {
+            margin: 2em 0;
+            padding: 18px 20px;
+            background: #fef3c7;
+            border-left: 3px solid var(--accent-amber);
+            border-radius: 0 4px 4px 0;
+            page-break-inside: avoid;
+        }
+
+        /* Diagram Box */
+        .diagram-box {
+            margin: 2em 0;
+            padding: 20px;
+            background: #fafafa;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            page-break-inside: avoid;
+        }
+
+        /* Process Steps */
+        .process-steps {
+            counter-reset: step;
+            margin: 2em 0;
+        }
+
+        .process-step {
+            position: relative;
+            padding-left: 45px;
+            margin: 1.2em 0;
+        }
+
+        .process-step::before {
+            counter-increment: step;
+            content: counter(step);
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 28px;
+            height: 28px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.85em;
+        }
+
+        /* Highlight Box */
+        .highlight-box {
+            background: #fafafa;
+            border-left: 3px solid var(--primary);
+            padding: 18px 20px;
+            margin: 2em 0;
+            border-radius: 0 4px 4px 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- Cover Page -->
+    <div class="cover-page">
+        <div class="series-name">技术文档</div>
+        <h1 class="cover-title">Claude 源码解析</h1>
+        <div class="cover-subtitle">从入口到工具调用，拆解 AI 编程助手的内部架构</div>
+        <div class="cover-meta">
+            <div class="cover-keywords"><strong>关键词：</strong>Claude Code · 源码解析 · AI Agent · TypeScript · Bun</div>
+            <div class="cover-audience"><strong>适合读者：</strong>想理解 AI 编程工具内部原理的工程师、想构建 AI Agent 的开发者、想通过源码阅读提升工程能力的程序员</div>
+            <div class="cover-version"><strong>版本：</strong>v260410</div>
+        </div>
+        <div class="cover-author">极客狐DevFox</div>
+        <div class="cover-footer">本手册基于 Claude 源码解析 编写。AI 工具迭代迅速，部分内容可能随版本更新而变化，请以官方文档为准。</div>
+    </div>
+
+    <!-- TOC Page -->
+    <div class="toc-page page-break">
+        <div class="container">
+            <h1 class="toc-title">目录</h1>
+            <div class="toc-subtitle">CONTENTS</div>
+            <div class="toc-part">
+<div class="toc-part-title">Part 1: 概念</div>
+<div class="toc-item">
+<div class="toc-item-number">§01</div>
+<div class="toc-item-title">你每天都在用的 Claude Code，里面到底有什么</div>
+<div class="toc-item-page">1</div>
+</div>
+<div class="toc-item">
+<div class="toc-item-number">§02</div>
+<div class="toc-item-title">一座智能工厂的蓝图</div>
+<div class="toc-item-page">2</div>
+</div>
+<div class="toc-item">
+<div class="toc-item-number">§03</div>
+<div class="toc-item-title">准备好进厂了</div>
+<div class="toc-item-page">3</div>
+</div>
+</div>
+<div class="toc-part">
+<div class="toc-part-title">Part 2: 核心机制</div>
+<div class="toc-item">
+<div class="toc-item-number">§04</div>
+<div class="toc-item-title">工厂大门</div>
+<div class="toc-item-page">4</div>
+</div>
+<div class="toc-item">
+<div class="toc-item-number">§05</div>
+<div class="toc-item-title">调度中心</div>
+<div class="toc-item-page">5</div>
+</div>
+<div class="toc-item">
+<div class="toc-item-number">§06</div>
+<div class="toc-item-title">生产线</div>
+<div class="toc-item-page">6</div>
+</div>
+<div class="toc-item">
+<div class="toc-item-number">§07</div>
+<div class="toc-item-title">总调度室</div>
+<div class="toc-item-page">7</div>
+</div>
+<div class="toc-item">
+<div class="toc-item-number">§08</div>
+<div class="toc-item-title">车间工具站</div>
+<div class="toc-item-page">8</div>
+</div>
+</div>
+<div class="toc-part">
+<div class="toc-part-title">Part 3: 深入系统</div>
+<div class="toc-item">
+<div class="toc-item-number">§09</div>
+<div class="toc-item-title">外部供应商通道</div>
+<div class="toc-item-page">9</div>
+</div>
+<div class="toc-item">
+<div class="toc-item-number">§10</div>
+<div class="toc-item-title">安检与品控 — 权限与Hook</div>
+<div class="toc-item-page">10</div>
+</div>
+<div class="toc-item">
+<div class="toc-item-number">§11</div>
+<div class="toc-item-title">控制面板 — Ink/React终端UI</div>
+<div class="toc-item-page">11</div>
+</div>
+</div>
+<div class="toc-part">
+<div class="toc-part-title">Part 4: 实战场景</div>
+<div class="toc-item">
+<div class="toc-item-number">§12</div>
+<div class="toc-item-title">一个请求的一生 — 全链路追踪</div>
+<div class="toc-item-page">12</div>
+</div>
+<div class="toc-item">
+<div class="toc-item-number">§13</div>
+<div class="toc-item-title">给工厂加一条产线</div>
+<div class="toc-item-page">13</div>
+</div>
+</div>
+<div class="toc-part">
+<div class="toc-part-title">Part 5: 深度思考</div>
+<div class="toc-item">
+<div class="toc-item-number">§14</div>
+<div class="toc-item-title">工程师的选择</div>
+<div class="toc-item-page">14</div>
+</div>
+<div class="toc-item">
+<div class="toc-item-number">§15</div>
+<div class="toc-item-title">从读懂到能写</div>
+<div class="toc-item-page">15</div>
+</div>
+</div>
+
+        </div>
+    </div>
+
+    <!-- Content Pages -->
+    <div class="container content-page">
+        <div class="part-header page-break">
+<div class="part-number">PART 1</div>
+<div class="part-rule"></div>
+<div class="part-title">概念</div>
+</div>
+<div class="section-header">
+<div class="section-number">§01</div>
+<h2 class="section-title">你每天都在用的 Claude Code，里面到底有什么</h2>
+<div class="section-subtitle">What's Inside the Box</div>
+</div>
+<p>"我每天都在终端里跟 Claude Code 聊天写代码，但它到底是什么？一个 shell 脚本？一个 Electron 应用？一个 Python 程序？"</p>
+<p>如果你有过这个念头，那你并不孤独。Claude Code 的黑盒感比大多数 CLI 工具都强——因为它不是一个普通的命令行工具，它是一座<strong>工厂</strong>。</p>
+<h3>CCB 反编译还原项目</h3>
+<p>这本教程分析的代码来自 CCB（Claude Code Best）项目。CCB 是一个逆向工程还原项目：从 Anthropic 官方发布的 Claude Code npm 包出发，通过反编译和类型还原，重新构建出可读、可运行、可调试的源码。它的 <code>package.json</code> 里写得很直接：<code>"description": "Reverse-engineered Anthropic Claude Code CLI"</code>。</p>
+<p>CCB 并非 1:1 完美还原——有些模块被裁剪了，有些类型标注在反编译过程中丢失了（约 1341 个 tsc 类型错误），但核心架构和运行逻辑完整保留。当前的版本号 <code>2.1.888</code> 里的 <code>888</code> 就是 CCB 的标识。</p>
+<p>这意味着你读到的代码和 Anthropic 工程师写的原始代码在结构上高度一致，只是少了一些 Anthropic 内部专用的功能分支。</p>
+<h3>运行时：Bun，不是 Node.js</h3>
+<p>Claude Code 选择 Bun（一个高性能的 JavaScript/TypeScript 运行时）作为运行时。这不是一个随便的决定。Bun 在三个关键点上碾压 Node.js：</p>
+<table>
+<thead><tr><th>对比维度</th><th>Node.js</th><th>Bun</th></tr></thead>
+<tbody><tr><td>冷启动速度</td><td>~200ms（加载 Commander + React + SDK）</td><td>~50ms（原生 TS/TSX 支持，无需转译）</td></tr>
+<tr><td>TypeScript 支持</td><td>需要 ts-node 或先编译</td><td>原生执行 .ts/.tsx 文件</td></tr>
+<tr><td>构建能力</td><td>需要 webpack/esbuild/rollup</td><td>内置 Bun.build()，支持代码分割</td></tr>
+<tr><td>包管理</td><td>npm/yarn/pnpm</td><td>内置 Bun Workspaces</td></tr>
+<tr><td><code>bun:bundle</code></td><td>无</td><td>编译时宏替换、feature flag 注入</td></tr>
+</tbody></table>
+<p>当你运行 <code>bun run dev</code>，Bun 直接执行 <code>.tsx</code> 文件，零构建步骤。这让 Claude Code 的开发循环快得惊人。</p>
+<p>Bun 在 CCB 项目里还有一个特殊用途：<code>bun:bundle</code> API。原版 Claude Code 用它在编译时注入 feature flag 和宏变量。CCB 用 polyfill 模拟了这一机制。</p>
+<h3>技术栈一览</h3>
+<p>把 Claude Code 拆开，核心组件清单如下：</p>
+<table>
+<thead><tr><th>层次</th><th>技术</th><th>作用</th></tr></thead>
+<tbody><tr><td>语言</td><td>TypeScript + TSX</td><td>全栈类型安全，JSX 用于终端 UI</td></tr>
+<tr><td>终端 UI</td><td>Ink（React for CLI）</td><td>用 React 组件模型渲染终端界面</td></tr>
+<tr><td>命令解析</td><td>Commander.js</td><td>CLI 参数、子命令、选项定义</td></tr>
+<tr><td>AI SDK</td><td>@anthropic-ai/sdk</td><td>与 Claude API 通信</td></tr>
+<tr><td>MCP 协议</td><td>@modelcontextprotocol/sdk</td><td>外部工具集成协议</td></tr>
+<tr><td>状态管理</td><td>自建 Store（Zustand 风格）</td><td>全局应用状态</td></tr>
+<tr><td>构建</td><td>Bun.build() + 代码分割</td><td>产出 ~450 个 chunk 文件</td></tr>
+<tr><td>包管理</td><td>Bun Workspaces monorepo</td><td>内部包统一管理</td></tr>
+<tr><td>可观测性</td><td>OpenTelemetry</td><td>日志、指标、链路追踪</td></tr>
+<tr><td>模式验证</td><td>Zod（一个 TypeScript 运行时类型校验库）+ Ajv</td><td>运行时类型检查</td></tr>
+</tbody></table>
+<p>用 React 写终端界面——这是 Claude Code 最独特的架构选择。<code>src/screens/REPL.tsx</code> 有 5009 行，是一个完整的 React 组件，管理着消息列表、用户输入、工具权限确认、键盘快捷键等所有交互。</p>
+<h3>项目目录结构速览</h3>
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">TEXT</span></div>
+<pre><code class="language-text">claude-code-best/
+</code></pre>
+</div>
+几个数字帮你建立规模感：<code>src/</code> 下有 40+ 目录、100+ 组件、86 个 hooks、40+ 工具、70+ 子命令。六个核心文件（cli.tsx、main.tsx、query.ts、QueryEngine.ts、claude.ts、REPL.tsx）总计超过 16000 行。
+<h3>Monorepo 与内部包</h3>
+CCB 用 Bun Workspaces 管理 monorepo。<code>packages/</code> 目录下有两类包：
+<strong>完整实现</strong>：<code>color-diff-napi/</code>——用于终端颜色差异计算的 NAPI 模块，有真正的 Rust 源码和编译产物。
+<strong>Stub 包</strong>：<code>audio-capture-napi/</code>、<code>image-processor-napi/</code>、<code>modifiers-napi/</code>、<code>url-handler-napi/</code>——这些是空壳，只导出类型定义或空函数。<code>packages/@ant/</code> 下的四个包（<code>claude-for-chrome-mcp</code>、<code>computer-use-input</code>、<code>computer-use-mcp</code>、<code>computer-use-swift</code>）也是 stub。
+在 <code>tools.ts</code> 里你会看到 <code>feature('PROACTIVE')</code>、<code>feature('KAIROS')</code> 这些条件——因为 CCB 的 <code>feature()</code>（一个内部特性开关函数）始终返回 <code>false</code>，所以依赖这些 flag 的工具（SleepTool、CronTool、MonitorTool 等）全部被死代码消除。这是 CCB 裁剪 Anthropic 内部功能的机制。
+<blockquote>
+<strong>核心建议</strong>
+读源码时，把 <code>feature('XXX')</code> 包裹的代码块当成注释跳过。CCB 里大约 30 个 feature flag 全部关闭，它们控制的是 Anthropic 内部的实验性功能（自主代理、远程控制、语音模式等）。你只需要关注 <code>feature()</code> 返回 <code>false</code> 时走的那条分支。
+</blockquote>
+不过，这座工厂的具体构造是什么样的？各个模块之间怎么配合？下一章会画出完整的蓝图。
+
+<div class="file-tree">
+<div class="file-tree-line file-tree-dir">├── build.ts              <span class="syntax-comment"># 构建脚本（Bun.build + 代码分割）</span></div>
+<div class="file-tree-line file-tree-dir">├── package.json          <span class="syntax-comment"># 项目配置（bun &gt;= <span class="syntax-number">1.2</span>.<span class="syntax-number">0</span>）</span></div>
+<div class="file-tree-line file-tree-dir">├── tsconfig.json         <span class="syntax-comment"># TypeScript 配置（target: ESNext）</span></div>
+<div class="file-tree-line file-tree-dir">├── packages/             <span class="syntax-comment"># 内部 workspace 包</span></div>
+<div class="file-tree-line file-tree-dir">│   ├── @ant/             <span class="syntax-comment"># Anthropic 内部专用包（Chrome MCP、Computer Use）</span></div>
+<div class="file-tree-line file-tree-dir">│   ├── color-diff-napi/  <span class="syntax-comment"># 完整实现的颜色差异计算</span></div>
+<div class="file-tree-line file-tree-dir">│   ├── audio-capture-napi/  <span class="syntax-comment"># 音频捕获（stub）</span></div>
+<div class="file-tree-line file-tree-dir">│   └── ...               <span class="syntax-comment"># 其他 napi 包（多数为 stub）</span></div>
+<div class="file-tree-line file-tree-dir">└── src/</div>
+<div class="file-tree-line file-tree-dir">    ├── entrypoints/</div>
+<div class="file-tree-line file-tree-dir">    │   ├── cli.tsx       <span class="syntax-comment"># 真正的入口（<span class="syntax-number">375</span> 行）</span></div>
+<div class="file-tree-line file-tree-dir">    │   ├── init.ts       <span class="syntax-comment"># 一次性初始化</span></div>
+<div class="file-tree-line file-tree-dir">    │   └── mcp.ts        <span class="syntax-comment"># MCP 入口</span></div>
+<div class="file-tree-line file-tree-dir">    ├── main.tsx          <span class="syntax-comment"># Commander.js 主逻辑（约 <span class="syntax-number">4600</span> 行）</span></div>
+<div class="file-tree-line file-tree-dir">    ├── query.ts          <span class="syntax-comment"># 核心查询循环（约 <span class="syntax-number">1700</span> 行）</span></div>
+<div class="file-tree-line file-tree-dir">    ├── QueryEngine.ts    <span class="syntax-comment"># 会话引擎（<span class="syntax-number">1320</span> 行）</span></div>
+<div class="file-tree-line file-tree-dir">    ├── tools.ts          <span class="syntax-comment"># 工具注册表（<span class="syntax-number">497</span> 行）</span></div>
+<div class="file-tree-line file-tree-dir">    ├── Tool.ts           <span class="syntax-comment"># Tool 类型定义</span></div>
+<div class="file-tree-line file-tree-dir">    ├── screens/</div>
+<div class="file-tree-line file-tree-dir">    │   └── REPL.tsx      <span class="syntax-comment"># 主交互界面（<span class="syntax-number">5009</span> 行）</span></div>
+<div class="file-tree-line file-tree-dir">    ├── tools/            <span class="syntax-comment"># <span class="syntax-number">40</span>+ 工具实现</span></div>
+<div class="file-tree-line file-tree-dir">    │   ├── BashTool/     <span class="syntax-comment"># Shell 命令执行</span></div>
+<div class="file-tree-line file-tree-dir">    │   ├── FileReadTool/ <span class="syntax-comment"># 文件读取</span></div>
+<div class="file-tree-line file-tree-dir">    │   ├── FileEditTool/ <span class="syntax-comment"># 文件编辑</span></div>
+<div class="file-tree-line file-tree-dir">    │   ├── GrepTool/     <span class="syntax-comment"># 内容搜索</span></div>
+<div class="file-tree-line file-tree-dir">    │   ├── AgentTool/    <span class="syntax-comment"># 子代理</span></div>
+<div class="file-tree-line file-tree-file">    │   └── ...</div>
+<div class="file-tree-line file-tree-dir">    ├── services/</div>
+<div class="file-tree-line file-tree-dir">    │   ├── api/          <span class="syntax-comment"># API 客户端（claude.ts 有 <span class="syntax-number">3420</span> 行）</span></div>
+<div class="file-tree-line file-tree-dir">    │   ├── mcp/          <span class="syntax-comment"># MCP 协议实现</span></div>
+<div class="file-tree-line file-tree-dir">    │   └── compact/      <span class="syntax-comment"># 上下文压缩</span></div>
+<div class="file-tree-line file-tree-dir">    ├── components/       <span class="syntax-comment"># <span class="syntax-number">100</span>+ React 终端组件</span></div>
+<div class="file-tree-line file-tree-dir">    ├── hooks/            <span class="syntax-comment"># <span class="syntax-number">86</span> 个自定义 React hooks</span></div>
+<div class="file-tree-line file-tree-dir">    ├── state/            <span class="syntax-comment"># 状态管理（AppState + Store）</span></div>
+<div class="file-tree-line file-tree-dir">    ├── ink/              <span class="syntax-comment"># Ink 框架（定制版）</span></div>
+<div class="file-tree-line file-tree-dir">    ├── bootstrap/        <span class="syntax-comment"># 启动引导 + 全局状态单例</span></div>
+<div class="file-tree-line file-tree-dir">    ├── context/          <span class="syntax-comment"># React Context</span></div>
+<div class="file-tree-line file-tree-dir">    ├── commands/         <span class="syntax-comment"># <span class="syntax-number">70</span>+ 子命令（/help、/compact 等）</span></div>
+<div class="file-tree-line file-tree-dir">    ├── utils/            <span class="syntax-comment"># 工具函数（含 model/ 子目录）</span></div>
+<div class="file-tree-line file-tree-dir">    ├── memdir/           <span class="syntax-comment"># 记忆系统</span></div>
+<div class="file-tree-line file-tree-dir">    └── types/            <span class="syntax-comment"># 类型定义</span></div>
+</div><div class="section-header">
+<div class="section-number">§02</div>
+<h2 class="section-title">一座智能工厂的蓝图</h2>
+<div class="section-subtitle">Architecture Blueprint</div>
+</div>
+<p>Claude Code 不是"一个 CLI 工具"——它是一套六层架构的分布式系统。如果你把它当成 <code>argparse + print()</code> 的传统 CLI 来读源码，你会在 5000 行的 REPL.tsx 里迷路。正确的打开方式是先看蓝图。</p>
+<h3>六层架构</h3>
+<p>从上到下，Claude Code 可以分成六个清晰的层：</p>
+<table>
+<thead><tr><th>层次</th><th>名称</th><th>核心文件</th><th>职责</th></tr></thead>
+<tbody><tr><td>L1</td><td>入口层</td><td><code>cli.tsx</code></td><td>运行时 polyfill、快速路径分派</td></tr>
+<tr><td>L2</td><td>命令层</td><td><code>main.tsx</code></td><td>Commander.js 参数解析、服务初始化</td></tr>
+<tr><td>L3</td><td>核心层</td><td><code>query.ts</code> + <code>QueryEngine.ts</code>（查询引擎，协调整个请求生命周期）</td><td>对话循环、消息管理、压缩策略</td></tr>
+<tr><td>L4</td><td>工具层</td><td><code>tools.ts</code> + <code>src/tools/</code></td><td>工具注册与执行（Bash、Read、Edit 等）</td></tr>
+<tr><td>L5</td><td>服务层</td><td><code>src/services/</code></td><td>API 通信、MCP 协议、压缩、记忆</td></tr>
+<tr><td>L6</td><td>表现层</td><td><code>src/screens/</code> + <code>src/components/</code></td><td>Ink/React 终端 UI</td></tr>
+</tbody></table>
+<p>!<a href="images/architecture-six-layers.png">六层架构图</a></p>
+<p>每一层只依赖它下面的层。入口层永远不知道 UI 长什么样，工具层永远不知道消息是怎么发送给 API 的。这种分层不是学术上的洁癖——它意味着你可以从任何一层切入阅读，不用先理解其他五层。</p>
+<h3>数据流：一条消息的旅程</h3>
+<p>你在终端敲下 <code>> 帮我重构这个函数</code>，然后看到 Claude 的回复。这条消息经过了完整的工厂流水线：</p>
+<p>!<a href="images/message-data-flow.png">消息数据流</a></p>
+<p><code>query.ts</code> 里的循环就是这个流程的核心。它不是"发送一次请求，拿到一次响应"的简单模式——它是一个<strong>多轮循环</strong>，因为 Claude 的回复可能包含工具调用（<code>tool_use</code>），每个工具调用产生结果后要再喂回 API，直到 Claude 认为任务完成（<code>stop_reason: "end_turn"</code>）。</p>
+<p>!<a href="images/core-loop-flowchart.png">核心循环流程图</a></p>
+<h3>工厂隐喻映射</h3>
+<p>全书使用一个统一的隐喻：Claude Code 是一座<strong>智能工厂</strong>。每个模块对应工厂的一个部门：</p>
+<table>
+<thead><tr><th>工厂部门</th><th>代码模块</th><th>干什么</th></tr></thead>
+<tbody><tr><td>工厂大门 + 门卫</td><td><code>cli.tsx</code> + <code>feature()</code></td><td>检查来者是谁，快速路径直接放行，其余引入调度中心</td></tr>
+<tr><td>调度中心</td><td><code>main.tsx</code> (Commander.js)</td><td>解析指令，分配任务到对应的车间</td></tr>
+</tbody></table>
+<p>| 生产线 | <code>query.ts</code> 核心循环 | 反复执行"请求<span class="flowchart-arrow">→</span> <span class="flowchart-box">响应</span><span class="flowchart-arrow">→</span> <span class="flowchart-box">工具调用</span><span class="flowchart-arrow">→</span> <span class="flowchart-box">再请求"的循环 |</span></p>
+<table>
+<thead><tr><th>总调度室</th><th><code>QueryEngine.ts</code></th><th>管理整条生产线的节奏：压缩、快照、成本追踪</th></tr></thead>
+<tbody><tr><td>外部供应商通道</td><td>MCP 协议 (<code>src/services/mcp/</code>)</td><td>连接外部服务，像供应商给工厂送货</td></tr>
+<tr><td>安检门</td><td>权限系统 (<code>useCanUseTool</code>)</td><td>工具执行前检查权限，危险操作需要人工确认</td></tr>
+<tr><td>品控检测点</td><td>Hook 系统 (<code>src/hooks/</code>)</td><td>在关键节点插入检查逻辑，类似质检</td></tr>
+<tr><td>控制面板</td><td>UI 层 (Ink/React)</td><td>终端界面就是工厂的控制面板，实时显示状态</td></tr>
+<tr><td>仓库 + 档案馆</td><td>状态管理 + 记忆系统 (<code>memdir/</code>)</td><td>仓库存当前状态，档案馆存历史记忆</td></tr>
+<tr><td>节能压缩模式</td><td>自动压缩（compact，上下文压缩，防止 Token 溢出）(<code>src/services/compact/</code>)</td><td>上下文太长时自动压缩历史，节省 Token</td></tr>
+</tbody></table>
+<p>这个映射不是牵强的比喻。<code>cli.tsx</code> 真的就是"大门"——它做的第一件事是检查参数（验身份），如果是 <code>--version</code> 这种简单请求，直接打印结果放行，连工厂都不用进。<code>query.ts</code> 真的就是"生产线"——它是一个 <code>while</code> 循环，每轮都是标准的"接收原料<span class="flowchart-arrow">→</span> <span class="flowchart-box">加工</span><span class="flowchart-arrow">→</span> <span class="flowchart-box">输出"流程。</span></p>
+<h3>和传统 CLI 工具的根本差异</h3>
+<p>如果你用过 Python 的 <code>argparse</code> 或 <code>click</code>，或者 Node.js 的 <code>commander</code>，你对 CLI 工具的心智模型大概是：</p>
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">TEXT</span></div>
+<pre><code class="language-text">解析参数 <span class="flowchart-arrow">→</span> <span class="flowchart-box">执行逻辑 </span><span class="flowchart-arrow">→</span> <span class="flowchart-box">打印结果 </span><span class="flowchart-arrow">→</span> <span class="flowchart-box">退出</span>
+</code></pre>
+</div>
+<p>Claude Code 完全不同。它是一个<strong>长驻进程</strong>：</p>
+<table>
+<thead><tr><th>维度</th><th>传统 CLI</th><th>Claude Code</th></tr></thead>
+<tbody><tr><td>生命周期</td><td>一次执行，输出后退出</td><td>长驻 REPL，反复交互</td></tr>
+</tbody></table>
+<p>| I/O 模型 | stdin <span class="flowchart-arrow">→</span> <span class="flowchart-box">stdout | React 终端 UI + 流式 API |</span></p>
+<table>
+<thead><tr><th>状态</th><th>无状态</th><th>有状态（对话历史、权限、MCP 连接）</th></tr></thead>
+<tbody><tr><td>复杂度</td><td>线性流程</td><td>多层嵌套循环 + 异步事件</td></tr>
+<tr><td>用户交互</td><td>参数一次传完</td><td>对话式，随时中断、追问</td></tr>
+</tbody></table>
+<p>这就解释了为什么 <code>main.tsx</code> 有约 4600 行——它不只是解析参数，它要初始化认证、启动遥测、加载配置、连接 MCP 服务器、设置权限策略，然后才启动 REPL。而 REPL 本身（<code>REPL.tsx</code>）又有 5009 行，因为它管理着整个交互循环。</p>
+<blockquote>
+<strong>核心建议</strong>
+读源码时，先在脑子里画出六层架构。遇到一个文件，先判断它在哪一层，然后只关注它的上下游。不要试图从 <code>main.tsx</code> 的第一行顺序读到最后一行——那个文件几乎是一个"粘合层"，把所有服务拉到一起，逐行读会被大量的初始化代码淹没。
+</blockquote>
+<p>蓝图画完了。但光看图纸不等于会开机器——下一章会带你走进工厂，从安装 Bun 开始，一步步让这座工厂在你本地跑起来。</p>
+<div class="section-header">
+<div class="section-number">§03</div>
+<h2 class="section-title">准备好进厂了</h2>
+<div class="section-subtitle">Setting Up for Source Reading</div>
+</div>
+<p>你打开了 VS Code，clone 了 CCB 仓库，然后面对 5000 行的 <code>main.tsx</code> 和 100 多个组件目录，手指停在键盘上不知道从哪里开始。这是正常的。本章带你搭建环境并建立一套阅读策略，让你能在这座工厂里自如穿行。</p>
+<h3>环境搭建</h3>
+<p>CCB 的唯一运行时依赖是 Bun。它不需要 Node.js、不需要 Python、不需要 Docker。</p>
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">Bash</span></div>
+<pre><code class="language-bash"><span class="syntax-comment"># macOS / Linux 安装 Bun</span>
+<span class="syntax-keyword">curl</span> <span class="syntax-property">-fsSL</span> https://bun.sh/install | bash
+<span class="syntax-comment"># 验证版本（需要 &gt;= <span class="syntax-number">1</span>.<span class="syntax-number">2</span>.<span class="syntax-number">0</span>）</span>
+bun <span class="syntax-property">--version</span>
+</code></pre>
+</div>
+<p>为什么必须是 Bun 而不是 Node.js？两个原因。第一，<code>package.json</code> 里声明了 <code>"engines": { "bun": ">=1.2.0" }</code>，且没有任何 Node engine 字段。第二，CCB 的构建脚本 <code>build.ts</code> 直接调用 <code>Bun.build()</code>，源码里有 <code>import { feature } from 'bun:bundle'</code> 这样的 Bun 专有 API。用 Node.js 跑不起来。</p>
+<h3>Clone 与依赖安装</h3>
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">Bash</span></div>
+<pre><code class="language-bash"><span class="syntax-comment"># Clone 仓库</span>
+<span class="syntax-keyword">git</span> clone https://github.com/claude-code-best/claude-code.<span class="syntax-keyword">git</span>
+<span class="syntax-keyword">cd</span> claude-code
+<span class="syntax-comment"># 安装依赖（Bun Workspaces 会自动处理内部包）</span>
+bun install
+</code></pre>
+</div>
+<p><code>bun install</code> 会处理 <code>packages/</code> 下的所有 workspace 包。多数内部包是 stub（只导出空函数），但 <code>color-diff-napi</code> 需要编译原生模块。如果你的环境缺少 Rust 工具链，这个包可能编译失败——不影响核心功能的阅读。</p>
+<p>依赖安装完后，项目结构确认一下：</p>
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">Bash</span></div>
+<pre><code class="language-bash"><span class="syntax-comment"># 确认核心文件都在</span>
+<span class="syntax-keyword">ls</span> <span class="syntax-property">-la</span> src/entrypoints/cli.tsx     <span class="syntax-comment"># 入口</span>
+<span class="syntax-keyword">ls</span> <span class="syntax-property">-la</span> src/main.tsx                 <span class="syntax-comment"># 主逻辑</span>
+<span class="syntax-keyword">ls</span> <span class="syntax-property">-la</span> src/query.ts                 <span class="syntax-comment"># 核心循环</span>
+<span class="syntax-keyword">ls</span> <span class="syntax-property">-la</span> src/QueryEngine.ts           <span class="syntax-comment"># 会话引擎</span>
+<span class="syntax-keyword">ls</span> <span class="syntax-property">-la</span> src/screens/REPL.tsx         <span class="syntax-comment"># 主界面</span>
+</code></pre>
+</div>
+<h3>运行与调试</h3>
+<p>CCB 提供了两种运行模式：</p>
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">Bash</span></div>
+<pre><code class="language-bash"><span class="syntax-comment"># 开发模式：直接执行源码，零构建</span>
+bun run dev
+<span class="syntax-comment"># 等价于：bun run src/entrypoints/cli.tsx</span>
+<span class="syntax-comment"># 构建模式：产出 dist/ 目录</span>
+bun run build
+<span class="syntax-comment"># 产出 dist/cli.js + 约 <span class="syntax-number">450</span> 个 chunk 文件</span>
+</code></pre>
+</div>
+<p>开发模式是源码阅读的最佳搭档。Bun 直接执行 <code>.tsx</code> 文件，你的任何修改都在下次启动时立即生效。</p>
+<p><strong>调试技巧一：快速路径验证</strong></p>
+<p>在 <code>cli.tsx</code> 里，<code>--version</code> 是最简单的快速路径。你可以用它验证环境是否正常：</p>
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">Bash</span></div>
+<pre><code class="language-bash">bun run src/entrypoints/cli.tsx <span class="syntax-property">--version</span>
+<span class="syntax-comment"># 应输出：<span class="syntax-number">2</span>.<span class="syntax-number">1</span>.<span class="syntax-number">888</span> (Claude Code)</span>
+</code></pre>
+</div>
+<p><strong>调试技巧二：console.log 插桩</strong></p>
+<p>因为 CCB 有大量反编译产生的类型错误（~1341 个 tsc 错误），IDE 的 TypeScript 类型提示可能不太可靠。最实用的调试方式是直接插 <code>console.log</code>：</p>
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">TypeScript</span></div>
+<pre><code class="language-typescript"><span class="syntax-comment">// 在 src/query.ts 的 <span class="syntax-function">query</span>() 函数入口加一行</span>
+<span class="syntax-keyword">export</span> <span class="syntax-keyword">async</span> <span class="syntax-keyword">function</span> <span class="syntax-function">query</span>(params: QueryParams): Promise&lt;QueryResult&gt; {
+    console.<span class="syntax-function">log</span>(<span class=\"syntax-string\">'[DEBUG] <span class="syntax-function">query</span>() called with:'</span>, params.messages.length, <span class=\"syntax-string\">'messages'</span>)
+    <span class="syntax-comment">// ... 原有代码</span>
+}
+</code></pre>
+</div>
+<p>Bun 在终端模式下会正常输出 console.log 到 stderr。</p>
+<p><strong>调试技巧三：环境变量控制</strong></p>
+<p>CCB 有大量环境变量控制行为。几个有用的：</p>
+<table>
+<thead><tr><th>环境变量</th><th>作用</th><th>用途</th></tr></thead>
+<tbody><tr><td><code>CLAUDE_CODE_USE_BEDROCK=1</code></td><td>切换到 AWS Bedrock Provider</td><td>测试不同 API 路径</td></tr>
+<tr><td><code>CLAUDE_CODE_USE_VERTEX=1</code></td><td>切换到 Google Vertex Provider</td><td>测试不同 API 路径</td></tr>
+<tr><td><code>CLAUDE_CODE_REMOTE=true</code></td><td>启用远程模式（8GB 堆内存）</td><td>模拟容器环境</td></tr>
+<tr><td><code>DISABLE_AUTO_COMPACT=1</code></td><td>禁用自动压缩</td><td>观察完整对话上下文</td></tr>
+</tbody></table>
+<h3>关键文件速查表</h3>
+<p>把这张表打印出来贴在屏幕旁边，比翻目录快十倍：</p>
+<table>
+<thead><tr><th>文件</th><th>行数</th><th>一句话说明</th></tr></thead>
+<tbody><tr><td><code>src/entrypoints/cli.tsx</code></td><td>375</td><td>入口 + polyfill + 快速路径分派</td></tr>
+<tr><td><code>src/main.tsx</code></td><td>约 4600</td><td>Commander 命令定义 + 全局初始化</td></tr>
+<tr><td><code>src/query.ts</code></td><td>约 1700</td><td>核心 API 查询循环（发请求、处理流、调工具）</td></tr>
+<tr><td><code>src/QueryEngine.ts</code></td><td>1320</td><td>会话引擎（压缩、快照、成本追踪）</td></tr>
+<tr><td><code>src/tools.ts</code></td><td>497</td><td>工具注册表（组装 + 过滤 + 合并 MCP）</td></tr>
+<tr><td><code>src/Tool.ts</code></td><td>—</td><td>Tool 类型定义 + 匹配工具</td></tr>
+<tr><td><code>src/services/api/claude.ts</code></td><td>3420</td><td>API 客户端（构建请求、处理流式响应）</td></tr>
+<tr><td><code>src/screens/REPL.tsx</code></td><td>5009</td><td>主界面（React/Ink 组件）</td></tr>
+<tr><td><code>src/bootstrap/state.ts</code></td><td>—</td><td>全局状态单例（sessionId、projectRoot）</td></tr>
+<tr><td><code>src/state/AppState.tsx</code></td><td>—</td><td>React Context 状态容器</td></tr>
+<tr><td><code>src/utils/model/providers.ts</code></td><td>41</td><td>API Provider 选择逻辑</td></tr>
+<tr><td><code>build.ts</code></td><td>71</td><td>构建脚本</td></tr>
+</tbody></table>
+<h3>阅读策略：从大门开始</h3>
+<p>面对 16000+ 行的核心代码，"从第一行读到最后一行"是效率最低的策略。推荐这套路径：</p>
+<p><strong>第一步：走通入口链。</strong> 从 <code>cli.tsx</code> 的 <code>main()</code> 函数开始，跟踪它怎么跳到 <code>main.tsx</code>。注意快速路径（<code>--version</code>、<code>--claude-in-chrome-mcp</code>）和正常路径的区别。这条链路很短， 10 分钟就能走完。</p>
+<p><strong>第二步：跟踪一次完整对话。</strong> 在 <code>query.ts</code> 的 <code>query()</code> 函数入口打断点或插 log，然后通过 REPL 发送一条消息。观察参数怎么传进来、API 响应怎么回来、工具调用怎么触发。这一步让你理解工厂的生产线是怎么转的。</p>
+<p><strong>第三步：挑一个工具读透。</strong> 从 <code>BashTool</code> 开始——它最简单，也最核心。读它的 <code>inputSchema</code>（参数定义）、<code>call()</code>（执行逻辑）、渲染组件。然后把同样的模式套用到 <code>FileReadTool</code>、<code>FileEditTool</code>。</p>
+<p><strong>第四步：看 UI 层。</strong> <code>REPL.tsx</code> 太大了，不要从头读。先找到它调用 <code>QueryEngine</code> 的地方，理解 UI 和核心层怎么交互。</p>
+<blockquote>
+<strong>核心建议</strong>
+源码阅读的效率取决于你"跳跃"的能力，而不是"顺序阅读"的耐力。在 VS Code 里，多用"Go to Definition"（F12）和"Find All References"（Shift+F12）。遇到不认识的类型，跳到定义看一眼就回来，不要展开读整个文件。
+</blockquote>
+<p>你现在已经站在工厂大门外了——Bun 装好了，代码跑通了，地图也画好了。下一步就是推开 <code>cli.tsx</code> 这扇门，看看门卫是怎么工作的。</p>
+<div class="part-header page-break">
+<div class="part-number">PART 2</div>
+<div class="part-rule"></div>
+<div class="part-title">核心机制</div>
+</div>
+<div class="section-header">
+<div class="section-number">§04</div>
+<h2 class="section-title">工厂大门</h2>
+<div class="section-subtitle">The Entry Gate — cli.tsx</div>
+</div>
+<p>你输入 <code>claude --version</code>，屏幕立刻打出 <code>2.1.888 (Claude Code)</code>，整个过程不到 10 毫秒。但如果你输入 <code>claude</code>，然后点根烟回来，终端里已经是一个完整的交互式对话界面了。同一个二进制文件，两条命令，启动速度差了几百倍。</p>
+<p>反直觉的结论是：<code>--version</code> 和正常启动走的是完全不同的路径。前者连一个模块都没加载，后者拉起了约 4600 行代码。制造这个巨大差异的，就是 <code>cli.tsx</code> 这个只有 376 行的文件。</p>
+<p>它不像你见过的那种"先 import 一百个模块再开始干活"的入口文件。它更像一座智能工厂的大门——门卫不查身份证不搜包，直接问你："你要干嘛？"如果你只是来问个版本号，门卫递张纸条你就走了，连厂房都不用进。</p>
+<h3>门卫的第一个问题：快速路径检测</h3>
+<p><code>cli.tsx</code> 的 <code>main()</code> 函数做的第一件事，就是扫描命令行参数：</p>
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">TypeScript</span></div>
+<pre><code class="language-typescript"><span class="syntax-keyword">async</span> <span class="syntax-keyword">function</span> <span class="syntax-function">main</span>(): Promise&lt;void&gt; {
+  <span class="syntax-keyword">const</span> args = process.argv.<span class="syntax-function">slice</span>(<span class="syntax-number">2</span>);
+  <span class="syntax-comment">// 快速路径：--version/-v，零模块加载</span>
+  <span class="syntax-function"><span class="syntax-keyword">if</span></span>(
+    args.length === <span class="syntax-number">1</span> &amp;&amp;
+    (args[<span class="syntax-number">0</span>] === <span class="syntax-string">"--version"</span> || args[<span class="syntax-number">0</span>] === <span class="syntax-string">"-v"</span> || args[<span class="syntax-number">0</span>] === <span class="syntax-string">"-V"</span>)
+  ) {
+    console.<span class="syntax-function">log</span>(<span class="syntax-string"><code>${MACRO.VERSION} (Claude Code)</code></span>);
+    <span class="syntax-keyword">return</span>; <span class="syntax-comment">// 直接返回，什么都不加载</span>
+  }
+  <span class="syntax-comment">// ...</span>
+}
+</code></pre>
+</div>
+<p>这个 <code>if</code> 判断在函数最顶端，甚至没有 <code>await import</code> 任何东西。<code>MACRO.VERSION</code> 是个全局常量（后面会说怎么来的），<code>console.log</code> 是 Node.js 内置 API——这意味着整条路径零额外模块加载，零 IO 等待。</p>
+<p>但这只是最简单的一条快速路径。往下看，你会发现一整棵决策树：</p>
+<table>
+<thead><tr><th>快速路径</th><th>参数</th><th>需要加载什么</th><th>谁能用</th></tr></thead>
+<tbody><tr><td>版本号</td><td><code>--version</code></td><td>无</td><td>所有人</td></tr>
+<tr><td>Chrome MCP</td><td><code>--claude-in-chrome-mcp</code></td><td><code>claudeInChrome/mcpServer.js</code></td><td>所有人</td></tr>
+<tr><td>Chrome 原生宿主</td><td><code>--chrome-native-host</code></td><td><code>claudeInChrome/chromeNativeHost.js</code></td><td>所有人</td></tr>
+<tr><td>系统提示词导出</td><td><code>--dump-system-prompt</code></td><td>config + prompts 模块</td><td>Ant 内部</td></tr>
+<tr><td>守护进程工作器</td><td><code>--daemon-worker</code></td><td><code>daemon/workerRegistry.js</code></td><td>Ant 内部</td></tr>
+<tr><td>远程控制桥接</td><td><code>remote-control/bridge</code></td><td>bridge 全套模块</td><td>Ant 内部</td></tr>
+<tr><td>后台会话管理</td><td><code>ps/logs/attach/kill</code></td><td><code>cli/bg.js</code></td><td>Ant 内部</td></tr>
+<tr><td>模板任务</td><td><code>new/list/reply</code></td><td><code>handlers/templateJobs.js</code></td><td>Ant 内部</td></tr>
+<tr><td>环境运行器</td><td><code>environment-runner</code></td><td><code>environment-runner/main.js</code></td><td>Ant 内部</td></tr>
+<tr><td>自托管运行器</td><td><code>self-hosted-runner</code></td><td><code>self-hosted-runner/main.js</code></td><td>Ant 内部</td></tr>
+<tr><td>完整 CLI</td><td>其他所有参数</td><td><code>main.tsx</code>（约 4600 行）</td><td>所有人</td></tr>
+</tbody></table>
+<p>注意到"谁能用"那一列了吗？大部分快速路径被标记为"Ant 内部"——Anthropic 内部版本。你用的公开版本根本走不到这些分支。这个区分机制就是接下来要说的 <code>feature()</code> 门禁。</p>
+<h3>feature() 门禁：全关的总闸</h3>
+<p>在 <code>cli.tsx</code> 的顶部，有一行看起来平平无奇的代码：</p>
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">TypeScript</span></div>
+<pre><code class="language-typescript"><span class="syntax-keyword">const</span> feature = (_name: string) =&gt; <span class="syntax-keyword">false</span>;
+</code></pre>
+</div>
+<p>这是一个始终返回 <code>false</code> 的函数。参数名叫 <code>_name</code>，下划线前缀表示"我不关心你传什么"。但它的作用极其关键——它控制着大约 30 个 feature flag，决定哪些代码路径活着、哪些是死代码。</p>
+<p>在 Anthropic 内部的原始构建流程中，Bun 打包器会在编译时把这个函数替换成真正的 feature flag 检查。对于公开版本，<code>feature()</code> 始终返回 <code>false</code>，打包器再通过 tree-shaking 把被 <code>if (feature("XXX"))</code> 包裹的代码块整段删掉。</p>
+<p>这就形成了一个精巧的安全网：</p>
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">TypeScript</span></div>
+<pre><code class="language-typescript"><span class="syntax-comment">// 这些代码在公开版本中根本不存在（被 tree-shaking 删掉了）</span>
+<span class="syntax-function"><span class="syntax-keyword">if</span></span>(<span class="syntax-function">feature</span>(<span class="syntax-string">"DAEMON"</span>) &amp;&amp; args[<span class="syntax-number">0</span>] === <span class="syntax-string">"--daemon-worker"</span>) {
+  <span class="syntax-keyword">const</span> { runDaemonWorker } = <span class="syntax-keyword">await</span> <span class="syntax-function"><span class="syntax-keyword">import</span></span>(<span class="syntax-string">"../daemon/workerRegistry.js"</span>);
+  <span class="syntax-keyword">await</span> <span class="syntax-function">runDaemonWorker</span>(args[<span class="syntax-number">1</span>]);
+  <span class="syntax-keyword">return</span>;
+}
+<span class="syntax-function"><span class="syntax-keyword">if</span></span>(<span class="syntax-function">feature</span>(<span class="syntax-string">"BRIDGE_MODE"</span>) &amp;&amp; args[<span class="syntax-number">0</span>] === <span class="syntax-string">"remote-control"</span>) {
+  <span class="syntax-comment">// ... 一大段远程控制逻辑</span>
+  <span class="syntax-keyword">return</span>;
+}
+</code></pre>
+</div>
+<p>在公开版本中，这些 <code>if</code> 块不会执行，对应的 <code>await import</code> 也不会触发。这不仅仅是功能开关——它是安全边界。守护进程、远程控制、后台会话管理这些高风险功能，通过编译时消除彻底从公开构建中剥离了。</p>
+<blockquote>
+<strong>核心建议</strong>：理解 feature flag 门禁是阅读 Claude Code 源码的第一把钥匙。当你看到 <code>if (feature("XXX"))</code> 包裹的代码块，在公开版本中可以直接跳过——它要么已经被删掉了，要么永远不会执行。这能帮你过滤掉大约 40% 的条件分支，让约 4600 行的 <code>main.tsx</code> 不再那么吓人。
+</blockquote>
+<h3>MACRO 变量注入：编译时常量</h3>
+<p>紧跟 <code>feature()</code> 函数之后，你会看到一段给 <code>globalThis</code> 注入常量的代码：</p>
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">TypeScript</span></div>
+<pre><code class="language-typescript"><span class="syntax-function"><span class="syntax-keyword">if</span></span>(<span class="syntax-keyword">typeof</span> globalThis.MACRO === <span class="syntax-string">"<span class="syntax-keyword">undefined</span>"</span>) {
+  (globalThis as any).MACRO = {
+    VERSION: <span class="syntax-string">"<span class="syntax-number">2.1</span>.<span class="syntax-number">888</span>"</span>,
+    BUILD_TIME: <span class="syntax-keyword">new</span> <span class="syntax-function">Date</span>().<span class="syntax-function">toISOString</span>(),
+    FEEDBACK_CHANNEL: <span class="syntax-string">""</span>,
+    ISSUES_EXPLAINER: <span class="syntax-string">""</span>,
+    NATIVE_PACKAGE_URL: <span class="syntax-string">""</span>,
+    PACKAGE_URL: <span class="syntax-string">""</span>,
+    VERSION_CHANGELOG: <span class="syntax-string">""</span>,
+  };
+}
+(globalThis as any).BUILD_TARGET = <span class="syntax-string">"external"</span>;
+(globalThis as any).BUILD_ENV = <span class="syntax-string">"production"</span>;
+(globalThis as any).INTERFACE_TYPE = <span class="syntax-string">"stdio"</span>;
+</code></pre>
+</div>
+<p>在原始构建流程中，这些值由 Bun 打包器在编译时注入。对于逆向还原版本，它们被硬编码在这里。这解释了为什么 <code>--version</code> 能做到零模块加载——<code>MACRO.VERSION</code> 已经挂在全局对象上了，不需要任何 import。</p>
+<p><code>BUILD_TARGET</code> 设为 <code>"external"</code> 尤其有意思。代码中到处有 <code>"external" as string === 'ant'</code> 这样的比较（注意 <code>"external"</code> 作为字面量，而 <code>'ant'</code> 是比较对象）。这个值决定了 Anthropic 内部版和外部版的行为差异——内部版有更多的迁移逻辑、遥测收集和实验功能。</p>
+<h3>安全加固：工厂围墙</h3>
+<p>在进入主路径之前，<code>cli.tsx</code> 还做了两道安全加固。</p>
+<p>第一道是防止 Corepack 自动修改 <code>package.json</code>：</p>
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">TypeScript</span></div>
+<pre><code class="language-typescript">process.env.COREPACK_ENABLE_AUTO_PIN = <span class="syntax-string">"<span class="syntax-number">0</span>"</span>;
+</code></pre>
+</div>
+<p>第二道是内存限制。如果检测到运行在 CCR（Claude Code Runtime）容器环境中，会设置 Node.js 子进程的最大堆内存为 8GB：</p>
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">TypeScript</span></div>
+<pre><code class="language-typescript"><span class="syntax-function"><span class="syntax-keyword">if</span></span>(process.env.CLAUDE_CODE_REMOTE === <span class="syntax-string">"<span class="syntax-keyword">true</span>"</span>) {
+  <span class="syntax-keyword">const</span> existing = process.env.NODE_OPTIONS || <span class="syntax-string">""</span>;
+  process.env.NODE_OPTIONS = existing
+    ? <span class="syntax-string"><code>${existing} --max-old-space-size=<span class="syntax-number">8192</span></code></span>
+    : <span class="syntax-string">"--max-old-space-size=<span class="syntax-number">8192</span>"</span>;
+}
+</code></pre>
+</div>
+<p>为什么要 8GB？因为容器通常配 16GB 内存，给 Bun 主进程和其他进程留出足够空间。这个值不是拍脑袋定的——它是在生产环境中观测到 OOM 后调优出来的。</p>
+<h3>动态导入：只背你需要的包</h3>
+<p>当所有快速路径都匹配失败，代码最终会走到默认路径：</p>
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">TypeScript</span></div>
+<pre><code class="language-typescript"><span class="syntax-comment">// 开始捕获早期输入（用户在加载过程中键入的内容）</span>
+<span class="syntax-keyword">const</span> { startCapturingEarlyInput } = <span class="syntax-keyword">await</span> <span class="syntax-function"><span class="syntax-keyword">import</span></span>(<span class="syntax-string">"../utils/earlyInput.js"</span>);
+<span class="syntax-function">startCapturingEarlyInput</span>();
+<span class="syntax-comment">// 动态加载 main.tsx</span>
+<span class="syntax-keyword">const</span> { main: cliMain } = <span class="syntax-keyword">await</span> <span class="syntax-function"><span class="syntax-keyword">import</span></span>(<span class="syntax-string">"../main.jsx"</span>);
+<span class="syntax-keyword">await</span> <span class="syntax-function">cliMain</span>();
+</code></pre>
+</div>
+<p>这里有两个值得注意的设计。</p>
+<p>第一，<code>startCapturingEarlyInput()</code>。在加载 <code>main.tsx</code> 的几毫秒到几百毫秒之间，用户可能已经在键盘上敲东西了。这个函数会开始缓冲 stdin 输入，等 REPL 界面准备好后再回放。这是一个追求极致体验的设计——连"加载中的键盘输入"都不放过。</p>
+<p>第二，<code>main.jsx</code> 的扩展名。注意它是 <code>.jsx</code> 而不是 <code>.tsx</code>。Bun 运行时不关心扩展名——它能直接运行 TypeScript 和 TSX 文件。这里的 <code>.jsx</code> 只是源码文件的命名习惯。</p>
+<p>沿途还有 <code>profileCheckpoint</code> 埋点，追踪每个阶段的耗时：</p>
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">TypeScript</span></div>
+<pre><code class="language-typescript"><span class="syntax-function">profileCheckpoint</span>(<span class="syntax-string">"cli_entry"</span>);
+<span class="syntax-comment">// ... 快速路径检测 ...</span>
+<span class="syntax-function">profileCheckpoint</span>(<span class="syntax-string">"cli_before_main_import"</span>);
+<span class="syntax-keyword">const</span> { main: cliMain } = <span class="syntax-keyword">await</span> <span class="syntax-function"><span class="syntax-keyword">import</span></span>(<span class="syntax-string">"../main.jsx"</span>);
+<span class="syntax-function">profileCheckpoint</span>(<span class="syntax-string">"cli_after_main_import"</span>);
+<span class="syntax-keyword">await</span> <span class="syntax-function">cliMain</span>();
+<span class="syntax-function">profileCheckpoint</span>(<span class="syntax-string">"cli_after_main_complete"</span>);
+</code></pre>
+</div>
+<p>这些埋点帮助 Anthropic 团队监控启动性能，定位瓶颈。在工厂的比喻里，它就像门口打卡机上记录每辆卡车进出时间的探头。</p>
+<h3>从大门到调度中心</h3>
+<p><code>cli.tsx</code> 的设计哲学可以浓缩为一句话：<strong>能不做的事就不做，能晚做的就晚做</strong>。</p>
+<p>快速路径检测避免了不必要的模块加载。<code>feature()</code> 门禁通过编译时消除让 40% 的条件分支消失。动态导入确保只有真正需要的代码才进入内存。MACRO 变量注入让常量在编译时就固定下来。</p>
+<p>但大门终究只是大门。当 <code>cliMain()</code> 被调用，卡车驶入工厂大门的那一刻，它面对的是一座更复杂的调度中心——Commander.js 的命令体系、preAction 初始化链、交互与非交互模式的分叉。这些都在 <code>main.tsx</code> 里等着它。</p>
+<p>现在，让我们跟着卡车走进调度中心。</p>
+<div class="section-header">
+<div class="section-number">§05</div>
+<h2 class="section-title">调度中心</h2>
+<div class="section-subtitle">The Dispatch Center — main.tsx</div>
+</div>
+<p>你在终端里敲下 <code>claude</code>，然后等了大概一秒钟。这一秒钟里发生了什么？你的内心 OS 大概是这样的："不就是解析几个命令行参数，然后弹个界面出来吗？"</p>
+<p>对，也不对。这一秒钟里，<code>main.tsx</code> 已经跑完了：MDM（移动设备管理）设置加载、钥匙串预取、遥测初始化、数据库迁移、远程配置拉取、权限模式设定、并行加载三组数据，然后根据你的运行环境分叉到交互式 REPL 或者无头模式。这些步骤里，任何一步失败都可能导致启动中断，但大部分步骤你甚至不知道它们存在。</p>
+<p><code>main.tsx</code> 大约 4600 行。别被这个数字吓到——大部分行是 Commander.js 的选项定义和 action handler。核心启动链路其实相当清晰：<code>main()</code> <span class="flowchart-arrow">→</span> <span class="flowchart-box"><code>run()</code> </span><span class="flowchart-arrow">→</span> <span class="flowchart-box">preAction 钩子 </span><span class="flowchart-arrow">→</span> <span class="flowchart-box">action handler </span><span class="flowchart-arrow">→</span> <span class="flowchart-box">REPL 或 Headless。</span></p>
+<h3>main() 做的第一件事不是解析参数</h3>
+<p><code>main()</code> 函数的前几行做的事，和命令行参数完全无关：</p>
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">TypeScript</span></div>
+<pre><code class="language-typescript"><span class="syntax-keyword">export</span> <span class="syntax-keyword">async</span> <span class="syntax-keyword">function</span> <span class="syntax-function">main</span>() {
+  <span class="syntax-comment">// 安全：防止 Windows 从当前目录执行命令（PATH 劫持防护）</span>
+  process.env.NoDefaultCurrentDirectoryInExePath = <span class=\"syntax-string\">'<span class="syntax-number">1</span>'</span>;
+  <span class="syntax-comment">// 初始化警告处理器，捕获早期警告</span>
+  <span class="syntax-function">initializeWarningHandler</span>();
+  <span class="syntax-comment">// 进程退出时重置光标</span>
+  process.<span class="syntax-function">on</span>(<span class=\"syntax-string\">'exit'</span>, () =&gt; { <span class="syntax-function">resetCursor</span>(); });
+}
+</code></pre>
+</div>
+<p><code>NoDefaultCurrentDirectoryInExePath</code> 这个环境变量是 Windows 安全防护。在 Windows 上，如果你在当前目录有一个和系统命令同名的可执行文件（比如 <code>cls.exe</code>），系统会优先执行当前目录的版本。设置这个变量可以阻止这种行为。</p>
+<p>光标重置也很巧妙——如果 Ink（终端 UI 框架）在异常退出时没有正确恢复光标状态，<code>exit</code> 事件处理器会兜底处理。这是防御性编程的典型例子。</p>
+<p>然后才调用 <code>run()</code>——真正的命令解析和分派。</p>
+<h3>preAction 钩子：启动前的初始化链</h3>
+<p><code>run()</code> 函数创建 Commander.js 的 program 实例，然后挂载了一个关键的 <code>preAction</code> 钩子：</p>
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">TypeScript</span></div>
+<pre><code class="language-typescript">program.<span class="syntax-function">hook</span>(<span class=\"syntax-string\">'preAction'</span>, <span class="syntax-keyword">async</span> thisCommand =&gt; {
+  <span class="syntax-comment">// <span class="syntax-number">1</span>. 等待 MDM 设置和钥匙串预取完成</span>
+  <span class="syntax-keyword">await</span> Promise.<span class="syntax-function">all</span>([
+    <span class="syntax-function">ensureMdmSettingsLoaded</span>(),
+    <span class="syntax-function">ensureKeychainPrefetchCompleted</span>(),
+  ]);
+  <span class="syntax-comment">// <span class="syntax-number">2</span>. 初始化核心系统</span>
+  <span class="syntax-keyword">await</span> <span class="syntax-function">init</span>();
+  <span class="syntax-comment">// <span class="syntax-number">3</span>. 挂载日志管道</span>
+  <span class="syntax-function">initSinks</span>();
+  <span class="syntax-comment">// <span class="syntax-number">4</span>. 运行数据库迁移</span>
+  <span class="syntax-function">runMigrations</span>();
+  <span class="syntax-comment">// <span class="syntax-number">5</span>. 非阻塞：加载远程托管设置和策略限制</span>
+  void <span class="syntax-function">loadRemoteManagedSettings</span>();
+  void <span class="syntax-function">loadPolicyLimits</span>();
+});
+</code></pre>
+</div>
+<p>这段代码的信息密度极高，值得逐行拆解。</p>
+<p><code>ensureMdmSettingsLoaded()</code> 和 <code>ensureKeychainPrefetchCompleted()</code> 为什么放在最前面？因为它们在 <code>main.tsx</code> 的模块顶层就已经通过 <code>startMdmRawRead()</code> 和 <code>startKeychainPrefetch()</code> 启动了子进程。在模块加载的 ~135 毫秒里，这些子进程在后台并行执行。到了 preAction 钩子，只需 <code>await</code> 它们的结果——几乎零等待。</p>
+<table>
+<thead><tr><th>初始化步骤</th><th>耗时</th><th>阻塞？</th><th>失败会怎样</th></tr></thead>
+<tbody><tr><td>MDM 设置加载</td><td>~50ms</td><td>是（但已在后台运行）</td><td>使用缓存值继续</td></tr>
+<tr><td>钥匙串预取</td><td>~65ms</td><td>是（但已在后台运行）</td><td>跳过 OAuth 密钥</td></tr>
+<tr><td><code>init()</code></td><td>~30ms</td><td>是</td><td>启动中断</td></tr>
+<tr><td><code>initSinks()</code></td><td><5ms</td><td>是</td><td>日志丢失</td></tr>
+<tr><td><code>runMigrations()</code></td><td>~10ms</td><td>是</td><td>使用旧配置继续</td></tr>
+<tr><td><code>loadRemoteManagedSettings()</code></td><td>网络请求</td><td>否（void）</td><td>使用本地设置继续</td></tr>
+<tr><td><code>loadPolicyLimits()</code></td><td>网络请求</td><td>否（void）</td><td>使用默认策略继续</td></tr>
+</tbody></table>
+<p>注意最后两个用 <code>void</code> 标记的调用。<code>void</code> 在 TypeScript 里不仅是类型关键字，作为语句时它的语义是"我主动丢弃这个 Promise 的结果"。这意味着 <code>loadRemoteManagedSettings()</code> 和 <code>loadPolicyLimits()</code> 是真正的 fire-and-forget——它们在后台运行，不会阻塞启动。即使网络请求超时或失败，用户也不会感知到。</p>
+<blockquote>
+<strong>核心建议</strong>：在阅读 <code>main.tsx</code> 的初始化代码时，区分"阻塞"和"非阻塞"是关键。<code>await</code> 的调用是必须等它完成才能继续的；<code>void</code> 的调用是"能做就做，做不了拉倒"。后者的失败是设计上允许的，而不是 bug。
+</blockquote>
+<h3>Commander.js 选项：六个分类</h3>
+<p><code>run()</code> 函数用了一长串 <code>.option()</code> 调用来定义命令行选项。按功能分类更清晰：</p>
+<table>
+<thead><tr><th>分类</th><th>代表选项</th><th>用途</th></tr></thead>
+<tbody><tr><td>调试</td><td><code>--debug</code>, <code>--verbose</code>, <code>--debug-file</code></td><td>开发者调试和日志</td></tr>
+<tr><td>模式</td><td><code>--print</code>, <code>--bare</code></td><td>交互 vs 无头 vs 极简</td></tr>
+<tr><td>输出</td><td><code>--output-format</code>, <code>--json-schema</code></td><td>控制输出格式和结构</td></tr>
+<tr><td>会话</td><td><code>--continue</code>, <code>--resume</code>, <code>--fork-session</code></td><td>恢复和管理对话</td></tr>
+<tr><td>模型</td><td><code>--model</code>, <code>--effort</code>, <code>--fallback-model</code></td><td>模型选择和配置</td></tr>
+<tr><td>配置</td><td><code>--settings</code>, <code>--mcp-config</code>, <code>--add-dir</code></td><td>外部配置注入</td></tr>
+</tbody></table>
+<p>其中 <code>--bare</code> 是个特别有意思的选项。它设置 <code>CLAUDE_CODE_SIMPLE=1</code>，跳过 hooks、LSP、插件同步、自动记忆、后台预取、钥匙串读取和 CLAUDE.md 自动发现。相当于把工厂切换到"最小运行模式"——只保留核心生产线，关掉所有辅助系统。适合 CI/CD 和脚本化调用。</p>
+<h3>并行初始化：三个赛道同时起跑</h3>
+<p>当 action handler 确定要执行默认命令（启动 REPL 或 Headless）时，代码做了一个关键的并行化操作：</p>
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">TypeScript</span></div>
+<pre><code class="language-typescript"><span class="syntax-comment">// 在 <span class="syntax-function">setup</span>() 启动前，先注册内置插件和技能（纯内存操作，&lt;1ms）</span>
+<span class="syntax-function">initBuiltinPlugins</span>();
+<span class="syntax-function">initBundledSkills</span>();
+<span class="syntax-comment">// <span class="syntax-function">setup</span>() 负责工作目录、worktree、权限等初始化</span>
+<span class="syntax-keyword">const</span> setupPromise = <span class="syntax-function">setup</span>(preSetupCwd, permissionMode, ...);
+<span class="syntax-comment">// <span class="syntax-function">getCommands</span>() 加载斜杠命令</span>
+<span class="syntax-keyword">const</span> commandsPromise = worktreeEnabled ? <span class="syntax-keyword">null</span> : <span class="syntax-function">getCommands</span>(preSetupCwd);
+<span class="syntax-comment">// <span class="syntax-function">getAgentDefinitionsWithOverrides</span>() 加载自定义 Agent 定义</span>
+<span class="syntax-keyword">const</span> agentDefsPromise = worktreeEnabled ? <span class="syntax-keyword">null</span> : <span class="syntax-function">getAgentDefinitionsWithOverrides</span>(preSetupCwd);
+<span class="syntax-comment">// 等待 setup 完成后再等 commands 和 agents（它们和 setup 并行运行了）</span>
+<span class="syntax-keyword">await</span> setupPromise;
+</code></pre>
+</div>
+<p>这里的设计考虑了一个微妙的依赖关系：<code>setup()</code> 可能会执行 <code>process.chdir()</code>（当使用 <code>--worktree</code> 时），而 <code>getCommands()</code> 和 <code>getAgentDefinitionsWithOverrides()</code> 需要在正确的目录下读取文件。所以当 <code>worktreeEnabled</code> 为 true 时，后两者被跳过，等 setup 完成后再在后续逻辑里加载。</p>
+<p>当 <code>worktreeEnabled</code> 为 false 时，三件事并行运行。<code>setup()</code> 的 ~28ms 主要是 UDS（Unix Domain Socket，一种进程间通信机制，不走网络）消息通道的建立，不涉及磁盘 IO，不会和文件读取密集的 <code>getCommands()</code> 争抢资源。</p>
+<h3>交互 vs 非交互：工厂的两条产线</h3>
+<p>在所有初始化完成后，代码来到一个关键的分叉点：</p>
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">TypeScript</span></div>
+<pre><code class="language-typescript"><span class="syntax-keyword">const</span> hasPrintFlag = cliArgs.<span class="syntax-function">includes</span>(<span class=\"syntax-string\">'-p'</span>) || cliArgs.<span class="syntax-function">includes</span>(<span class=\"syntax-string\">'--print'</span>);
+<span class="syntax-keyword">const</span> isNonInteractive = hasPrintFlag || hasInitOnlyFlag || hasSdkUrl || !process.stdout.isTTY;
+<span class="syntax-function"><span class="syntax-keyword">if</span></span>(isNonInteractive) {
+  <span class="syntax-function">stopCapturingEarlyInput</span>();
+} <span class="syntax-keyword">else</span> {
+  <span class="syntax-comment">// 交互模式：继续缓冲键盘输入</span>
+}
+<span class="syntax-function">setIsInteractive</span>(!isNonInteractive);
+<span class="syntax-function">initializeEntrypoint</span>(isNonInteractive);
+</code></pre>
+</div>
+<p>判断非交互模式的条件有四个：</p>
+<ol>
+<li><code>-p</code> / <code>--print</code> 标志（pipe 模式）</li>
+<li><code>--init-only</code> 标志（只运行初始化钩子）</li>
+<li><code>--sdk-url</code> 标志（SDK 调用模式）</li>
+<li><code>!process.stdout.isTTY</code>（标准输出不是终端——比如被管道重定向了）</li>
+</ol>
+<p>非交互模式走 <code>runHeadless()</code> 路径——接收输入、调用 API、输出结果、退出。没有 UI、没有键盘监听、没有实时渲染。</p>
+<p>交互模式走 <code>launchRepl()</code> 路径——启动 Ink/React 渲染的终端界面，进入持续的事件循环。</p>
+<table>
+<thead><tr><th>维度</th><th>交互模式 (REPL)</th><th>非交互模式 (Headless)</th></tr></thead>
+<tbody><tr><td>入口</td><td><code>launchRepl()</code></td><td><code>runHeadless()</code></td></tr>
+<tr><td>UI</td><td>Ink/React 终端渲染</td><td>stdout 直接输出</td></tr>
+<tr><td>输入</td><td>键盘实时监听</td><td>stdin 单次读取</td></tr>
+<tr><td>会话持久化</td><td>支持 <code>/resume</code></td><td>可选（<code>--no-session-persistence</code>）</td></tr>
+<tr><td>权限提示</td><td>弹出交互式确认</td><td>必须预配置</td></tr>
+<tr><td>典型场景</td><td>开发者日常使用</td><td>CI/CD、脚本、SDK</td></tr>
+</tbody></table>
+<h3>延迟预取：把活藏到用户看不见的地方</h3>
+<p>在 REPL 模式下，首次渲染完成后，会调用 <code>startDeferredPrefetches()</code>。这个函数的设计理念是"用户在看界面的时候，我们在后台偷偷干活"：</p>
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">TypeScript</span></div>
+<pre><code class="language-typescript"><span class="syntax-keyword">export</span> <span class="syntax-keyword">function</span> <span class="syntax-function">startDeferredPrefetches</span>(): void {
+  <span class="syntax-comment">// 如果是极简模式或只需要测量启动性能，跳过所有预取</span>
+  <span class="syntax-function"><span class="syntax-keyword">if</span></span>(<span class="syntax-function">isBareMode</span>() || <span class="syntax-function">isEnvTruthy</span>(process.env.CLAUDE_CODE_EXIT_AFTER_FIRST_RENDER)) {
+    <span class="syntax-keyword">return</span>;
+  }
+  <span class="syntax-comment">// 用户信息预取（等用户输入提示词时完成）</span>
+  void <span class="syntax-function">initUser</span>();
+  void <span class="syntax-function">getUserContext</span>();
+  <span class="syntax-function">prefetchSystemContextIfSafe</span>();
+  <span class="syntax-comment">// 云服务凭证预取</span>
+  <span class="syntax-function"><span class="syntax-keyword">if</span></span>(<span class="syntax-comment">/<em> 使用 Bedrock </em>/</span>) void <span class="syntax-function">prefetchAwsCredentialsAndBedRockInfoIfSafe</span>();
+  <span class="syntax-function"><span class="syntax-keyword">if</span></span>(<span class="syntax-comment">/<em> 使用 Vertex </em>/</span>) void <span class="syntax-function">prefetchGcpCredentialsIfSafe</span>();
+  <span class="syntax-comment">// 文件计数（用 ripgrep，3秒超时）</span>
+  void <span class="syntax-function">countFilesRoundedRg</span>(<span class="syntax-function">getCwd</span>(), AbortSignal.<span class="syntax-function">timeout</span>(<span class="syntax-number">3000</span>), []);
+  <span class="syntax-comment">// 功能开关初始化</span>
+  void <span class="syntax-function">initializeAnalyticsGates</span>();
+  void <span class="syntax-function">refreshModelCapabilities</span>();
+  <span class="syntax-comment">// 文件变更检测器</span>
+  void settingsChangeDetector.<span class="syntax-function">initialize</span>();
+  void skillChangeDetector.<span class="syntax-function">initialize</span>();
+}
+</code></pre>
+</div>
+<p>每个 <code>void</code> 调用都是非阻塞的。它们在事件循环的空闲时间执行，不会影响 UI 渲染和用户输入响应。等用户真正输入第一个提示词时，这些数据已经在内存里准备好了。</p>
+<p>这里有一个细节值得注意：<code>prefetchSystemContextIfSafe()</code> 会检查是否已建立信任关系（trust dialog accepted）。在交互模式下，Git 命令可能执行任意代码（通过 hooks 和 config），所以只有确认用户已信任当前目录后才运行。非交互模式则默认信任——这也是 <code>--print</code> 模式跳过信任对话框的原因，帮助文档里已经说明了这一点。</p>
+<h3>从调度中心到生产线</h3>
+<p><code>main.tsx</code> 的约 4600 行看起来吓人，但它的核心启动链路可以压缩成六步：</p>
+<ol>
+<li>安全初始化 + 信号处理</li>
+<li>preAction 钩子：MDM/钥匙串/核心初始化/迁移/远程配置</li>
+<li>Commander.js 选项解析和命令匹配</li>
+<li>并行加载 setup/commands/agents</li>
+<li>交互 vs 非交互分叉</li>
+<li>延迟预取启动</li>
+</ol>
+<p>整个流程像一个精心编排的交响乐——每个模块在正确的时间进入，有些必须同步等待（<code>await</code>），有些在后台默默运行（<code>void</code>），有些被 feature flag 挡在门外（编译时消除）。</p>
+<p>但不管是 REPL 还是 Headless，当用户输入的第一个提示词准备好发送时，它们都汇聚到同一个地方——<code>query.ts</code> 的核心循环。那是工厂里轰鸣的生产线，消息进去、工具调用出来、AI 回复产生、循环往复。</p>
+<p>让我们走进那条生产线。</p>
+<div class="section-header">
+<div class="section-number">§06</div>
+<h2 class="section-title">生产线</h2>
+<div class="section-subtitle">The Production Line — query.ts Core Loop</div>
+</div>
+<p>你输入了一句话："帮我把这个函数拆成两个。"然后你看着终端里的文字一段段出现，接着 Claude 开始读文件、编辑代码、运行测试。你看到的这一切，背后是一个 <code>while(true)</code> 循环在疯狂运转。</p>
+<p>这个循环就在 <code>query.ts</code> 里，大约 1700 行。但核心循环结构本身并不复杂——它做的事可以浓缩成一句话：<strong>把消息发给 API，拿到回复，如果回复里有工具调用就执行工具，然后把结果拼回去继续发，直到没有工具调用为止。</strong></p>
+<p>问题在于"细节"二字。流式响应怎么处理？工具可以并发执行吗？上下文太长怎么办？API 报错了怎么恢复？用户按了 Ctrl+C 怎么办？这些才是 <code>query.ts</code> 真正要解决的问题。</p>
+<h3>函数签名：AsyncGenerator（一种可以暂停和恢复的异步迭代器）的妙用</h3>
+<p><code>query()</code> 函数的签名长这样：</p>
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">TypeScript</span></div>
+<pre><code class="language-typescript"><span class="syntax-keyword">export</span> <span class="syntax-keyword">async</span> function* <span class="syntax-function">query</span>(
+  params: QueryParams,
+): AsyncGenerator&lt;
+  | StreamEvent        <span class="syntax-comment">// 流式事件（文本片段、工具调用等）</span>
+  | RequestStartEvent  <span class="syntax-comment">// 请求开始事件</span>
+  | Message            <span class="syntax-comment">// 完整消息</span>
+  | TombstoneMessage   <span class="syntax-comment">// 消息删除标记</span>
+  | ToolUseSummaryMessage,  <span class="syntax-comment">// 工具使用摘要</span>
+  Terminal             <span class="syntax-comment">// 返回值类型</span>
+&gt; {
+</code></pre>
+</div>
+<code>async function*</code> 是 JavaScript 的异步生成器语法。它和普通 <code>async function</code> 的区别在于：普通函数 <code>return</code> 一次就结束了，而异步生成器可以 <code>yield</code> 多次，每次 yield 都把一个值推给调用者，然后暂停自己，等调用者再要下一个值时继续执行。
+这个设计选择不是偶然的。<code>query()</code> 的调用者（REPL 或 Headless）需要实时接收流式事件来更新 UI——文本一个字一个字地出现、工具调用一个个地执行。如果用普通函数，要么等整个循环跑完再一次性返回所有结果（用户等半天什么也看不到），要么传入回调函数（代码耦合度高，控制流复杂）。
+<code>AsyncGenerator</code> 提供了第三条路：<code>query()</code> 在循环里 <code>yield</code> 每个事件，调用者用 <code>for await...of</code> 消费。这是一个"推-拉"模型——生成器主动推数据，但节奏由调用者控制。
+<table>
+<thead><tr><th>方案</th><th>实时性</th><th>控制流</th><th>取消支持</th></tr></thead>
+<tbody><tr><td>同步返回</td><td>差（等全部完成）</td><td>简单</td><td>不支持</td></tr>
+<tr><td>回调函数</td><td>好</td><td>复杂（回调地狱）</td><td>需手动实现</td></tr>
+<tr><td>AsyncGenerator</td><td>好</td><td>清晰（for await）</td><td><code>.return()</code> / <code>.throw()</code></td></tr>
+</tbody></table>
+<code>QueryParams</code> 包含循环需要的所有输入：
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">TypeScript</span></div>
+<pre><code class="language-typescript"><span class="syntax-keyword">export</span> type QueryParams = {
+  messages: Message[]              <span class="syntax-comment">// 对话历史</span>
+  systemPrompt: SystemPrompt       <span class="syntax-comment">// 系统提示词</span>
+  userContext: { [k: string]: string }   <span class="syntax-comment">// 用户上下文</span>
+  systemContext: { [k: string]: string } <span class="syntax-comment">// 系统上下文</span>
+  canUseTool: CanUseToolFn         <span class="syntax-comment">// 权限检查函数</span>
+  toolUseContext: ToolUseContext    <span class="syntax-comment">// 工具执行上下文</span>
+  fallbackModel?: string           <span class="syntax-comment">// 备用模型</span>
+  querySource: QuerySource         <span class="syntax-comment">// 查询来源标识</span>
+  maxTurns?: number                <span class="syntax-comment">// 最大循环轮次</span>
+  taskBudget?: { total: number }   <span class="syntax-comment">// Token 预算</span>
+  <span class="syntax-comment">// ...</span>
+}
+</code></pre>
+</div>
+<h3>while(true)：永远不会停的传送带</h3>
+<code>queryLoop()</code> 里的核心结构是一个 <code>while(true)</code> 循环。每一轮循环做四件事：
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">TEXT</span></div>
+<pre><code class="language-text">┌──────────────────────────────────────────────┐
+</code></pre>
+</div>
+在代码中，它看起来像这样（简化后）：
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">TypeScript</span></div>
+<pre><code class="language-typescript"><span class="syntax-function"><span class="syntax-keyword">while</span></span>(<span class="syntax-keyword">true</span>) {
+  <span class="syntax-keyword">let</span> messagesForQuery = [...<span class="syntax-function">getMessagesAfterCompactBoundary</span>(messages)];
+  <span class="syntax-comment">// ---- 阶段1：消息预处理 ----</span>
+  messagesForQuery = <span class="syntax-keyword">await</span> <span class="syntax-function">applyToolResultBudget</span>(messagesForQuery, ...);
+  <span class="syntax-comment">// snip 裁剪（如果 feature flag 开启）</span>
+  <span class="syntax-comment">// microcompact 微压缩</span>
+  <span class="syntax-comment">// autocompact 自动压缩</span>
+  <span class="syntax-keyword">yield</span> { type: <span class=\"syntax-string\">'stream_request_start'</span> };
+  <span class="syntax-comment">// ---- 阶段2和3：调用 API + 处理流式响应 ----</span>
+  <span class="syntax-keyword">const</span> toolUseBlocks: ToolUseBlock[] = [];
+  <span class="syntax-keyword">let</span> needsFollowUp = <span class="syntax-keyword">false</span>;
+  <span class="syntax-keyword">for</span> <span class="syntax-function"><span class="syntax-keyword">await</span></span>(<span class="syntax-keyword">const</span> message <span class="syntax-keyword">of</span> deps.<span class="syntax-function">callModel</span>({
+    messages: <span class="syntax-function">prependUserContext</span>(messagesForQuery, userContext),
+    systemPrompt: fullSystemPrompt,
+    tools: toolUseContext.options.tools,
+    <span class="syntax-comment">// ...</span>
+  })) {
+    <span class="syntax-keyword">yield</span> message;  <span class="syntax-comment">// 实时推送给上层</span>
+    <span class="syntax-function"><span class="syntax-keyword">if</span></span>(message.type === <span class=\"syntax-string\">'assistant'</span>) {
+      <span class="syntax-comment">// 收集工具调用</span>
+      <span class="syntax-function"><span class="syntax-keyword">if</span></span>(msgToolUseBlocks.length &gt; <span class="syntax-number">0</span>) {
+        toolUseBlocks.<span class="syntax-function">push</span>(...msgToolUseBlocks);
+        needsFollowUp = <span class="syntax-keyword">true</span>;
+      }
+  <span class="syntax-comment">// ---- 阶段4：工具执行或退出 ----</span>
+  <span class="syntax-function"><span class="syntax-keyword">if</span></span>(!needsFollowUp) {
+    <span class="syntax-keyword">return</span> { reason: <span class=\"syntax-string\">'completed'</span> };  <span class="syntax-comment">// 没有工具调用，循环结束</span>
+  }
+  <span class="syntax-comment">// 执行工具...</span>
+  <span class="syntax-keyword">for</span> <span class="syntax-function"><span class="syntax-keyword">await</span></span>(<span class="syntax-keyword">const</span> update <span class="syntax-keyword">of</span> <span class="syntax-function">runTools</span>(toolUseBlocks, ...)) {
+    <span class="syntax-keyword">yield</span> update.message;
+    toolResults.<span class="syntax-function">push</span>(update.message);
+  }
+  <span class="syntax-comment">// 把工具结果拼入消息，更新状态，继续下一轮循环</span>
+  state = {
+    messages: [...messagesForQuery, ...assistantMessages, ...toolResults],
+    turnCount: nextTurnCount,
+    <span class="syntax-comment">// ...</span>
+  };
+}
+</code></pre>
+</div>
+每一轮循环代表一个"turn"（轮次）。用户的第一句话是 turn 1，API 返回的工具调用执行后产生的消息让循环进入 turn 2，依此类推。<code>turnCount</code> 追踪当前轮次，<code>maxTurns</code> 限制最大轮次（只在非交互模式下生效）。
+<h3>消息预处理链：传送带上的四道工序</h3>
+在把消息发给 API 之前，消息要经过最多四道预处理工序。每一道都解决一个特定的问题：
+<table>
+<thead><tr><th>工序</th><th>函数</th><th>解决的问题</th><th>特点</th></tr></thead>
+<tbody><tr><td>工具结果预算</td><td><code>applyToolResultBudget</code></td><td>单条工具结果太大</td><td>截断超大结果</td></tr>
+<tr><td>Snip 裁剪</td><td><code>snipCompactIfNeeded</code></td><td>历史消息过长</td><td>保留近期，摘要远期</td></tr>
+<tr><td>微压缩</td><td><code>microcompact</code></td><td>小范围上下文压缩</td><td>增量式，低成本</td></tr>
+<tr><td>自动压缩</td><td><code>autocompact</code></td><td>上下文窗口溢出</td><td>完整摘要，高成本</td></tr>
+</tbody></table>
+它们按顺序执行，前一道的结果作为后一道的输入。autocompact 是最重的一步——它会调用另一个模型来生成对话摘要，替换掉之前的完整历史。这个操作的成本很高（额外的 API 调用），所以只在 Token 数接近上下文窗口上限时触发。
+<h3>流式响应处理：流水线上的实时检测</h3>
+<code>deps.callModel()</code> 返回的是一个异步可迭代对象，每次 yield 一个 SSE（Server-Sent Events）事件。<code>query.ts</code> 用 <code>for await...of</code> 逐个处理这些事件：
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">TypeScript</span></div>
+<pre><code class="language-typescript"><span class="syntax-keyword">for</span> <span class="syntax-function"><span class="syntax-keyword">await</span></span>(<span class="syntax-keyword">const</span> message <span class="syntax-keyword">of</span> deps.<span class="syntax-function">callModel</span>({ ... })) {
+  <span class="syntax-comment">// withholding 机制：某些错误消息暂不推送给用户</span>
+  <span class="syntax-keyword">let</span> withheld = <span class="syntax-keyword">false</span>;
+  <span class="syntax-function"><span class="syntax-keyword">if</span></span>(<span class="syntax-function">isWithheldMaxOutputTokens</span>(message)) withheld = <span class="syntax-keyword">true</span>;
+  <span class="syntax-function"><span class="syntax-keyword">if</span></span>(reactiveCompact?.<span class="syntax-function">isWithheldPromptTooLong</span>(message)) withheld = <span class="syntax-keyword">true</span>;
+  <span class="syntax-function"><span class="syntax-keyword">if</span></span>(!withheld) {
+    <span class="syntax-keyword">yield</span> message;  <span class="syntax-comment">// 实时推送给上层</span>
+  }
+  <span class="syntax-comment">// 收集 assistant 消息中的工具调用块</span>
+  <span class="syntax-function"><span class="syntax-keyword">if</span></span>(message.type === <span class=\"syntax-string\">'assistant'</span>) {
+    assistantMessages.<span class="syntax-function">push</span>(message);
+    <span class="syntax-keyword">const</span> toolUseBlocks = message.message.content
+      .<span class="syntax-function">filter</span>(block =&gt; block.type === <span class=\"syntax-string\">'tool_use'</span>);
+    <span class="syntax-function"><span class="syntax-keyword">if</span></span>(toolUseBlocks.length &gt; <span class="syntax-number">0</span>) {
+      needsFollowUp = <span class="syntax-keyword">true</span>;
+    }
+</code></pre>
+</div>
+注意 <code>withheld</code> 机制。某些错误（如"输出 Token 超限"或"提示词太长"）在流式响应中被检测到后，不会立即推送给用户，而是先尝试自动恢复——比如重新压缩上下文后重试，或者调大输出 Token 限制后重试。只有恢复失败后，错误才会被 surface 出来。这是 <code>query.ts</code> 最精巧的设计之一：<strong>先尝试自救，再告诉用户出了问题</strong>。
+<h3>工具执行：串行与并发的调度艺术</h3>
+当 <code>needsFollowUp</code> 为 true 时，<code>query.ts</code> 会执行收集到的工具调用。入口是 <code>runTools()</code> 函数，它有一个聪明的调度策略：
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">TypeScript</span></div>
+<pre><code class="language-typescript"><span class="syntax-keyword">async</span> function* <span class="syntax-function">runTools</span>(toolUseMessages, ...): AsyncGenerator&lt;MessageUpdate&gt; {
+  <span class="syntax-function"><span class="syntax-keyword">for</span></span>(<span class="syntax-keyword">const</span> { isConcurrencySafe, blocks } <span class="syntax-keyword">of</span> <span class="syntax-function">partitionToolCalls</span>(toolUseMessages)) {
+    <span class="syntax-function"><span class="syntax-keyword">if</span></span>(isConcurrencySafe) {
+      <span class="syntax-comment">// 只读工具批量并发执行</span>
+      <span class="syntax-keyword">yield</span>* <span class="syntax-function">runToolsConcurrently</span>(blocks, ...);
+    } <span class="syntax-keyword">else</span> {
+      <span class="syntax-comment">// 写入工具串行执行</span>
+      <span class="syntax-keyword">yield</span>* <span class="syntax-function">runToolsSerially</span>(blocks, ...);
+    }
+</code></pre>
+</div>
+<code>partitionToolCalls()</code> 把工具调用分成批次。连续的只读工具（如 <code>Read</code>、<code>Grep</code>）被分到同一批并发执行，写入工具（如 <code>Edit</code>、<code>Write</code>、<code>Bash</code>）则单独串行执行。
+举个例子：如果 API 返回了 5 个工具调用，按顺序是 <code>Read(A)</code> <code>Read(B)</code> <code>Edit(C)</code> <code>Read(D)</code> <code>Edit(E)</code>，那么 <code>partitionToolCalls</code> 会把它分成三批：
+<table>
+<thead><tr><th>批次</th><th>工具</th><th>执行方式</th></tr></thead>
+<tbody><tr><td>1</td><td><code>Read(A)</code> + <code>Read(B)</code></td><td>并发</td></tr>
+<tr><td>2</td><td><code>Edit(C)</code></td><td>串行</td></tr>
+<tr><td>3</td><td><code>Read(D)</code></td><td>并发（只有1个，和串行效果一样）</td></tr>
+<tr><td>4</td><td><code>Edit(E)</code></td><td>串行</td></tr>
+</tbody></table>
+这个分类通过每个工具的 <code>isConcurrencySafe()</code> 方法判断。<code>Read</code> 工具检查自己的输入参数，只读文件的操作标记为安全，并发执行不会产生冲突。<code>Bash</code> 工具虽然可能只执行 <code>git status</code> 这种只读命令，但保守起见仍然标记为不安全——因为无法静态分析 shell 命令的副作用。
+<h3>循环终止：六条出路</h3>
+<code>while(true)</code> 循环不会永远转下去。它有六条出路：
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">TypeScript</span></div>
+<pre><code class="language-typescript"><span class="syntax-comment">// 出路1：没有工具调用，正常完成</span>
+<span class="syntax-function"><span class="syntax-keyword">if</span></span>(!needsFollowUp) {
+  <span class="syntax-keyword">return</span> { reason: <span class=\"syntax-string\">'completed'</span> };
+}
+<span class="syntax-comment">// 出路2：达到最大轮次限制</span>
+<span class="syntax-function"><span class="syntax-keyword">if</span></span>(maxTurns &amp;&amp; nextTurnCount &gt; maxTurns) {
+  <span class="syntax-keyword">return</span> { reason: <span class=\"syntax-string\">'max_turns'</span>, turnCount: nextTurnCount };
+}
+<span class="syntax-comment">// 出路3：用户中断（Ctrl+C）</span>
+<span class="syntax-function"><span class="syntax-keyword">if</span></span>(toolUseContext.abortController.signal.aborted) {
+  <span class="syntax-keyword">return</span> { reason: <span class=\"syntax-string\">'aborted_streaming'</span> }; <span class="syntax-comment">// 或 <span class=\"syntax-string\">'aborted_tools'</span></span>
+}
+<span class="syntax-comment">// 出路4：Token 预算耗尽</span>
+<span class="syntax-function"><span class="syntax-keyword">if</span></span>(decision.action !== <span class=\"syntax-string\">'<span class="syntax-keyword">continue</span>'</span>) {
+  <span class="syntax-keyword">return</span> { reason: <span class=\"syntax-string\">'completed'</span> };
+}
+<span class="syntax-comment">// 出路5：Hook 阻止继续</span>
+<span class="syntax-function"><span class="syntax-keyword">if</span></span>(shouldPreventContinuation) {
+  <span class="syntax-keyword">return</span> { reason: <span class=\"syntax-string\">'hook_stopped'</span> };
+}
+<span class="syntax-comment">// 出路6：API 错误</span>
+<span class="syntax-keyword">return</span> { reason: <span class=\"syntax-string\">'model_error'</span>, error };
+</code></pre>
+</div>
+每条出路都返回一个 <code>Terminal</code> 对象，包含 <code>reason</code> 字段说明为什么退出。调用者可以根据这个原因做不同处理——比如 <code>max_turns</code> 时显示提示信息，<code>aborted</code> 时中断工具执行并清理资源。
+<h3>错误处理与回退：自救三部曲</h3>
+<code>query.ts</code> 的错误处理堪称教科书级别。它不是简单地 try/catch 然后报错，而是实现了"自救三部曲"：
+<strong>第一部：模型回退。</strong> 如果主模型过载，自动切换到备用模型：
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">TypeScript</span></div>
+<pre><code class="language-typescript"><span class="syntax-function"><span class="syntax-keyword">if</span></span>(innerError <span class="syntax-keyword">instanceof</span> FallbackTriggeredError &amp;&amp; fallbackModel) {
+  currentModel = fallbackModel;
+  attemptWithFallback = <span class="syntax-keyword">true</span>;  <span class="syntax-comment">// 重试</span>
+  <span class="syntax-keyword">yield</span> <span class="syntax-function">createSystemMessage</span>(
+    <span class="syntax-string"><code>Switched to ${fallbackModel} due to high demand</code></span>,
+    <span class=\"syntax-string\">'warning'</span>
+  );
+  <span class="syntax-keyword">continue</span>;
+}
+</code></pre>
+</div>
+<strong>第二部：上下文压缩。</strong> 如果提示词太长（413 错误），先尝试增量压缩（context collapse），再尝试完整压缩（reactive compact）：
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">TypeScript</span></div>
+<pre><code class="language-typescript"><span class="syntax-function"><span class="syntax-keyword">if</span></span>(isWithheld413) {
+  <span class="syntax-comment">// 先尝试轻量恢复</span>
+  <span class="syntax-keyword">const</span> drained = contextCollapse.<span class="syntax-function">recoverFromOverflow</span>(messagesForQuery, ...);
+  <span class="syntax-function"><span class="syntax-keyword">if</span></span>(drained.committed &gt; <span class="syntax-number">0</span>) { state = next; <span class="syntax-keyword">continue</span>; }
+  <span class="syntax-comment">// 再尝试重量恢复</span>
+  <span class="syntax-keyword">const</span> compacted = <span class="syntax-keyword">await</span> reactiveCompact.<span class="syntax-function">tryReactiveCompact</span>(...);
+  <span class="syntax-function"><span class="syntax-keyword">if</span></span>(compacted) { state = next; <span class="syntax-keyword">continue</span>; }
+}
+</code></pre>
+</div>
+<strong>第三部：输出 Token 扩容。</strong> 如果输出被截断，先自动从 8k 提升到 64k 重试。如果还是超限，注入一条"继续完成"的消息让模型接着输出：
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">TypeScript</span></div>
+<pre><code class="language-typescript"><span class="syntax-function"><span class="syntax-keyword">if</span></span>(<span class="syntax-function">isWithheldMaxOutputTokens</span>(lastMessage)) {
+  <span class="syntax-comment">// 先尝试 64k</span>
+  <span class="syntax-function"><span class="syntax-keyword">if</span></span>(maxOutputTokensOverride === <span class="syntax-keyword">undefined</span>) {
+    state = { ..., maxOutputTokensOverride: ESCALATED_MAX_TOKENS };
+    <span class="syntax-keyword">continue</span>;
+  }
+  <span class="syntax-comment">// 再尝试多轮恢复</span>
+  <span class="syntax-function"><span class="syntax-keyword">if</span></span>(maxOutputTokensRecoveryCount &lt; LIMIT) {
+    <span class="syntax-keyword">const</span> recoveryMessage = <span class="syntax-function">createUserMessage</span>({
+      content: <span class=\"syntax-string\">'Output token limit hit. Resume directly — pick up mid-thought.'</span>,
+      isMeta: <span class="syntax-keyword">true</span>,
+    });
+    state = { messages: [...previous, recoveryMessage] };
+    <span class="syntax-keyword">continue</span>;
+  }
+</code></pre>
+</div>
+这三部曲的设计逻辑是<strong>先低成本恢复，再高成本恢复，最后才告诉用户</strong>。大部分情况下用户根本不知道发生了错误——循环在后台自动解决了问题，然后正常返回结果。
+<blockquote>
+<strong>核心建议</strong>：<code>query.ts</code> 最值得学习的设计不是循环结构本身，而是错误恢复策略。当你设计自己的 Agent 循环时，不要只考虑"出错怎么办"，更要考虑"出错后怎么自动恢复"。给循环加上重试、回退、压缩恢复这些机制，用户体验会有质的飞跃。
+</blockquote>
+<h3>从生产线看总调度室</h3>
+<code>query.ts</code> 的 <code>while(true)</code> 循环是 Claude Code 的心脏。它接收消息、调用 API、执行工具、处理错误、yield 事件。但它不知道自己在第几轮对话、不知道用户切换了什么模式、不知道会话什么时候该保存。这些"元信息"的管理在它之上——<code>QueryEngine</code>。
+如果把 <code>query()</code> 比作一条不断运转的生产线，那 <code>QueryEngine</code> 就是总调度室。它决定什么时候启动生产线、什么时候压缩历史、什么时候结束会话。生产线只管干活，调度室管全局。
+下一章，我们走进总调度室。
+
+<div class="file-tree">
+<div class="file-tree-line file-tree-file">│  while (true) {                               │</div>
+<div class="file-tree-line file-tree-dir">│    <span class="syntax-number">1</span>. 消息预处理（压缩/裁剪/预算检查）          │</div>
+<div class="file-tree-line file-tree-dir">│    <span class="syntax-number">2</span>. 调用 Anthropic API（流式）                │</div>
+<div class="file-tree-line file-tree-dir">│    <span class="syntax-number">3</span>. 处理 SSE 事件流 <span class="flowchart-arrow">→</span> <span class="flowchart-box">收集文本和工具调用        │</span></div>
+<div class="file-tree-line file-tree-dir">│    <span class="syntax-number">4</span>. 如有工具调用：执行工具 <span class="flowchart-arrow">→</span> <span class="flowchart-box">继续循环           │</span></div>
+<div class="file-tree-line file-tree-file">│       如无工具调用：退出循环                     │</div>
+<div class="file-tree-line file-tree-file">│  }                                            │</div>
+<div class="file-tree-line file-tree-file">└──────────────────────────────────────────────┘</div>
+</div><div class="section-header">
+<div class="section-number">§07</div>
+<h2 class="section-title">总调度室</h2>
+<div class="section-subtitle">The Control Room — QueryEngine.ts</div>
+</div>
+<p>凌晨三点，工厂里的警报响了。三号生产线的上下文窗口快要爆了，Token 数量逼近模型极限。你冲进总调度室，看到墙上的大屏闪烁着红色警告——但调度系统已经自动启动了压缩程序。五秒后，警报解除。总调度室把最近 200 条旧消息压缩成了一段精炼的摘要，生产线继续运转。</p>
+<p>这就是 QueryEngine 干的事。上一章我们跟着 query() 走完了单次 API 调用的核心循环，但那只是车间里的一条产线。总调度室站在更高的位置，管理整座工厂的会话状态：消息来了要持久化、上下文太长要压缩、文件改了要记快照、钱花超了要踩刹车。理解了它，你就理解了 Claude Code 为什么能在一场对话中稳定运转几百个回合。</p>
+<h3>一个类，一场会话</h3>
+<p>QueryEngine 的设计原则很简单：<strong>一个对话，一个实例</strong>。每次你启动一个新的 Claude Code 会话，就有一个 QueryEngine 被创建出来。它贯穿整个会话的完整生命周期，管理所有跨回合的状态。</p>
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">TypeScript</span></div>
+<pre><code class="language-typescript"><span class="syntax-comment">// QueryEngine 持有会话的全部可变状态</span>
+<span class="syntax-keyword">export</span> <span class="syntax-keyword">class</span> <span class="syntax-class">QueryEngine</span> {
+  private config: QueryEngineConfig       <span class="syntax-comment">// 会话配置（工具、命令、MCP 客户端等）</span>
+  private mutableMessages: Message[]      <span class="syntax-comment">// 消息列表——会话的核心数据</span>
+  private abortController: AbortController <span class="syntax-comment">// 中断控制器</span>
+  private permissionDenials: SDKPermissionDenial[]  <span class="syntax-comment">// 权限拒绝记录</span>
+  private totalUsage: NonNullableUsage     <span class="syntax-comment">// 累计 token 用量</span>
+  private readFileState: FileStateCache    <span class="syntax-comment">// 文件状态缓存</span>
+  <span class="syntax-comment">// ...</span>
+}
+</code></pre>
+</div>
+<p>这些字段里，<code>mutableMessages</code> 是最重要的。它是整个会话的消息存储，每一条用户消息、助手回复、工具调用结果都追加到这个数组里。它也是后续压缩操作的目标——上下文窗口有限，消息不能无限增长。</p>
+<p><code>submitMessage()</code> 是 QueryEngine 对外暴露的唯一核心方法。每次用户发一条新消息，就调用一次 <code>submitMessage()</code>，它会：</p>
+<ol>
+<li>处理用户输入（包括斜杠命令展开）</li>
+<li>把新消息持久化到转录日志</li>
+<li>调用底层的 <code>query()</code> 函数进入核心循环</li>
+<li>yield 格式化的 SDK 消息给调用方</li>
+</ol>
+<p>整个过程是一个 <code>AsyncGenerator</code>——调用方通过 <code>for await...of</code> 消费消息流。这种设计让 QueryEngine 既能被 SDK 的 headless 模式使用，也能被交互式 REPL 使用。</p>
+<h3>消息的两次写入</h3>
+<p>你可能会问：为什么要管消息持久化？直接放在内存里不就行了？</p>
+<p>不行。因为进程可能在任何时候挂掉。你发了一条消息、模型正在思考、用户点了 Stop——这时候进程被杀了。如果没有提前把用户消息写入磁盘，转录日志里就没有这条记录，下次用 <code>--resume</code> 恢复会话时就会丢失上下文。QueryEngine 的源码注释把这个场景写得很清楚：</p>
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">TypeScript</span></div>
+<pre><code class="language-typescript"><span class="syntax-comment">// 在进入查询循环之前持久化用户消息。</span>
+<span class="syntax-comment">// 如果进程在 API 响应之前被杀死（比如用户在 cowork 模式下点击了 Stop），</span>
+<span class="syntax-comment">// 转录日志只会有队列操作的条目；getLastSessionLog 返回 <span class="syntax-keyword">null</span>，--resume 就会失败。</span>
+<span class="syntax-comment">// 现在写入使得转录可以从用户消息被接受的那一刻恢复，即使没有收到任何 API 响应。</span>
+</code></pre>
+</div>
+<p>它还区分了阻塞写入和异步写入：在 bare/simple 模式下（脚本调用），写入是 fire-and-forget 的，不阻塞主流程；在普通模式下，写入是阻塞的，确保数据安全落盘后才继续。在 cowork 模式下，还会额外调用 <code>flushSessionStorage()</code> 强制刷新缓冲区。</p>
+<h3>四层压缩：工厂的废料回收系统</h3>
+<p>工厂运行久了，车间的库存（上下文）会越来越多。模型有一个固定的上下文窗口（比如 200K Token），一旦消息总量逼近这个限制，就必须想办法腾出空间。QueryEngine 管理着一套多层压缩策略，就像工厂的废料回收系统——不同类型的废料有不同的处理方式。</p>
+<table>
+<thead><tr><th>压缩策略</th><th>触发条件</th><th>工作方式</th><th>效果</th></tr></thead>
+<tbody><tr><td>auto-compact</td><td>Token 数超过阈值（上下文窗口 - 13K 缓冲）</td><td>调用 API 生成对话摘要，替换旧消息</td><td>大幅减少 Token（典型压缩比 5-10x）</td></tr>
+<tr><td>micro-compact</td><td>API 返回 Token 数超限的警告</td><td>清除旧工具调用结果和思考块</td><td>轻量级，不调用额外 API</td></tr>
+<tr><td>snip compaction</td><td>检测到 snip 边界标记</td><td>裁剪旧消息，保留最近的活跃段</td><td>适用于长时间 SDK 会话</td></tr>
+<tr><td>reactive-compact</td><td>API 返回 <code>prompt_too_long</code> 错误</td><td>紧急压缩，响应式触发</td><td>兜底策略，防止崩溃</td></tr>
+</tbody></table>
+<p>!<a href="images/compression-strategy.png">压缩策略</a></p>
+<p>auto-compact 是主力策略。它的工作方式很精妙：不是简单地删掉旧消息，而是把整个对话历史发给模型，让模型生成一段精炼的摘要。这个摘要被包装成一条特殊的"压缩边界"消息，替换掉之前的全部历史。压缩后，模型的上下文窗口一下子就有了大量可用空间。</p>
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">TypeScript</span></div>
+<pre><code class="language-typescript"><span class="syntax-comment">// auto-compact 的阈值计算</span>
+<span class="syntax-keyword">export</span> <span class="syntax-keyword">const</span> AUTOCOMPACT_BUFFER_TOKENS = 13_000  <span class="syntax-comment">// 保留 13K 的缓冲空间</span>
+<span class="syntax-keyword">export</span> <span class="syntax-keyword">function</span> <span class="syntax-function">getAutoCompactThreshold</span>(model: string): number {
+  <span class="syntax-keyword">const</span> effectiveContextWindow = <span class="syntax-function">getEffectiveContextWindowSize</span>(model)
+  <span class="syntax-keyword">return</span> effectiveContextWindow - AUTOCOMPACT_BUFFER_TOKENS
+}
+</code></pre>
+</div>
+<p>13K Token 的缓冲看起来很大，但它是必要的。压缩本身需要消耗输出 Token（摘要通常几千 Token），而且压缩后模型还需要足够的空间来思考和调用工具。如果缓冲设得太小，模型刚压缩完就又触发了下一次压缩，陷入死循环。</p>
+<p>micro-compact 是一种更轻量的策略。它不需要额外的 API 调用，而是利用 Anthropic API 的原生上下文管理功能（context management edits）。当 API 检测到输入 Token 过多时，可以在 API 层面直接清除旧的工具调用结果（比如文件搜索结果、命令输出）和思考块。这种方式速度极快，但压缩比有限。</p>
+<p>还有一个细节很有趣：auto-compact 有一个熔断机制。如果连续压缩失败超过 3 次（比如摘要本身太长导致再次超限），就停止尝试。源码注释记录了真实的运维数据——2026 年 3 月的统计显示有 1,279 个会话出现了 50 次以上的连续失败，最极端的达到了 3,272 次，每天浪费约 25 万次 API 调用。加了熔断之后，这种情况被彻底杜绝了。</p>
+<h3>压缩后的消息管理</h3>
+<p>压缩完成后，总调度室需要做一件微妙的事：<strong>清理消息数组</strong>。如果只是往数组里追加压缩边界消息，旧消息仍然占据内存。在长时间的 SDK 会话中，<code>mutableMessages</code> 会无限增长——这是内存泄漏。</p>
+<p>QueryEngine 的做法是：压缩边界消息被 push 进数组后，立即 <code>splice(0, boundaryIndex)</code>，把边界之前的所有消息删掉。只保留边界消息和之后的新消息。这样内存使用始终是有界的。</p>
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">TypeScript</span></div>
+<pre><code class="language-typescript"><span class="syntax-comment">// 释放压缩前的消息，让 GC 回收</span>
+<span class="syntax-keyword">const</span> mutableBoundaryIdx = <span class="syntax-keyword">this</span>.mutableMessages.length - <span class="syntax-number">1</span>
+<span class="syntax-function"><span class="syntax-keyword">if</span></span>(mutableBoundaryIdx &gt; <span class="syntax-number">0</span>) {
+  <span class="syntax-keyword">this</span>.mutableMessages.<span class="syntax-function">splice</span>(<span class="syntax-number">0</span>, mutableBoundaryIdx)
+}
+</code></pre>
+</div>
+<p>同时，转录日志（transcript）仍然保留完整的压缩前记录——splice 只影响内存中的数组，不影响已经写入磁盘的文件。这意味着 <code>--resume</code> 恢复会话时，仍然能看到完整的对话历史。</p>
+<h3>文件历史快照：追踪每一处改动</h3>
+<p>工厂的质检部门需要记录每个零件的加工过程。QueryEngine 通过 <code>fileHistory</code> 模块做类似的事——在每次用户发消息之前，给当前工作目录的所有被跟踪文件拍一张"快照"。</p>
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">TypeScript</span></div>
+<pre><code class="language-typescript"><span class="syntax-function"><span class="syntax-keyword">if</span></span>(<span class="syntax-function">fileHistoryEnabled</span>() &amp;&amp; persistSession) {
+  messagesFromUserInput
+    .<span class="syntax-function">filter</span>(<span class="syntax-function">messageSelector</span>().selectableUserMessagesFilter)
+    .<span class="syntax-function">forEach</span>(message =&gt; {
+      void <span class="syntax-function">fileHistoryMakeSnapshot</span>(
+        updater =&gt; { <span class="syntax-comment">/<em> 更新 AppState 中的 fileHistory </em>/</span> },
+        message.uuid,
+      )
+    })
+}
+</code></pre>
+</div>
+<p>每个快照记录了被跟踪文件在那一刻的版本号和备份路径。当模型在后续回合中修改了文件，系统可以对比快照，计算出哪些行被增加、哪些行被删除。这些统计数据最终展示在会话的成本报告中。</p>
+<p>快照有上限——最多保留 100 个，老的快照会被淘汰。但 <code>snapshotSequence</code> 计数器永远递增，即使快照被淘汰，这个计数器也可以作为活动信号使用。</p>
+<h3>归因跟踪：谁改了什么</h3>
+<p>工厂的产品追溯系统需要知道每个零件是哪条产线加工的。归因跟踪（commit attribution）做的是类似的事：追踪文件修改是哪个模型在哪个会话中做的。</p>
+<p>当模型通过 FileEditTool 或 FileWriteTool 修改文件后，这些修改最终可能会被用户 <code>git commit</code>。归因系统会在 git commit 的 trailer 里添加 <code>Authored-by: claude-code</code> 和模型名称，这样就能在 git 历史中追溯哪些代码是 AI 生成的。对于 Anthropic 内部的私有仓库，甚至可以看到具体的模型代号（如 claude-sonnet-4-20250514），但对于公开仓库则只显示通用名称——这是防止内部代号泄露的安全措施。</p>
+<h3>Token 预算与成本追踪</h3>
+<p>总调度室的大屏上有一栏是实时显示的：<strong>累计成本</strong>。</p>
+<p>QueryEngine 在每一轮 API 调用后都会更新 Token 用量统计。它跟踪的粒度很细：</p>
+<ul>
+<li>每条消息的输入 Token、输出 Token</li>
+<li>缓存命中 Token（cache read / cache creation）</li>
+<li>每个模型的单独用量（跨模型回退时会切换模型）</li>
+<li>每次工具调用的执行时间</li>
+<li>总 API 耗时（不含重试）和总耗时（含重试）</li>
+</ul>
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">TypeScript</span></div>
+<pre><code class="language-typescript"><span class="syntax-comment">// 在 stream_event 的 message_start 和 message_stop 之间累计用量</span>
+<span class="syntax-function"><span class="syntax-keyword">if</span></span>(message.event.type === <span class=\"syntax-string\">'message_start'</span>) {
+  currentMessageUsage = EMPTY_USAGE
+  currentMessageUsage = <span class="syntax-function">updateUsage</span>(currentMessageUsage, message.event.message.usage)
+}
+<span class="syntax-function"><span class="syntax-keyword">if</span></span>(message.event.type === <span class=\"syntax-string\">'message_stop'</span>) {
+  <span class="syntax-keyword">this</span>.totalUsage = <span class="syntax-function">accumulateUsage</span>(<span class="syntax-keyword">this</span>.totalUsage, currentMessageUsage)
+}
+</code></pre>
+</div>
+<p>这些数据会在每次 <code>submitMessage()</code> 结束时打包成 result 消息，包含 <code>total_cost_usd</code>、<code>usage</code>、<code>modelUsage</code> 等字段。SDK 调用方可以据此实现成本控制。</p>
+<p>QueryEngine 还支持两个硬性预算限制：<code>maxTurns</code>（最大回合数）和 <code>maxBudgetUsd</code>（最大美元成本）。每轮结束后检查是否超限，超了就立即 yield 一个错误结果并终止。</p>
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">TypeScript</span></div>
+<pre><code class="language-typescript"><span class="syntax-comment">// 检查美元预算是否已超出</span>
+<span class="syntax-function"><span class="syntax-keyword">if</span></span>(maxBudgetUsd !== <span class="syntax-keyword">undefined</span> &amp;&amp; <span class="syntax-function">getTotalCost</span>() &gt;= maxBudgetUsd) {
+  <span class="syntax-keyword">yield</span> { type: <span class=\"syntax-string\">'result'</span>, subtype: <span class=\"syntax-string\">'error_max_budget_usd'</span>, ... }
+  <span class="syntax-keyword">return</span>
+}
+</code></pre>
+</div>
+<blockquote>
+<strong>核心建议</strong>
+理解 QueryEngine 的关键在于把它看成"会话的一生"的管理者。它不关心单次 API 调用的细节（那是 query() 的事），它关心的是：消息不能丢、上下文不能爆、成本不能跑飞。这三件事就是总调度室的 KPI。当你在调试长时间会话的内存问题或成本异常时，第一时间看 QueryEngine 的状态管理逻辑。
+</blockquote>
+<h3>权限拒绝追踪</h3>
+<p>还有一个小但重要的功能：权限拒绝记录。QueryEngine 包装了 <code>canUseTool</code> 回调，在每次权限检查后记录拒绝结果：</p>
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">TypeScript</span></div>
+<pre><code class="language-typescript"><span class="syntax-comment">// 包装 canUseTool 以跟踪权限拒绝</span>
+<span class="syntax-keyword">const</span> wrappedCanUseTool: CanUseToolFn = <span class="syntax-function"><span class="syntax-keyword">async</span></span>(...) =&gt; {
+  <span class="syntax-keyword">const</span> result = <span class="syntax-keyword">await</span> <span class="syntax-function">canUseTool</span>(...)
+  <span class="syntax-function"><span class="syntax-keyword">if</span></span>(result.behavior !== <span class=\"syntax-string\">'allow'</span>) {
+    <span class="syntax-keyword">this</span>.permissionDenials.<span class="syntax-function">push</span>({
+      tool_name: <span class="syntax-function">sdkCompatToolName</span>(tool.name),
+      tool_use_id: toolUseID,
+      tool_input: input,
+    })
+  }
+  <span class="syntax-keyword">return</span> result
+}
+</code></pre>
+</div>
+<p>这些记录在会话结束时返回给 SDK 调用方，帮助他们了解哪些工具调用被权限系统拒绝了。</p>
+<h3>ask()：一次性便捷包装</h3>
+<p>除了 QueryEngine 类，源码还导出了 <code>ask()</code> 函数——它是 QueryEngine 的一次性包装。如果你只需要发一条消息拿结果，不需要管理会话状态，直接调 <code>ask()</code> 就行。它内部创建一个临时 QueryEngine 实例，执行完就把文件读取缓存写回给调用方。</p>
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">TypeScript</span></div>
+<pre><code class="language-typescript"><span class="syntax-comment">// <span class="syntax-function">ask</span>() 是 QueryEngine 的一次性便捷包装</span>
+<span class="syntax-keyword">export</span> <span class="syntax-keyword">async</span> function* <span class="syntax-function">ask</span>({ ... }): AsyncGenerator&lt;SDKMessage, void, unknown&gt; {
+  <span class="syntax-keyword">const</span> engine = <span class="syntax-keyword">new</span> <span class="syntax-function">QueryEngine</span>({ ... })
+  <span class="syntax-keyword">try</span> {
+    <span class="syntax-keyword">yield</span>* engine.<span class="syntax-function">submitMessage</span>(prompt, { uuid: promptUuid, isMeta })
+  } finally {
+    <span class="syntax-function">setReadFileCache</span>(engine.<span class="syntax-function">getReadFileState</span>())
+  }
+</code></pre>
+</div>
+<p>总调度室的故事到这里就差不多了。消息管理、压缩回收、成本控制——这些是让工厂持续运转的基础设施。但工厂光有调度室不行，还得有能干活的工具。下一站，我们去车间看看工具是怎么注册和执行的。</p>
+<div class="section-header">
+<div class="section-number">§08</div>
+<h2 class="section-title">车间工具站</h2>
+<div class="section-subtitle">Tool Stations — Registration & Execution</div>
+</div>
+<p>你站在工厂的车间里，面前是一整面墙的工具架。左边是重型设备——BashTool、FileEditTool，用的时候得小心翼翼；右边是轻型量具——GlobTool、GrepTool，随手拿来就能用；角落里还有一台可以派生出微型车间的 AgentTool。每个工具上面贴着一张标签：名称、用途、安全等级。</p>
+<p>这套工具管理系统是怎么运作的？工具怎么注册上来、怎么被发现、怎么被安全地执行？这一章我们走进工具站，拆解这套机制。</p>
+<h3>工具的定义格式</h3>
+<p>在 Claude Code 的世界里，每个工具都遵循同一个接口规范——<code>Tool</code> 类型。这个类型定义在 <code>Tool.ts</code> 里，是所有工具（无论是内置的还是 MCP 外部的）的"身份证"。它的核心字段如下：</p>
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">TypeScript</span></div>
+<pre><code class="language-typescript"><span class="syntax-keyword">export</span> type Tool = {
+  name: string                    <span class="syntax-comment">// 工具名称，如 <span class="syntax-string">"Bash"</span>、<span class="syntax-string">"Read"</span>、<span class="syntax-string">"Edit"</span></span>
+  aliases?: string[]              <span class="syntax-comment">// 别名，用于向后兼容重命名</span>
+  <span class="syntax-function">description</span>(input, options)     <span class="syntax-comment">// 根据输入动态生成描述</span>
+  readonly inputSchema: z.ZodType <span class="syntax-comment">// Zod schema，定义输入参数的类型约束</span>
+  <span class="syntax-function">call</span>(args, context, ...)        <span class="syntax-comment">// 执行工具，返回结果</span>
+  <span class="syntax-function">isConcurrencySafe</span>(input)        <span class="syntax-comment">// 是否可以与其他工具并发执行</span>
+  <span class="syntax-function">isReadOnly</span>(input)               <span class="syntax-comment">// 是否是只读操作</span>
+  isDestructive?(input)           <span class="syntax-comment">// 是否有破坏性（不可逆）</span>
+  <span class="syntax-function">checkPermissions</span>(input, ctx)    <span class="syntax-comment">// 权限检查</span>
+  <span class="syntax-function">userFacingName</span>(input)           <span class="syntax-comment">// 用户可见的显示名称</span>
+  maxResultSizeChars: number      <span class="syntax-comment">// 结果持久化的阈值</span>
+  <span class="syntax-comment">// ... 渲染相关的方法（renderToolUseMessage 等）</span>
+}
+</code></pre>
+</div>
+<p>其中最重要的三个方法是 <code>call()</code>、<code>isConcurrencySafe()</code> 和 <code>isReadOnly()</code>。<code>call()</code> 是工具的执行逻辑，后两个决定了工具的调度策略。</p>
+<p>但实际开发中，大部分工具不需要实现所有方法。<code>buildTool()</code> 函数提供了一套安全默认值：</p>
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">TypeScript</span></div>
+<pre><code class="language-typescript"><span class="syntax-keyword">const</span> TOOL_DEFAULTS = {
+  isEnabled: () =&gt; <span class="syntax-keyword">true</span>,           <span class="syntax-comment">// 默认启用</span>
+  isConcurrencySafe: () =&gt; <span class="syntax-keyword">false</span>,  <span class="syntax-comment">// 默认不可并发（安全优先）</span>
+  isReadOnly: () =&gt; <span class="syntax-keyword">false</span>,         <span class="syntax-comment">// 默认非只读</span>
+  isDestructive: () =&gt; <span class="syntax-keyword">false</span>,      <span class="syntax-comment">// 默认非破坏性</span>
+  checkPermissions: (input) =&gt;     <span class="syntax-comment">// 默认交给通用权限系统</span>
+    Promise.<span class="syntax-function">resolve</span>({ behavior: <span class=\"syntax-string\">'allow'</span>, updatedInput: input }),
+  toAutoClassifierInput: () =&gt; <span class=\"syntax-string\">''</span>, <span class="syntax-comment">// 默认跳过安全分类器</span>
+  userFacingName: () =&gt; <span class=\"syntax-string\">''</span>,        <span class="syntax-comment">// 默认无显示名</span>
+}
+</code></pre>
+</div>
+<p>注意 <code>isConcurrencySafe</code> 的默认值是 <code>false</code>——这是一个"fail-closed"的设计。如果一个工具没有显式声明自己可以并发执行，系统就假设它不行。宁可牺牲一点性能，也不要冒并发冲突的风险。</p>
+<p>!<a href="images/tool-filtering-pipeline.png">工具注册与过滤流水线</a></p>
+<h3>注册流程：工具怎么上架</h3>
+<p>工具不是一股脑全堆在工具架上。<code>tools.ts</code> 中的 <code>getAllBaseTools()</code> 函数是所有内置工具的注册中心，但它不是简单地返回一个静态列表——它会根据环境动态过滤。</p>
+<p>注册流程分为四层过滤：</p>
+<p><strong>第一层：环境变量过滤。</strong> 有些工具只在特定环境下可用。比如 REPLTool 只在 <code>USER_TYPE === 'ant'</code>（内部用户）时注册；LSPTool 需要 <code>ENABLE_LSP_TOOL</code> 环境变量开启；PowerShellTool 只在特定平台上启用。</p>
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">TypeScript</span></div>
+<pre><code class="language-typescript"><span class="syntax-comment">// 条件导入：Dead code elimination 让未使用的工具根本不进入打包</span>
+<span class="syntax-keyword">const</span> REPLTool = process.env.USER_TYPE === <span class=\"syntax-string\">'ant'</span>
+  ? <span class="syntax-function">require</span>(<span class=\"syntax-string\">'./tools/REPLTool/REPLTool.js'</span>).REPLTool
+  : <span class="syntax-keyword">null</span>
+</code></pre>
+</div>
+<p>注意 <code>require()</code> 是条件执行的——如果环境不满足，变量直接是 <code>null</code>。配合 Bun 的 dead code elimination，这些代码路径在打包阶段就被移除了，不影响最终产物大小。</p>
+<p><strong>第二层：Feature Flag 过滤。</strong> 通过 <code>feature()</code> 函数（Bun 的编译时特性门控）控制的工具包括 SleepTool、CronTools、MonitorTool、WorkflowTool 等。这些通常是实验性功能或内部功能。</p>
+<p><strong>第三层：模式过滤。</strong> <code>getTools()</code> 函数在 <code>getAllBaseTools()</code> 的基础上进一步过滤。在 simple 模式下（<code>CLAUDE_CODE_SIMPLE=true</code>），只保留 Bash、Read、Edit 三个工具。在 REPL 模式下，某些原始工具（如 Bash、Read、Edit）会被隐藏，因为 REPL 工具会在虚拟机内部调用它们。</p>
+<p><strong>第四层：权限过滤。</strong> <code>filterToolsByDenyRules()</code> 把被权限规则明确禁止的工具过滤掉。注意这是"批量拒绝"——如果用户配置了拒绝某个 MCP 服务器的所有工具，这些工具根本不会出现在模型的工具列表中，而不是等到调用时才拒绝。</p>
+<h3>与 MCP 工具合并</h3>
+<p>内置工具和 MCP 工具最终要合并成一个统一的工具池。<code>assembleToolPool()</code> 函数负责这个合并：</p>
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">TypeScript</span></div>
+<pre><code class="language-typescript"><span class="syntax-keyword">export</span> <span class="syntax-keyword">function</span> <span class="syntax-function">assembleToolPool</span>(
+  permissionContext: ToolPermissionContext,
+  mcpTools: Tools,
+): Tools {
+  <span class="syntax-keyword">const</span> builtInTools = <span class="syntax-function">getTools</span>(permissionContext)
+  <span class="syntax-keyword">const</span> allowedMcpTools = <span class="syntax-function">filterToolsByDenyRules</span>(mcpTools, permissionContext)
+  <span class="syntax-comment">// 按名称排序以保证提示缓存稳定性，内置工具优先</span>
+  <span class="syntax-keyword">const</span> byName = (a, b) =&gt; a.name.<span class="syntax-function">localeCompare</span>(b.name)
+  <span class="syntax-keyword">return</span> <span class="syntax-function">uniqBy</span>(
+    [...builtInTools].<span class="syntax-function">sort</span>(byName).<span class="syntax-function">concat</span>(allowedMcpTools.<span class="syntax-function">sort</span>(byName)),
+    <span class=\"syntax-string\">'name'</span>,  <span class="syntax-comment">// 内置工具同名时优先保留（uniqBy 保留首次出现）</span>
+  )
+}
+</code></pre>
+</div>
+<p>这里有一个精妙的设计：排序是为了提示缓存的稳定性。模型的系统提示包含了所有工具的定义，如果工具列表的顺序每次都变，提示缓存就会失效，导致重复发送大量相同的 Token。按名称排序保证了确定性。内置工具放在前面，<code>uniqBy</code> 在同名冲突时保留第一个出现——所以内置工具的优先级始终高于 MCP 工具。</p>
+<h3>并发安全与调度策略</h3>
+<p>工具执行不是一视同仁的。Claude Code 的调度策略根据工具的安全特性分为两条路径：<strong>并发执行</strong>和<strong>串行执行</strong>。</p>
+<p>分区逻辑在 <code>partitionToolCalls()</code> 中实现：</p>
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">TypeScript</span></div>
+<pre><code class="language-typescript"><span class="syntax-keyword">function</span> <span class="syntax-function">partitionToolCalls</span>(toolUseMessages, toolUseContext): Batch[] {
+  <span class="syntax-keyword">return</span> toolUseMessages.<span class="syntax-function">reduce</span>((acc, toolUse) =&gt; {
+    <span class="syntax-keyword">const</span> tool = <span class="syntax-function">findToolByName</span>(toolUseContext.options.tools, toolUse.name)
+    <span class="syntax-keyword">const</span> isSafe = tool?.<span class="syntax-function">isConcurrencySafe</span>(parsedInput.data) ?? <span class="syntax-keyword">false</span>
+    <span class="syntax-comment">// 连续的并发安全工具合并为一个批次</span>
+    <span class="syntax-function"><span class="syntax-keyword">if</span></span>(isSafe &amp;&amp; acc[acc.length - <span class="syntax-number">1</span>]?.isConcurrencySafe) {
+      acc[acc.length - <span class="syntax-number">1</span>].blocks.<span class="syntax-function">push</span>(toolUse)
+    } <span class="syntax-keyword">else</span> {
+      acc.<span class="syntax-function">push</span>({ isConcurrencySafe: isSafe, blocks: [toolUse] })
+    }
+    <span class="syntax-keyword">return</span> acc
+  }, [])
+}
+</code></pre>
+</div>
+<p>这个分区算法的关键在于：只有<strong>连续的</strong>安全工具才会被合并到一个批次。如果模型在一次回复中调用了三个工具：Read、Edit、Glob，那么 Read 和 Glob 各自是安全的，但因为中间夹了一个不安全的 Edit，它们会被分到不同的批次。</p>
+<table>
+<thead><tr><th>调度模式</th><th>条件</th><th>并发度</th><th>示例工具</th></tr></thead>
+<tbody><tr><td>并发执行</td><td><code>isConcurrencySafe()</code> 返回 true</td><td>最大 10</td><td>Glob、Grep、WebFetch、WebSearch、TaskGet</td></tr>
+<tr><td>串行执行</td><td><code>isConcurrencySafe()</code> 返回 false 或解析失败</td><td>1</td><td>Bash、Edit、Write、Agent</td></tr>
+</tbody></table>
+<p>并发执行时使用 <code>pMap</code> 控制最大并发数为 10（可通过环境变量 <code>CLAUDE_CODE_MAX_TOOL_USE_CONCURRENCY</code> 调整）。串行执行时，每个工具执行完后才会启动下一个。</p>
+<p>还有一个安全细节：如果 <code>isConcurrencySafe()</code> 本身抛了异常（比如 shell-quote 解析失败），系统会保守地把工具归类为不安全。宁可少一点并发，也不要引入竞态条件。</p>
+<h3>关键工具实现</h3>
+<p>工具架上最常用的几件"重型设备"，各有各的绝活。</p>
+<p><strong>BashTool</strong>——工厂的通用机床。它执行 shell 命令，是最灵活也最危险的工具。安全措施包括：沙箱执行（通过 SandboxManager 隔离）、语义命令分类（把命令分为 search/read/list 等类型，决定输出截断策略）、安全检查（扫描命令中的危险模式）。<code>isConcurrencySafe()</code> 的判断基于语义分类——只读命令（如 <code>ls</code>、<code>grep</code>）可以并发，写入命令（如 <code>rm</code>、<code>npm install</code>）不行。</p>
+<p><strong>FileReadTool</strong>——工厂的质检探针。它不只读文本文件，还支持 PDF（分页读取）、图片（视觉模型处理）、Jupyter Notebook（按 cell 读取）。它有设备文件保护（不读 <code>/dev/random</code> 这类特殊文件）和文件大小限制（超大会被截断）。<code>isConcurrencySafe()</code> 始终返回 true——读文件不会产生副作用。</p>
+<p><strong>FileEditTool</strong>——工厂的精密切割机。它使用字符串替换式编辑，而不是传统的行号编辑。这种方式的好处是：即使文件在读取和编辑之间被修改了，只要目标字符串还在，编辑就能成功。<code>replace_all</code> 模式可以一次替换所有匹配。安全检查包括：拒绝 UNC 路径（Windows 网络路径）、扫描秘密信息（API key、密码等）。<code>isConcurrencySafe()</code> 始终返回 false——文件编辑不能并发。</p>
+<p><strong>FileWriteTool</strong>——工厂的焊接工。它负责创建新文件或完全覆盖已有文件。每次写入后会生成 diff，让用户可以预览变更。同样不可并发执行。</p>
+<p><strong>AgentTool</strong>——工厂的子车间。这是最特殊的工具：它可以派生出一个子代理，在隔离的 worktree 中独立执行任务。子代理有自己的消息历史和工具集，执行完后把结果返回给父代理。它支持后台运行（<code>run_in_background</code>），让主流程不必等待。这个工具的存在让 Claude Code 具备了"多线程"能力——多个任务可以并行推进。</p>
+<h3>工具特性对比</h3>
+<table>
+<thead><tr><th>工具</th><th>并发安全</th><th>只读</th><th>典型用途</th><th>安全等级</th></tr></thead>
+<tbody><tr><td>BashTool</td><td>视命令而定</td><td>视命令而定</td><td>执行 shell 命令</td><td>高（沙箱隔离）</td></tr>
+<tr><td>FileReadTool</td><td>是</td><td>是</td><td>读取文件内容</td><td>低（只读）</td></tr>
+<tr><td>FileEditTool</td><td>否</td><td>否</td><td>字符串替换式编辑</td><td>中（秘密扫描）</td></tr>
+<tr><td>FileWriteTool</td><td>否</td><td>否</td><td>创建/覆盖文件</td><td>中（diff 预览）</td></tr>
+<tr><td>GlobTool</td><td>是</td><td>是</td><td>文件名模式匹配</td><td>低</td></tr>
+<tr><td>GrepTool</td><td>是</td><td>是</td><td>内容搜索</td><td>低</td></tr>
+<tr><td>WebFetchTool</td><td>是</td><td>是</td><td>抓取网页内容</td><td>低</td></tr>
+<tr><td>WebSearchTool</td><td>是</td><td>是</td><td>网络搜索</td><td>低</td></tr>
+<tr><td>AgentTool</td><td>否</td><td>否</td><td>派生子代理</td><td>高（worktree 隔离）</td></tr>
+<tr><td>NotebookEditTool</td><td>否</td><td>否</td><td>编辑 Jupyter Notebook</td><td>中</td></tr>
+</tbody></table>
+<blockquote>
+<strong>核心建议</strong>
+工具系统的设计哲学是"默认安全"。<code>isConcurrencySafe()</code> 默认 false，权限检查默认交给通用系统，工具描述可以动态调整。当你在开发自定义工具时，先想清楚三个问题：它是只读的吗？它可以并发吗？它有破坏性吗？把这三个问题的答案明确地实现在对应的方法里，工具就会在调度系统中被正确对待。
+</blockquote>
+<p>工具站逛完了。这些是工厂自带的内置工具。但现实中的工厂不会什么都自己造——有些工序需要外协供应商来做。下一章，我们走进外部供应商通道，看看 MCP 协议如何把外部工具接入这座工厂。</p>
+<div class="part-header page-break">
+<div class="part-number">PART 3</div>
+<div class="part-rule"></div>
+<div class="part-title">深入系统</div>
+</div>
+<div class="section-header">
+<div class="section-number">§09</div>
+<h2 class="section-title">外部供应商通道</h2>
+<div class="section-subtitle">The Supply Channel — MCP Protocol</div>
+</div>
+<p>工厂的围墙上有几扇特殊的门，外面停着一排供应商的卡车。每辆卡车代表一个 MCP 服务器——它们不是工厂自有的产线，但通过标准化的装卸协议（Model Context Protocol），可以把外部的工具、资源、命令无缝接入工厂的生产流程。</p>
+<p>供应商来了，先要验明身份（OAuth 认证），然后登记货物清单（工具发现），最后把货物合并到工厂的总仓库里（与内置工具合并）。这套流程就是 MCP 协议在 Claude Code 中的实现。</p>
+<h3>MCP 架构概览</h3>
+<p>MCP（Model Context Protocol）是一个开放协议，定义了 AI 应用如何与外部工具和数据源通信。在 Claude Code 中，MCP 的实现大约 12,000 行代码，分布在 <code>src/services/mcp/</code> 目录下。</p>
+<p>!<a href="images/mcp-architecture.png">MCP 架构概览</a></p>
+<p>架构上分三层：</p>
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">TEXT</span></div>
+<pre><code class="language-text">应用层（Claude Code）
+</code></pre>
+</div>
+MCP 的核心理念是：<strong>外部服务器提供工具，Claude Code 作为客户端消费工具</strong>。每个 MCP 服务器是一个独立进程或远程服务，通过 JSON-RPC 协议与 Claude Code 通信。服务器提供三种能力：工具（tools）、资源（resources）、提示（prompts）。
+<h3>传输层：供应商的配送方式</h3>
+供应商怎么把货物送到工厂？有几种不同的配送方式。
+<strong>Stdio 传输</strong>——最常见的本地配送。MCP 服务器作为子进程启动，通过标准输入/输出通信。配置方式很直观：
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">JSON</span></div>
+<pre><code class="language-json">{
+  <span class="syntax-string">"my-server"</span>: {
+    <span class="syntax-string">"command"</span>: <span class="syntax-string">"npx"</span>,
+    <span class="syntax-string">"args"</span>: [<span class="syntax-string">"-y"</span>, <span class="syntax-string">"@my/mcp-server"</span>],
+    <span class="syntax-string">"env"</span>: { <span class="syntax-string">"API_KEY"</span>: <span class="syntax-string">"..."</span> }
+  }
+</code></pre>
+</div>
+Stdio 传输的好处是零配置网络——没有端口冲突、没有防火墙问题。缺点是每个服务器是一个独立的操作系统进程，消耗资源。关闭时的清理也很讲究：先发 SIGINT（Ctrl+C），等 100ms；没退出就发 SIGTERM，再等 400ms；还没退出就 SIGKILL 强杀。总共最多 600ms，保证 CLI 的响应速度不受拖累。
+<strong>SSE 传输</strong>——远程配送的第一种方式。通过 HTTP 长连接接收服务器推送的事件。适合部署在远程的 MCP 服务器。
+<strong>StreamableHTTP 传输</strong>——更新一代的 HTTP 传输。支持 POST 请求发送消息、GET 请求接收 SSE 事件流。有一个容易踩的坑：MCP 规范要求每个 POST 请求都带上 <code>Accept: application/json, text/event-stream</code> 头，某些运行时会丢掉这个头。Claude Code 在传输层的最外层强制设置了这个头，保证合规。
+<strong>WebSocket 传输</strong>——双向实时通信。支持 IDE 集成（如 VS Code 扩展通过 WebSocket 连接）。
+每种传输都有独立的超时管理。连接超时默认 30 秒（<code>MCP_TIMEOUT</code> 环境变量可调），单次请求超时 60 秒。一个容易遇到的 bug 是 <code>AbortSignal.timeout()</code> 在 Bun 中的内存泄漏——即使请求已完成，底层的定时器对象仍然占用内存直到被 GC。Claude Code 改用 <code>setTimeout</code> + 手动 <code>clearTimeout</code> 来解决这个问题。
+<h3>连接管理：供应商准入流程</h3>
+不是所有供应商都能直接把货物卸在工厂里。连接管理有一套准入流程。
+<code>connectToServer()</code> 函数是整个准入流程的入口。它被 <code>memoize</code> 包装——相同配置的重复连接会复用缓存结果，避免重复建立连接。流程如下：
+<ol>
+<li><strong>选择传输层</strong>——根据配置的 <code>type</code> 字段（stdio/sse/http/ws/ide）选择对应的传输实现</li>
+<li><strong>创建 MCP 客户端</strong>——<code>new Client()</code> 创建 MCP SDK 客户端实例</li>
+<li><strong>建立连接</strong>——<code>client.connect(transport)</code> 发起连接，有超时保护</li>
+<li><strong>获取能力声明</strong>——<code>client.getServerCapabilities()</code> 查询服务器支持哪些功能</li>
+<li><strong>获取服务器指令</strong>——<code>client.getInstructions()</code> 获取服务器的使用说明（截断到 2048 字符）</li>
+</ol>
+连接建立后，客户端会注册事件处理器。最关键的是 <code>onclose</code> 和 <code>onerror</code>——它们负责连接断开后的重连逻辑。当连接断开时，<code>onclose</code> 会清除 memoize 缓存、清除工具/资源/命令的获取缓存，这样下次访问时就会自动重建连接。
+对于远程传输（SSE/HTTP），还有一个终端错误检测器。如果连续出现 3 次 ECONNRESET、ETIMEDOUT 等致命错误，就主动关闭连接触发重连。比等到所有工具调用超时才反应要快得多。
+连接管理还区分了本地服务器和远程服务器的并发策略。本地服务器（stdio）因为要 fork 进程，并发数设为 3；远程服务器只是网络连接，并发数设为 20。两者通过 <code>pMap</code> 并行连接，每个服务器连接完成后立即回调通知上层，不用等其他服务器。
+<h3>工具发现与合并</h3>
+供应商通过准入后，需要把它的货物清单报上来。这就是工具发现。
+<code>fetchToolsForClient()</code> 向 MCP 服务器发送 <code>tools/list</code> 请求，获取服务器提供的所有工具列表。每个工具被转换成 Claude Code 内部的 <code>Tool</code> 格式：
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">TypeScript</span></div>
+<pre><code class="language-typescript"><span class="syntax-comment">// MCP 工具转换为内部 Tool 格式</span>
+<span class="syntax-keyword">return</span> toolsToProcess.<span class="syntax-function">map</span>(tool =&gt; ({
+  ...MCPTool,                                  <span class="syntax-comment">// 使用 MCP 工具的通用实现</span>
+  name: <span class="syntax-function">buildMcpToolName</span>(client.name, tool.name),  <span class="syntax-comment">// 如 <span class="syntax-string">"mcp__slack__search"</span></span>
+  mcpInfo: { serverName: client.name, toolName: tool.name },
+  isMcp: <span class="syntax-keyword">true</span>,
+  <span class="syntax-function">isConcurrencySafe</span>() {
+    <span class="syntax-keyword">return</span> tool.annotations?.readOnlyHint ?? <span class="syntax-keyword">false</span>  <span class="syntax-comment">// 读取 MCP 标准注解</span>
+  },
+  <span class="syntax-keyword">async</span> <span class="syntax-function">call</span>(args, context, ...) {
+    <span class="syntax-keyword">const</span> connectedClient = <span class="syntax-keyword">await</span> <span class="syntax-function">ensureConnectedClient</span>(client)
+    <span class="syntax-keyword">const</span> result = <span class="syntax-keyword">await</span> <span class="syntax-function">callMCPToolWithUrlElicitationRetry</span>(...)
+    <span class="syntax-keyword">return</span> { data: result.content }
+  },
+  <span class="syntax-comment">// ...</span>
+}))
+</code></pre>
+</div>
+注意工具命名规则：MCP 工具的全名是 <code>mcp__服务器名__工具名</code>。这个前缀确保了不同服务器的同名工具不会冲突。但在 SDK 模式下，可以通过 <code>CLAUDE_AGENT_SDK_MCP_NO_PREFIX</code> 环境变量去掉前缀，让 MCP 工具直接覆盖同名内置工具。
+工具的 <code>isConcurrencySafe()</code> 直接读取 MCP 标准的 <code>readOnlyHint</code> 注解。这是 MCP 规范定义的标准字段，MCP 服务器实现者在工具的 annotations 中声明。如果服务器没有声明，默认是不可并发——又是 fail-closed 的思路。
+合并到统一工具池的逻辑我们在上一章已经看过了：<code>assembleToolPool()</code> 把内置工具和 MCP 工具合并，按名称排序，同名冲突时内置工具优先。
+<h3>资源与命令</h3>
+除了工具，MCP 服务器还可以提供<strong>资源</strong>和<strong>命令</strong>。
+资源（resources）是 MCP 服务器暴露的数据对象——比如数据库表、文件系统目录、API 响应。Claude Code 通过 <code>resources/list</code> 发现资源列表，通过 <code>ListMcpResourcesTool</code> 和 <code>ReadMcpResourceTool</code> 两个内置工具来操作它们。
+命令（prompts，在 MCP 术语中叫 prompts）是预定义的交互模板。比如 Slack 的 MCP 服务器可以提供 "search-messages" 命令，Claude Code 会把它注册为斜杠命令 <code>/mcp__slack__search-messages</code>，用户可以直接调用。
+<h3>OAuth 认证：供应商的身份证</h3>
+远程供应商（SSE/HTTP）通常需要认证。MCP 协议使用 OAuth 2.0 授权码流程，Claude Code 的 <code>ClaudeAuthProvider</code> 实现了完整的 OAuth 客户端：
+<ol>
+<li><strong>发现授权服务器元数据</strong>（<code>discoverAuthorizationServerMetadata</code>）——从服务器的 <code>.well-known/oauth-authorization-server</code> 端点获取授权 URL</li>
+<li><strong>打开浏览器授权页面</strong>（<code>openAuthFlow</code>）——启动本地 HTTP 服务器监听回调，然后在浏览器中打开授权页面</li>
+<li><strong>交换授权码获取令牌</strong>（<code>exchangeCodeForTokens</code>）——用户授权后，用授权码换取 access Token 和 refresh Token</li>
+</ol>
+令牌被安全存储在操作系统的密钥管理器中（macOS Keychain、Windows Credential Manager、Linux Secret Service）。刷新令牌时使用文件锁（lockfile）防止并发竞争。
+如果认证失败（401 Unauthorized），服务器会被标记为 <code>needs-auth</code> 状态，并生成一个特殊的 <code>McpAuthTool</code>。用户在 REPL 中看到这个工具的调用时，会触发重新认证流程。为了避免频繁重试已知需要认证的服务器，认证失败的状态会被缓存 15 分钟。
+<h3>MCP vs 内置工具</h3>
+<table>
+<thead><tr><th>维度</th><th>内置工具</th><th>MCP 工具</th></tr></thead>
+<tbody><tr><td>来源</td><td>编译时打包</td><td>运行时连接</td></tr>
+<tr><td>注册方式</td><td><code>getAllBaseTools()</code> 静态列表</td><td><code>tools/list</code> 动态发现</td></tr>
+<tr><td>命名格式</td><td><code>Bash</code>、<code>Read</code>、<code>Edit</code></td><td><code>mcp__server__tool</code></td></tr>
+<tr><td>权限检查</td><td>通用权限系统 + 工具自定义</td><td>通用权限系统 + MCP 注解</td></tr>
+<tr><td>并发安全</td><td>工具自行实现</td><td><code>readOnlyHint</code> 注解</td></tr>
+<tr><td>输入验证</td><td>Zod schema</td><td>JSON Schema</td></tr>
+<tr><td>连接管理</td><td>无需连接</td><td>memoize 缓存 + 自动重连</td></tr>
+<tr><td>安全隔离</td><td>进程内</td><td>子进程 / 远程服务</td></tr>
+<tr><td>结果大小限制</td><td><code>maxResultSizeChars</code></td><td>自动截断或持久化到文件</td></tr>
+<tr><td>描述长度</td><td>无限制</td><td>截断到 2048 字符</td></tr>
+<tr><td>同名冲突</td><td>优先级高</td><td>优先级低（同名被内置覆盖）</td></tr>
+</tbody></table>
+MCP 工具还有一个内置工具不具备的能力：<strong>URL 引导</strong>（URL Elicitation）。某些 MCP 工具在执行过程中可能需要用户在浏览器中完成某个操作（比如授权第三方服务）。工具会返回 <code>-32042</code> 错误码，Claude Code 拦截这个错误，弹出引导窗口让用户完成操作，然后自动重试工具调用。最多重试 3 次。
+<h3>大结果处理</h3>
+外部供应商返回的货物有时候会特别大——一个数据库查询可能返回几 MB 的文本。Claude Code 不会把这些大结果直接塞进模型的上下文窗口。
+<code>processMCPResult()</code> 函数实现了多级处理策略：
+<ol>
+<li>先检查结果大小是否需要截断（<code>mcpContentNeedsTruncation</code>）</li>
+<li>如果包含图片，走截断路径（持久化会破坏图片压缩）</li>
+<li>否则，把大结果保存到磁盘文件，返回一个简短的"请阅读文件"提示</li>
+<li>如果文件保存失败，回退到截断路径</li>
+</ol>
+文件名格式是 <code>mcp-server-tool-timestamp</code>，保存在 Claude Code 的临时目录中。模型收到的是一个包含文件路径和格式说明的文本提示，它可以后续用 Read 工具查看完整内容。
+<blockquote>
+<strong>核心建议</strong>
+MCP 的设计哲学是"协议优先、实现第二"。所有 MCP 相关的代码都围绕 JSON-RPC 协议构建，不依赖任何特定语言或运行时。当你在开发自己的 MCP 服务器时，最重要的是正确实现协议约定的注解（<code>readOnlyHint</code>、<code>destructiveHint</code>、<code>openWorldHint</code>）——这些注解决定了你的工具在 Claude Code 中如何被调度和安全检查。不要忽略它们。
+</blockquote>
+供应商通道走完了。工厂现在有了自有的工具站和外部供应商的扩展能力。但无论是自有工具还是外部工具，每一次操作都需要通过安全检查——就像工厂的每一道工序都需要经过品控。下一章，我们走进安检与品控部门，看看权限系统和 Hook 机制如何保护你的代码安全。
+
+<div class="file-tree">
+<div class="file-tree-line file-tree-file">  ├── MCP 客户端（client.ts）——管理连接、工具发现、工具调用</div>
+<div class="file-tree-line file-tree-file">  ├── 传输层 ——负责底层通信</div>
+<div class="file-tree-line file-tree-dir">  │     ├── StdioClientTransport  ——标准输入/输出（本地进程）</div>
+<div class="file-tree-line file-tree-file">  │     ├── SSEClientTransport    ——Server-Sent Events（HTTP 长连接）</div>
+<div class="file-tree-line file-tree-file">  │     ├── StreamableHTTPClientTransport ——流式 HTTP</div>
+<div class="file-tree-line file-tree-file">  │     └── WebSocketTransport    ——WebSocket</div>
+<div class="file-tree-line file-tree-file">  └── 认证层（auth.ts）——OAuth 流程管理</div>
+</div><div class="section-header">
+<div class="section-number">§10</div>
+<h2 class="section-title">安检与品控 — 权限与Hook</h2>
+<div class="section-subtitle">Security & Quality Gates</div>
+</div>
+<p>"不会吧，我明明只是让它帮我改个文件，它怎么把整个目录都删了？"</p>
+<p>这个噩梦场景，是每一个把 AI Agent 接入真实项目的人最深的恐惧。Claude Code 的回答是一套精密的双重防线——安检门负责"你能不能进"，品控检测点负责"你做得对不对"。</p>
+<h3>安检门：六种通行模式</h3>
+<p>源码中定义了六种权限模式：</p>
+<table>
+<thead><tr><th>模式</th><th>安检行为</th><th>适用场景</th></tr></thead>
+<tbody><tr><td><code>default</code></td><td>每个敏感操作都弹出确认</td><td>日常开发</td></tr>
+<tr><td><code>plan</code></td><td>只读放行，写操作需确认</td><td>阅读分析代码</td></tr>
+<tr><td><code>acceptEdits</code></td><td>自动允许文件编辑</td><td>信任的自动化流程</td></tr>
+<tr><td><code>dontAsk</code></td><td>不弹确认框，但遵守规则</td><td>CI/CD 流水线</td></tr>
+<tr><td><code>bypassPermissions</code></td><td>跳过所有权限检查</td><td>紧急修复（需额外确认）</td></tr>
+<tr><td><code>auto</code></td><td>分类器自动判断（仅内部版）</td><td>高级自动化</td></tr>
+</tbody></table>
+<p><code>bypassPermissions</code> 看起来像"完全敞开大门"，其实不然。源码里的权限检查流程有一条铁律：<strong>deny 规则和 safetyCheck 规则即使在 bypass 模式下也必须执行</strong>。</p>
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">TypeScript</span></div>
+<pre><code class="language-typescript"><span class="syntax-comment">// bypass 模式下的安全检查（safetyCheck）——不可绕过</span>
+<span class="syntax-function"><span class="syntax-keyword">if</span></span>(
+  toolPermissionResult?.behavior === <span class=\"syntax-string\">'ask'</span> &amp;&amp;
+  toolPermissionResult.decisionReason?.type === <span class=\"syntax-string\">'safetyCheck'</span>
+) {
+  <span class="syntax-keyword">return</span> toolPermissionResult <span class="syntax-comment">// 即使 bypass 模式也强制弹出确认</span>
+}
+</code></pre>
+</div>
+<h3>权限检查流水线：五道关卡</h3>
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">TEXT</span></div>
+<pre><code class="language-text">关卡 1a: deny 规则匹配 <span class="flowchart-arrow">→</span> <span class="flowchart-box">命中则直接拒绝</span>
+关卡 1b: ask 规则匹配 <span class="flowchart-arrow">→</span> <span class="flowchart-box">命中则强制弹出确认</span>
+关卡 1c: 工具自身权限检查 <span class="flowchart-arrow">→</span> <span class="flowchart-box">工具自定义的安全逻辑</span>
+关卡 2a: 模式检查 <span class="flowchart-arrow">→</span> <span class="flowchart-box">bypass 模式直接放行</span>
+关卡 2b: allow 规则匹配 <span class="flowchart-arrow">→</span> <span class="flowchart-box">命中则直接放行</span>
+关卡 <span class="syntax-number">3</span>:  转为 ask <span class="flowchart-arrow">→</span> <span class="flowchart-box">以上都没命中，弹出确认</span>
+</code></pre>
+</div>
+<table>
+<thead><tr><th>关卡</th><th>检查内容</th><th>可被 bypass 绕过？</th></tr></thead>
+<tbody><tr><td>1a</td><td>deny 规则</td><td>否</td></tr>
+<tr><td>1b</td><td>ask 规则</td><td>否</td></tr>
+<tr><td>1c</td><td>工具自身检查</td><td>部分（safetyCheck 不可绕过）</td></tr>
+<tr><td>2a</td><td>模式检查</td><td>是（bypass 本身）</td></tr>
+<tr><td>2b</td><td>allow 规则</td><td>是</td></tr>
+<tr><td>3</td><td>兜底</td><td>是</td></tr>
+</tbody></table>
+<p>规则有六个来源：<code>userSettings</code>、<code>projectSettings</code>、<code>localSettings</code>、<code>flagSettings</code>（企业管理员下发）、<code>policySettings</code>、<code>cliArg</code>。优先级从高到低，企业管理员的 deny 规则一票否决。</p>
+<h3>品控检测点：Hook 系统</h3>
+<p>Hook 在 <code>settings.json</code> 中配置，分三种触发时机：</p>
+<table>
+<thead><tr><th>Hook 类型</th><th>触发时机</th><th>典型用途</th></tr></thead>
+<tbody><tr><td><code>PreToolUse</code></td><td>工具执行前</td><td>安全审计、输入验证</td></tr>
+<tr><td><code>PostToolUse</code></td><td>工具执行后</td><td>代码格式化、自动测试</td></tr>
+<tr><td><code>PostToolUseFailure</code></td><td>工具执行失败后</td><td>错误上报</td></tr>
+</tbody></table>
+<p>Hook 返回值可以影响权限决策，但 <strong>Hook 的 allow 不能覆盖 deny/ask 规则</strong>——安检门始终有最终决定权。</p>
+<blockquote>
+<strong>核心建议</strong>
+权限系统的设计精髓是"分层防御，绝不信任单点"。deny 规则 > ask 规则 > Hook 决策 > allow 规则 > 模式检查。配置时先用 deny 锁定高危操作，再用 allow 放行可信操作，最后用 Hook 做实时审计。
+</blockquote>
+<p>下一章走进控制面板——那个用 React 构建的终端界面。</p>
+<div class="section-header">
+<div class="section-number">§11</div>
+<h2 class="section-title">控制面板 — Ink/React终端UI</h2>
+<div class="section-subtitle">The Dashboard — Ink/React Terminal UI</div>
+</div>
+<p>你在终端里运行 <code>claude</code>，屏幕上弹出了一个完整的交互式界面——消息气泡、工具调用卡片、权限确认对话框、底部输入框。这看起来像一个桌面应用，但它运行在纯终端里。</p>
+<p>这个"不可能"的界面是用 React 写的。Ink——一个用 React reconciler 直接把组件树渲染成终端字符的框架。Claude Code 团队维护了自己的 Ink 分支。</p>
+<h3>Ink 的秘密：React 在终端里怎么渲染</h3>
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">TEXT</span></div>
+<pre><code class="language-text">React 组件树 <span class="flowchart-arrow">→</span> <span class="flowchart-box">reconciler </span><span class="flowchart-arrow">→</span> <span class="flowchart-box">虚拟 DOM</span>
+                    ↓
+            Yoga 布局计算（Flexbox）
+                    ↓
+            render-node-to-output（ANSI 字符串）
+                    ↓
+            终端屏幕更新
+</code></pre>
+</div>
+你可以用 React 的全部能力：<code>useState</code>、<code>useEffect</code>、<code>useContext</code>、<code>useMemo</code>。甚至 React Compiler 的 memoization 也被保留了。
+<h3>REPL.tsx：5000 行的主界面</h3>
+渲染结构简化为：
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">TEXT</span></div>
+<pre><code class="language-text">&lt;REPL&gt;
+</code></pre>
+</div>
+<h3>虚拟列表：高效渲染的秘密</h3>
+<table>
+<thead><tr><th>参数</th><th>值</th><th>设计意图</th></tr></thead>
+<tbody><tr><td>DEFAULT_ESTIMATE</td><td>3 行</td><td>低估安全，高估导致空白</td></tr>
+<tr><td>OVERSCAN_ROWS</td><td>80 行</td><td>充足缓冲区</td></tr>
+<tr><td>SCROLL_QUANTUM</td><td>40 行</td><td>减少 React 重渲染</td></tr>
+<tr><td>MAX_MOUNTED_ITEMS</td><td>300</td><td>防止内存爆炸</td></tr>
+<tr><td>SLIDE_STEP</td><td>25</td><td>控制单次挂载渲染成本</td></tr>
+</tbody></table>
+虚拟列表的核心思路是：只挂载可见区域（视口）加上下缓冲区内的组件，视口外的消息用等高的空 <code><Box></code> 占位，保持滚动条位置正确。当用户滚动时，<code>onScroll</code> 事件触发重新计算可见范围，按 <code>SCROLL_QUANTUM</code>（40 行）为粒度批量调整挂载窗口，避免逐行触发 React 重渲染。每条消息的高度通过 <code>DEFAULT_ESTIMATE</code>（3 行）预估值 + 实际渲染后回填的方式动态维护，初始低估确保首次渲染不出空白行。超过 <code>MAX_MOUNTED_ITEMS</code>（300）的旧消息会被卸载回收内存，<code>SLIDE_STEP</code>（25）控制单次卸载的数量上限，防止大批量 DOM 操作造成帧率抖动。
+<h3>用户交互：键盘、输入与滚动</h3>
+REPL 的交互层有三个核心关注点。<strong>输入处理</strong>由 <code><PromptInput></code> 组件负责——它监听 stdin 的 <code>keypress</code> 事件，维护一个行缓冲区，支持多行编辑（Shift+Enter 换行）、历史记录上下翻（通过 <code>useHistory</code> hook）、Tab 补全（斜杠命令和文件路径）。输入完成后触发 <code>onSubmit</code>，文本被解析、包装、推入消息流。<strong>滚动行为</strong>由 <code>VirtualMessageList</code> 管理——自动滚动跟随新消息，但一旦用户主动向上滚动查看历史，自动跟随暂停，直到用户重新滚到底部。这个判断通过一个 <code>isUserScrolling</code> 状态实现，监听滚动偏移量与最大偏移量的差值。<strong>快捷键</strong>由 <code><KeybindingSetup></code> 统一注册，包括 Escape（取消当前操作）、Ctrl+C（中断流式响应）、Ctrl+L（清屏）等，通过 Ink 的 <code>useInput</code> hook 捕获原始键码并分发到对应的 action handler。
+<h3>状态管理：两层架构</h3>
+<strong>第一层：Bootstrap 状态（进程级单例）。</strong> <code>bootstrap/state.ts</code> 管理 sessionId、cwd、成本追踪。不走 React 渲染。
+<strong>第二层：AppState（React Context + Zustand）。</strong> 消息列表、工具权限、MCP 连接。触发 React 渲染。
+<blockquote>
+<strong>核心建议</strong>
+调试 UI 问题时，先确定数据在哪一层。Bootstrap 层查 <code>state.ts</code> 的 getter/setter；React 层查 <code>AppStateStore.ts</code> 的状态定义。
+</blockquote>
+控制面板是你看到的 Claude Code 的全部。下一章，我们把前面所有模块串起来——跟踪一个真实的请求走完它的完整旅程。
+
+<div class="file-tree">
+<div class="file-tree-line file-tree-dir">  ├── &lt;KeybindingSetup&gt;         // 快捷键上下文</div>
+<div class="file-tree-line file-tree-dir">  ├── &lt;VirtualMessageList&gt;      // 虚拟列表渲染消息</div>
+<div class="file-tree-line file-tree-file">  │   └── &lt;MessageRow&gt; × N</div>
+<div class="file-tree-line file-tree-dir">  ├── &lt;PermissionRequest&gt;       // 权限确认对话框</div>
+<div class="file-tree-line file-tree-dir">  ├── &lt;PromptInput&gt;             // 底部输入框</div>
+<div class="file-tree-line file-tree-dir">  └── &lt;SpinnerWithVerb&gt;         // 等待状态动画</div>
+</div><div class="part-header page-break">
+<div class="part-number">PART 4</div>
+<div class="part-rule"></div>
+<div class="part-title">实战场景</div>
+</div>
+<div class="section-header">
+<div class="section-number">§12</div>
+<h2 class="section-title">一个请求的一生 — 全链路追踪</h2>
+<div class="section-subtitle">Lifecycle of a Request — Full Chain Trace</div>
+</div>
+<p>60 秒。从你按下回车发送"帮我重构 parseConfig 函数"到看到完整的回复，大约 60 秒。这 60 秒里，你的这句话穿过了工厂的每一个车间、每一道安检门、每一个品控检测点。</p>
+<p>现在我们把前面十一章的知识串起来，跟着这句话走完它的一生。</p>
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">TEXT</span></div>
+<pre><code class="language-text">用户按下回车
+    ▼
+┌─────────────────────────────────────────────────────────────────┐
+                         ▼
+┌─────────────────────────────────────────────────────────────────┐
+                         ▼
+┌─────────────────────────────────────────────────────────────────┐
+                    有 tool_use？
+                    ╱          ╲
+                  是            否
+                  ▼              ▼
+┌──────────────────────┐   返回最终回复
+           ▼
+      回到 while(true) 循环顶部
+</code></pre>
+</div>
+<h3>第 0 秒：入口与命令解析</h3>
+<code>PromptInput</code> 组件捕获 <code>onSubmit</code> 事件。文本先经过 <code>parseReferences()</code> 扫描文件引用，斜杠命令被 <code>commands.ts</code> 拦截路由。处理后的文本被包装成 <code>UserMessage</code>，追加到 AppState。
+<h3>第 0.1 秒：QueryEngine 接管</h3>
+REPL 调用 <code>QueryEngine.submitMessage()</code>。总调度室持久化用户消息到转录日志，<code>fileHistory</code> 给工作目录拍快照。
+<h3>第 0.2 秒：进入生产线</h3>
+<code>query()</code> 进入 <code>while(true)</code> 循环。消息经过四道预处理：<code>applyToolResultBudget</code> <span class="flowchart-arrow">→</span> <span class="flowchart-box"><code>snipCompactIfNeeded</code> </span><span class="flowchart-arrow">→</span> <span class="flowchart-box"><code>microcompact</code> </span><span class="flowchart-arrow">→</span> <span class="flowchart-box"><code>autocompact</code>。构建请求：系统提示词 + 用户上下文 + 工具列表。</span>
+<h3>第 0.3 秒：API 调用</h3>
+<code>deps.callModel()</code> 发起流式请求。SSE 事件逐个到达，每个文本片段被 yield 给 REPL 渲染。
+<h3>第 3 秒：模型请求工具调用</h3>
+模型返回 <code>tool_use</code> 块（如 Read 工具读取文件）。<code>query()</code> 设置 <code>needsFollowUp = true</code>，进入工具执行阶段。
+<h3>第 3.1 秒：安检门开启</h3>
+<code>runPreToolUseHooks()</code> 执行 PreToolUse Hook，然后 <code>canUseTool()</code> 进入五道权限检查关卡。通过后工具放行执行。
+<h3>第 3.5-15 秒：循环</h3>
+工具结果追加到消息历史 <span class="flowchart-arrow">→</span> <span class="flowchart-box">第二轮 API 调用 </span><span class="flowchart-arrow">→</span> <span class="flowchart-box">模型决定编辑文件 </span><span class="flowchart-arrow">→</span> <span class="flowchart-box">Edit 工具 </span><span class="flowchart-arrow">→</span> <span class="flowchart-box">第三轮 API </span><span class="flowchart-arrow">→</span> <span class="flowchart-box">模型决定跑测试 </span><span class="flowchart-arrow">→</span> <span class="flowchart-box">BashTool </span><span class="flowchart-arrow">→</span> <span class="flowchart-box">第四轮 API </span><span class="flowchart-arrow">→</span> <span class="flowchart-box">最终回复。</span>
+<h3>全链路时序</h3>
+<table>
+<thead><tr><th>阶段</th><th>耗时</th><th>涉及模块</th></tr></thead>
+<tbody><tr><td>输入预处理</td><td>~10ms</td><td>PromptInput、commands.ts</td></tr>
+<tr><td>消息持久化</td><td>~20ms</td><td>QueryEngine、transcript</td></tr>
+<tr><td>消息预处理</td><td>~50ms</td><td>compact 链</td></tr>
+<tr><td>API 调用（×4轮）</td><td>~7s</td><td>api/claude.ts、流式处理</td></tr>
+<tr><td>权限确认（×3次）</td><td>~3s</td><td>canUseTool、PermissionRequest</td></tr>
+<tr><td>工具执行</td><td>~5s</td><td>FileReadTool、FileEditTool、BashTool</td></tr>
+<tr><td>结果渲染 + 成本记录</td><td>~15ms</td><td>VirtualMessageList、costTracker</td></tr>
+<tr><td><strong>总计</strong></td><td><strong>~15s</strong></td><td><strong>15+ 模块</strong></td></tr>
+</tbody></table>
+<blockquote>
+<strong>核心建议</strong>
+全链路追踪是理解复杂系统的终极方法。遇到 bug 时从入口沿数据流一步步追踪，不要从 UI 组件开始猜。设置 <code>CLAUDE_CODE_DEBUG=1</code> 可以看到完整的权限决策日志。
+</blockquote>
+到此，你已经理解了 Claude Code 从入口到输出的完整架构。接下来的章节，我们从"怎么做"转向"为什么这样做"。
+
+<div class="file-tree">
+<div class="file-tree-line file-tree-file">    │</div>
+<div class="file-tree-line file-tree-dir">│  L6 表现层：PromptInput 捕获输入 <span class="flowchart-arrow">→</span> <span class="flowchart-box">parseReferences() 解析引用   │</span></div>
+<div class="file-tree-line file-tree-dir">│           <span class="flowchart-arrow">→</span> <span class="flowchart-box">斜杠命令路由 </span><span class="flowchart-arrow">→</span> <span class="flowchart-box">UserMessage 追加到 AppState          │</span></div>
+<div class="file-tree-line file-tree-dir">└────────────────────────┬────────────────────────────────────────┘</div>
+<div class="file-tree-line file-tree-file">                         │</div>
+<div class="file-tree-line file-tree-file">│  L3 核心层：QueryEngine.submitMessage()                         │</div>
+<div class="file-tree-line file-tree-dir">│           <span class="flowchart-arrow">→</span> <span class="flowchart-box">持久化到 transcript </span><span class="flowchart-arrow">→</span> <span class="flowchart-box">fileHistory 快照              │</span></div>
+<div class="file-tree-line file-tree-dir">│           <span class="flowchart-arrow">→</span> <span class="flowchart-box">query() while(true) 循环启动                        │</span></div>
+<div class="file-tree-line file-tree-dir">│           <span class="flowchart-arrow">→</span> <span class="flowchart-box">四道预处理：budget </span><span class="flowchart-arrow">→</span> <span class="flowchart-box">snip </span><span class="flowchart-arrow">→</span> <span class="flowchart-box">micro </span><span class="flowchart-arrow">→</span> <span class="flowchart-box">autocompact     │</span></div>
+<div class="file-tree-line file-tree-dir">└────────────────────────┬────────────────────────────────────────┘</div>
+<div class="file-tree-line file-tree-file">                         │</div>
+<div class="file-tree-line file-tree-dir">│  L5 服务层：deps.callModel() <span class="flowchart-arrow">→</span> <span class="flowchart-box">流式 SSE 响应                    │</span></div>
+<div class="file-tree-line file-tree-dir">│           <span class="flowchart-arrow">→</span> <span class="flowchart-box">逐 token yield 给 REPL 渲染                         │</span></div>
+<div class="file-tree-line file-tree-dir">└────────────────────────┬────────────────────────────────────────┘</div>
+<div class="file-tree-line file-tree-file">                         │</div>
+<div class="file-tree-line file-tree-file">                  │              │</div>
+<div class="file-tree-line file-tree-dir">│  L4 工具层：权限检查   │   <span class="flowchart-arrow">→</span> <span class="flowchart-box">成本记录</span></div>
+<div class="file-tree-line file-tree-dir">│  <span class="flowchart-arrow">→</span> <span class="flowchart-box">PreToolUse Hook   │   </span><span class="flowchart-arrow">→</span> <span class="flowchart-box">会话结束</span></div>
+<div class="file-tree-line file-tree-dir">│  <span class="flowchart-arrow">→</span> <span class="flowchart-box">canUseTool()      │</span></div>
+<div class="file-tree-line file-tree-dir">│  <span class="flowchart-arrow">→</span> <span class="flowchart-box">工具执行           │</span></div>
+<div class="file-tree-line file-tree-dir">│  <span class="flowchart-arrow">→</span> <span class="flowchart-box">结果追加到消息      │</span></div>
+<div class="file-tree-line file-tree-dir">└──────────┬───────────┘</div>
+<div class="file-tree-line file-tree-file">           │</div>
+</div><div class="section-header">
+<div class="section-number">§13</div>
+<h2 class="section-title">给工厂加一条产线</h2>
+<div class="section-subtitle">Adding a New Production Line</div>
+</div>
+<p>假设你想让 Claude Code 帮你查天气——输入"北京明天天气怎么样"，它却一脸茫然，因为它根本没有天气查询这条产线。工厂再智能，缺少对应的车间也产不出你想要的货。好消息是，Claude Code 的工具系统是可扩展的：你可以给它接上任意新的"产线"，从天气查询到数据库操作，从 Slack 通知到 Jira 工单，只要你能定义清楚输入和输出。</p>
+<p>这一章我要带你从零造一条天气产线，走完工具定义、注册、权限配置、测试验证的完整流程。最后还会提到一条替代路径——通过 MCP 协议发布工具，不走内置注册。</p>
+<h3>工具是什么：产线的规格书</h3>
+<p>在工厂隐喻里，每条产线都有一份规格书，写明它叫什么、能做什么、需要什么原料、产出什么成品。Claude Code 的工具定义就是这个规格书。核心类型如下：</p>
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">TypeScript</span></div>
+<pre><code class="language-typescript">type Tool&lt;Input, Output&gt; = {
+  name: string                              <span class="syntax-comment">// 产线名称，全局唯一标识</span>
+  description?: string                      <span class="syntax-comment">// 向调度中心说明这条产线能干什么</span>
+  inputSchema: z.ZodType&lt;any&gt;               <span class="syntax-comment">// 原料规格——用 Zod 校验输入合法性</span>
+  call: (input: Input, context: ToolUseContext) =&gt; Promise&lt;ToolResult&lt;Output&gt;&gt;  <span class="syntax-comment">// 生产过程</span>
+  isConcurrencySafe?: (input: Input) =&gt; boolean  <span class="syntax-comment">// 标记是否可以并行投产</span>
+  aliases?: string[]                        <span class="syntax-comment">// 产线别名，方便引用</span>
+}
+</code></pre>
+</div>
+<p>逐个字段拆解：</p>
+<p><strong>name</strong>——工具的唯一标识符。调度中心（模型）靠这个名字选择工具。命名要简洁、表意清晰，比如 <code>WeatherQuery</code> 比 <code>tool_1</code> 好一万倍。</p>
+<p><strong>description</strong>——告诉模型这个工具在什么场景下该用。这段描述直接决定了模型会不会正确"调度"你的工具。写得模糊，模型就不会用；写得精准，模型就知道什么情况下该调用它。</p>
+<p><strong>inputSchema</strong>——用 Zod 定义的输入校验 schema。原料进厂前要先过质检，不合格的直接打回去。Zod 的好处是既能在运行时校验，又能自动生成 JSON Schema 给模型看。</p>
+<p><strong>call</strong>——核心生产函数。接收校验过的输入和上下文，返回处理结果。这是产线的心脏。</p>
+<p><strong>isConcurrencySafe</strong>——可选的并发安全标记。有些工具可以同时跑好几条（比如读取不同文件），有些必须排队（比如写同一个文件）。这个函数接收输入参数，返回 true 表示这次调用可以和其他调用并行执行。</p>
+<p><strong>aliases</strong>——工具的别名列表。比如你可以给 <code>WeatherQuery</code> 加个别名 <code>天气</code>，方便中文环境下的使用。</p>
+<h3>造一条天气产线</h3>
+<p>现在我们动手。目标是造一个 <code>WeatherTool</code>，输入城市名和日期，返回天气信息。</p>
+<p><strong>第一步：定义原料规格。</strong>用 Zod 写输入 schema：</p>
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">TypeScript</span></div>
+<pre><code class="language-typescript"><span class="syntax-keyword">import</span> { z } <span class="syntax-keyword">from</span> <span class="syntax-string">"zod"</span>
+<span class="syntax-keyword">const</span> WeatherInputSchema = z.<span class="syntax-function">object</span>({
+  city: z.<span class="syntax-function">string</span>().<span class="syntax-function">describe</span>(<span class="syntax-string">"城市名称，如<span class=\"syntax-string\">'北京'</span>、<span class=\"syntax-string\">'Shanghai'</span>"</span>),
+  date: z.<span class="syntax-function">string</span>().<span class="syntax-function">optional</span>().<span class="syntax-function">describe</span>(<span class="syntax-string">"查询日期，格式 YYYY-MM-DD，默认今天"</span>)
+})
+<span class="syntax-comment">// Zod 的 <span class="syntax-function">describe</span>() 会生成 JSON Schema 里的 description 字段</span>
+<span class="syntax-comment">// 模型通过这个字段理解每个参数的含义</span>
+</code></pre>
+</div>
+<p>这段代码同时完成了两件事：运行时校验（<code>parse()</code> 或 <code>safeParse()</code>）和编译时类型推导（TypeScript 自动推导出 <code>WeatherInput</code> 类型）。你不需要手写接口定义——Zod schema 就是唯一的类型来源。</p>
+<p><strong>第二步：实现生产函数。</strong><code>call()</code> 是工具的核心逻辑：</p>
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">TypeScript</span></div>
+<pre><code class="language-typescript"><span class="syntax-keyword">import</span> type { Tool, ToolResult, ToolUseContext } <span class="syntax-keyword">from</span> <span class="syntax-string">"./tool-types"</span>
+<span class="syntax-keyword">async</span> <span class="syntax-keyword">function</span> <span class="syntax-function">queryWeather</span>(
+  input: z.infer&lt;<span class="syntax-keyword">typeof</span> WeatherInputSchema&gt;,
+  context: ToolUseContext
+): Promise&lt;ToolResult&lt;{ temperature: number; condition: string }&gt;&gt; {
+  <span class="syntax-keyword">const</span> { city, date } = input
+  <span class="syntax-keyword">const</span> targetDate = date ?? <span class="syntax-keyword">new</span> <span class="syntax-function">Date</span>().<span class="syntax-function">toISOString</span>().<span class="syntax-function">slice</span>(<span class="syntax-number">0</span>, <span class="syntax-number">10</span>)
+  <span class="syntax-comment">// 实际项目中这里调用第三方天气 API</span>
+  <span class="syntax-comment">// context 里包含会话信息、日志工具等，可以用来记录调试信息</span>
+  context.log?.<span class="syntax-function">debug</span>(<span class="syntax-string"><code>Querying weather <span class="syntax-keyword">for</span> ${city} on ${targetDate}</code></span>)
+  <span class="syntax-comment">// 模拟 API 返回</span>
+  <span class="syntax-keyword">const</span> result = <span class="syntax-keyword">await</span> <span class="syntax-function">fetchWeatherFromAPI</span>(city, targetDate)
+  <span class="syntax-keyword">return</span> {
+    output: {
+      temperature: result.temp,
+      condition: result.condition
+    }
+</code></pre>
+</div>
+<p>注意 <code>context</code> 参数——它不是摆设。<code>ToolUseContext</code> 里包含了会话 ID、消息历史、权限状态等信息。高级工具可能需要读取上下文来决定行为，比如一个数据库查询工具可能需要根据用户的权限级别限制查询范围。</p>
+<p><strong>第三步：组装完整工具。</strong>把字段拼起来：</p>
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">TypeScript</span></div>
+<pre><code class="language-typescript"><span class="syntax-keyword">const</span> WeatherTool: Tool&lt;WeatherInput, WeatherOutput&gt; = {
+  name: <span class="syntax-string">"WeatherQuery"</span>,
+  description: <span class="syntax-string">"查询指定城市和日期的天气预报。当用户询问天气、气温、是否下雨等问题时使用此工具。"</span>,
+  inputSchema: WeatherInputSchema,
+  call: queryWeather,
+  <span class="syntax-comment">// 天气查询是只读操作，多次并发调用不会冲突</span>
+  isConcurrencySafe: () =&gt; <span class="syntax-keyword">true</span>,
+  aliases: [<span class="syntax-string">"weather"</span>, <span class="syntax-string">"天气查询"</span>]
+}
+</code></pre>
+</div>
+<p><code>isConcurrencySafe</code> 返回 <code>true</code>，因为天气查询是只读操作——查十次也不会互相干扰。如果这是一个"修改天气记录"的工具，就得返回 <code>false</code>，调度中心会让它排队执行。</p>
+<h3>注册产线：把规格书交到调度中心</h3>
+<p>工具定义好了，还得让工厂知道它的存在。这一步叫注册。</p>
+<p>Claude Code 内部使用 <code>buildTool()</code> 函数来注册工具。你不需要手动调用它——工具在模块加载时自动注册到工具表中。但在理解机制时，知道注册过程做了什么很重要：</p>
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">TypeScript</span></div>
+<pre><code class="language-typescript"><span class="syntax-comment">// buildTool 内部逻辑简化</span>
+<span class="syntax-keyword">function</span> <span class="syntax-function">buildTool</span>&lt;Input, Output&gt;(toolDef: Tool&lt;Input, Output&gt;): RegisteredTool {
+  <span class="syntax-keyword">return</span> {
+    name: toolDef.name,
+    description: toolDef.description,
+    <span class="syntax-comment">// Zod schema 自动转换为 JSON Schema 供模型消费</span>
+    inputSchema: <span class="syntax-function">zodToJsonSchema</span>(toolDef.inputSchema),
+    execute: <span class="syntax-function"><span class="syntax-keyword">async</span></span>(rawInput: unknown, context: ToolUseContext) =&gt; {
+      <span class="syntax-comment">// 质检：校验输入参数</span>
+      <span class="syntax-keyword">const</span> parsed = toolDef.inputSchema.<span class="syntax-function">safeParse</span>(rawInput)
+      <span class="syntax-function"><span class="syntax-keyword">if</span></span>(!parsed.success) {
+        <span class="syntax-keyword">return</span> { error: <span class="syntax-string"><code>输入参数校验失败: ${parsed.error.message}</code></span> }
+      }
+      <span class="syntax-comment">// 通过质检后执行生产函数</span>
+      <span class="syntax-keyword">return</span> toolDef.<span class="syntax-function">call</span>(parsed.data, context)
+    }
+</code></pre>
+</div>
+<p>注册过程中最关键的转换是 <code>zodToJsonSchema()</code>。模型不认识 Zod 对象，它只认 JSON Schema。这个转换把 Zod 的类型约束翻译成模型能理解的格式描述。</p>
+<h3>两种注册路径对比</h3>
+<table>
+<thead><tr><th>维度</th><th>内置工具注册</th><th>MCP 协议发布</th></tr></thead>
+<tbody><tr><td>注册方式</td><td>代码中 import 后自动注册</td><td>在 <code>.mcp.json</code> 中配置 MCP 服务器</td></tr>
+<tr><td>开发语言</td><td>必须是 TypeScript（与主项目同语言）</td><td>任意语言（Python、Go、Rust 均可）</td></tr>
+<tr><td>工具命名</td><td>直接用 name 字段</td><td>自动加前缀 <code>mcp__服务器名__工具名</code></td></tr>
+<tr><td>进程模型</td><td>与 Claude Code 同进程</td><td>独立子进程，通过 stdio/SSE 通信</td></tr>
+<tr><td>分发方式</td><td>需要 Claude Code 本身支持</td><td>作为独立 npm 包或 Docker 镜像分发</td></tr>
+<tr><td>适用场景</td><td>核心内置工具（Read、Write、Bash 等）</td><td>第三方集成、团队自定义工具</td></tr>
+<tr><td>冷启动</td><td>无额外开销</td><td>需要启动子进程，首次调用有延迟</td></tr>
+</tbody></table>
+<p>内置注册适合与核心功能紧耦合的工具；MCP 发布适合独立的第三方服务。我们的天气工具调用外部 API，逻辑独立，用 MCP 是更自然的路径。</p>
+<h3>通过 MCP 发布天气工具</h3>
+<p>MCP（Model Context Protocol）是 Claude Code 的标准扩展协议。你只需要启动一个 MCP 服务器，声明它有哪些工具，Claude Code 就会自动发现并注册。配置写在项目的 <code>.mcp.json</code> 里：</p>
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">JSON</span></div>
+<pre><code class="language-json">{
+  <span class="syntax-string">"mcpServers"</span>: {
+    <span class="syntax-string">"weather"</span>: {
+      <span class="syntax-string">"command"</span>: <span class="syntax-string">"node"</span>,
+      <span class="syntax-string">"args"</span>: [<span class="syntax-string">"./mcp-servers/weather-server.ts"</span>],
+      <span class="syntax-string">"env"</span>: {
+        <span class="syntax-string">"WEATHER_API_KEY"</span>: <span class="syntax-string">"${WEATHER_API_KEY}"</span>
+      }
+</code></pre>
+</div>
+<p>Claude Code 启动时会扫描 <code>.mcp.json</code>，为每个 <code>mcpServers</code> 条目启动一个子进程。工具名会被自动映射为 <code>mcp__weather__WeatherQuery</code> 的格式。你在终端里问"北京明天天气"，调度中心就会找到这条产线，把请求转发给天气 MCP 服务器。</p>
+<p>MCP 服务器的实现可以用任何语言。用 TypeScript 的 <code>@modelcontextprotocol/sdk</code> 写起来最简单：</p>
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">TypeScript</span></div>
+<pre><code class="language-typescript"><span class="syntax-keyword">import</span> { McpServer } <span class="syntax-keyword">from</span> <span class="syntax-string">"@modelcontextprotocol/sdk/server/mcp.js"</span>
+<span class="syntax-keyword">import</span> { z } <span class="syntax-keyword">from</span> <span class="syntax-string">"zod"</span>
+<span class="syntax-keyword">const</span> server = <span class="syntax-keyword">new</span> <span class="syntax-function">McpServer</span>({ name: <span class="syntax-string">"weather"</span>, version: <span class="syntax-string">"<span class="syntax-number">1.0</span>.<span class="syntax-number">0</span>"</span> })
+server.<span class="syntax-function">tool</span>(
+  <span class="syntax-string">"WeatherQuery"</span>,
+  <span class="syntax-string">"查询指定城市和日期的天气预报"</span>,
+  { city: z.<span class="syntax-function">string</span>().<span class="syntax-function">describe</span>(<span class="syntax-string">"城市名称"</span>), date: z.<span class="syntax-function">string</span>().<span class="syntax-function">optional</span>().<span class="syntax-function">describe</span>(<span class="syntax-string">"日期"</span>) },
+  <span class="syntax-function"><span class="syntax-keyword">async</span></span>({ city, date }) =&gt; {
+    <span class="syntax-keyword">const</span> result = <span class="syntax-keyword">await</span> <span class="syntax-function">fetchWeatherFromAPI</span>(city, date ?? <span class="syntax-function">today</span>())
+    <span class="syntax-keyword">return</span> { content: [{ type: <span class="syntax-string">"text"</span>, text: <span class="syntax-string"><code>${city} ${date}: ${result.condition}, ${result.temp}°C</code></span> }] }
+  }
+)
+<span class="syntax-comment">// MCP 框架会自动处理 schema 转换、错误处理、进程间通信</span>
+<span class="syntax-comment">// 你只需关注业务逻辑</span>
+</code></pre>
+</div>
+<h3>权限配置：产线门禁</h3>
+<p>每条产线都需要门禁。不是所有操作都应该自动批准——让模型随意执行 <code>rm -rf</code> 或者向外部 API 发送数据的后果不堪设想。</p>
+<p>Claude Code 的权限系统分三档：</p>
+<table>
+<thead><tr><th>权限级别</th><th>行为</th><th>适用场景</th></tr></thead>
+<tbody><tr><td><code>allow</code></td><td>自动批准，不弹确认框</td><td>只读操作、低风险工具</td></tr>
+<tr><td><code>ask</code>（默认）</td><td>每次调用前询问用户</td><td>涉及写操作或外部通信</td></tr>
+<tr><td><code>deny</code></td><td>直接拒绝，不可使用</td><td>危险操作或被策略禁止</td></tr>
+</tbody></table>
+<p>对于天气工具，推荐配置为 <code>allow</code>，因为它是纯只读的外部 API 调用。在 <code>.claude/settings.json</code> 中配置：</p>
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">JSON</span></div>
+<pre><code class="language-json">{
+  <span class="syntax-string">"permissions"</span>: {
+    <span class="syntax-string">"allow"</span>: [
+      <span class="syntax-string">"mcp__weather__WeatherQuery"</span>
+    ]
+  }
+</code></pre>
+</div>
+<p>如果你们公司的安全策略要求所有外部通信都要审批，就把它设为 <code>ask</code>。企业级配置可以通过管理策略文件统一推送，不需要每个开发者手动设置。</p>
+<h3>测试验证：产线验收</h3>
+<p>工具上线前要过验收。测试策略分两层：</p>
+<p><strong>单元测试</strong>——测试 <code>call()</code> 函数本身，mock 掉外部依赖：</p>
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">TypeScript</span></div>
+<pre><code class="language-typescript"><span class="syntax-keyword">import</span> { describe, it, expect, vi } <span class="syntax-keyword">from</span> <span class="syntax-string">"vitest"</span>
+<span class="syntax-function">describe</span>(<span class="syntax-string">"WeatherTool"</span>, () =&gt; {
+  <span class="syntax-function">it</span>(<span class="syntax-string">"返回正确的天气数据"</span>, <span class="syntax-function"><span class="syntax-keyword">async</span></span>() =&gt; {
+    <span class="syntax-comment">// mock 外部 API，避免测试依赖网络</span>
+    vi.<span class="syntax-function">mock</span>(<span class="syntax-string">"./api"</span>, () =&gt; ({
+      fetchWeatherFromAPI: vi.<span class="syntax-function">fn</span>().<span class="syntax-function">mockResolvedValue</span>({ temp: <span class="syntax-number">22</span>, condition: <span class="syntax-string">"晴"</span> })
+    }))
+    <span class="syntax-keyword">const</span> result = <span class="syntax-keyword">await</span> <span class="syntax-function">queryWeather</span>(
+      { city: <span class="syntax-string">"北京"</span>, date: <span class="syntax-string">"<span class="syntax-number">2025</span>-<span class="syntax-number">06</span>-<span class="syntax-number">01</span>"</span> },
+      mockContext
+    )
+    <span class="syntax-function">expect</span>(result.output.temperature).<span class="syntax-function">toBe</span>(<span class="syntax-number">22</span>)
+    <span class="syntax-function">expect</span>(result.output.condition).<span class="syntax-function">toBe</span>(<span class="syntax-string">"晴"</span>)
+  })
+  <span class="syntax-function">it</span>(<span class="syntax-string">"拒绝无效城市名"</span>, <span class="syntax-function"><span class="syntax-keyword">async</span></span>() =&gt; {
+    <span class="syntax-keyword">const</span> parsed = WeatherInputSchema.<span class="syntax-function">safeParse</span>({ city: <span class="syntax-number">123</span>, date: <span class="syntax-string">"invalid"</span> })
+    <span class="syntax-function">expect</span>(parsed.success).<span class="syntax-function">toBe</span>(<span class="syntax-keyword">false</span>)
+  })
+</code></pre>
+</div>
+<p><strong>集成测试</strong>——在 Claude Code 会话中实际调用工具，验证端到端流程：</p>
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">TEXT</span></div>
+<pre><code class="language-text">&gt; 北京明天天气怎么样？
+[工具调用] mcp__weather__WeatherQuery({<span class="syntax-string">"city"</span>:<span class="syntax-string">"北京"</span>,<span class="syntax-string">"date"</span>:<span class="syntax-string">"<span class="syntax-number">2025</span>-<span class="syntax-number">06</span>-<span class="syntax-number">02</span>"</span>})
+[返回] 北京 <span class="syntax-number">2025</span>-<span class="syntax-number">06</span>-<span class="syntax-number">02</span>: 晴, <span class="syntax-number">28</span>°C
+北京明天（6月2日）天气晴朗，气温约28°C，适合户外活动。
+</code></pre>
+</div>
+<p>测试通过，产线验收完成。你的天气工具正式上线了。</p>
+<blockquote>
+<strong>核心建议</strong>
+工具定义的关键在于 description 和 inputSchema。description 决定模型能不能选对你的工具，inputSchema 决定模型传的参数对不对。把这两个字段写好，工具就成功了一大半。isConcurrencySafe 也别忘标——标错了可能导致并发冲突或者不必要的串行等待。
+</blockquote>
+<p>到这里，你已经学会了怎么给工厂加产线。但产线加得越多，选择就越多，选错的概率也越大。为什么 Claude Code 的工具系统要这样设计？为什么用 Zod 而不是别的校验库？为什么 MCP 工具要跑在独立进程里？这些问题的答案藏在设计决策里。下一章，我们要钻进工程师的大脑，看看那些取舍背后的逻辑。</p>
+<div class="part-header page-break">
+<div class="part-number">PART 5</div>
+<div class="part-rule"></div>
+<div class="part-title">深度思考</div>
+</div>
+<div class="section-header">
+<div class="section-number">§14</div>
+<h2 class="section-title">工程师的选择</h2>
+<div class="section-subtitle">Design Decisions & Trade-offs</div>
+</div>
+<p>一个约 4600 行的单文件、一个用 React 写的终端界面、一个基于 AsyncGenerator 的主循环——单看任何一个，你都会觉得这是某个疯狂原型。但把它们放在一起，却组成了目前最强大的 AI 编程助手之一。反直觉吗？一点也不。每一个看似"奇怪"的选择背后都有清晰的推理，只是在权衡取舍的天平上，另一端的砝码被大多数人忽略了。</p>
+<p>这一章我要分析 Claude Code 的七个关键设计决策。我不会只告诉你"他们选了什么"，更重要的——为什么选这个、放弃了什么、什么场景下这个选择可能反噬。</p>
+<h3>决策一：为什么选 Bun 不选 Node</h3>
+<table>
+<thead><tr><th>维度</th><th>Bun</th><th>Node.js</th></tr></thead>
+<tbody><tr><td>冷启动时间</td><td>~50ms</td><td>~200ms</td></tr>
+<tr><td>TypeScript 支持</td><td>原生，无需编译</td><td>需要转译或 tsx 等工具</td></tr>
+<tr><td>内置打包</td><td><code>Bun.build()</code> 一个 API 搞定</td><td>需要 esbuild/webpack 等外部工具</td></tr>
+<tr><td>包管理</td><td><code>bun install</code>，兼容 npm 生态</td><td><code>npm</code>/<code>yarn</code>/<code>pnpm</code></td></tr>
+<tr><td>生态成熟度</td><td>较新，部分 API 不兼容</td><td>久经考验，库覆盖率高</td></tr>
+</tbody></table>
+<p>Claude Code 是一个终端工具，用户输入命令后等待的第一毫秒都肉眼可见。冷启动 50ms vs 200ms，差了 150ms——可能不明显，但加上后续的模块加载、配置初始化，差距会累积。Bun 的原生 TS 支持也省去了构建步骤，开发体验更流畅。</p>
+<p>但选择 Bun 也有代价：遇到 Bun 特定的 bug 时（比如早期版本的 <code>fetch</code> 实现问题），团队要自己修或者等上游修复，不像 Node 那样有庞大的社区可以快速找到解决方案。</p>
+<h3>决策二：为什么用 Ink/React 做终端 UI</h3>
+<p>"在终端里用 React？"——第一次看到这个选择时，多数人的反应是这样。</p>
+<p>但想一下终端 UI 的实际需求：输出是动态的、结构化的、需要局部更新的。模型一边生成 Token 一边渲染，用户可能随时中断，工具调用的状态要实时展示。这些需求用传统的 <code>console.log</code> 或 <code>readline</code> 来做，代码会变成意大利面。</p>
+<table>
+<thead><tr><th>维度</th><th>Ink/React</th><th>传统 readline/ncurses</th></tr></thead>
+<tbody><tr><td>组件模型</td><td>声明式，可组合</td><td>命令式，手动管理状态</td></tr>
+<tr><td>生态复用</td><td>直接用 React 生态（hooks、状态管理）</td><td>终端 UI 库少且质量参差</td></tr>
+<tr><td>渲染性能</td><td>虚拟列表，只重绘变化部分</td><td>全量重绘，大输出时闪烁</td></tr>
+<tr><td>学习曲线</td><td>会 React 就会 Ink</td><td>需要学终端渲染的底层细节</td></tr>
+<tr><td>包体积</td><td>较大（React 运行时）</td><td>极小</td></tr>
+</tbody></table>
+<p>Ink 把终端输出抽象成了组件树。你可以写一个 <code><ToolCallProgress></code> 组件来展示工具执行状态，写一个 <code><StreamingText></code> 组件来渲染模型的流式输出。每个组件只关心自己的状态和渲染逻辑，不需要知道整个屏幕该怎么重绘。虚拟列表的高效渲染在展示大量文件搜索结果时尤其明显——只渲染可见行，不管结果有几千条。</p>
+<p>代价是 React 运行时的包体积。但对于一个 CLI 工具来说，多几百 KB 的依赖换来开发效率的巨大提升，这笔账算得过来。</p>
+<h3>决策三：为什么主循环用 AsyncGenerator</h3>
+<p>Claude Code 的核心循环是一个 <code>AsyncGenerator</code>——每 yield 一次就是一条新消息。为什么不用回调？为什么不用 Promise 链？为什么不用 EventEmitter？</p>
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">TypeScript</span></div>
+<pre><code class="language-typescript"><span class="syntax-comment">// AsyncGenerator 的核心骨架</span>
+<span class="syntax-keyword">async</span> function* <span class="syntax-function">query</span>(messages: Message[]): AsyncGenerator&lt;SDKMessage&gt; {
+  <span class="syntax-function"><span class="syntax-keyword">while</span></span>(hasTokenBudget) {
+    <span class="syntax-keyword">const</span> response = <span class="syntax-keyword">await</span> <span class="syntax-function">callModel</span>(messages)
+    <span class="syntax-function"><span class="syntax-keyword">for</span></span>(<span class="syntax-keyword">const</span> block <span class="syntax-keyword">of</span> response.content) {
+      <span class="syntax-function"><span class="syntax-keyword">if</span></span>(block.type === <span class="syntax-string">"text"</span>) {
+        <span class="syntax-keyword">yield</span> { type: <span class="syntax-string">"assistant"</span>, content: block.text }
+      }
+      <span class="syntax-function"><span class="syntax-keyword">if</span></span>(block.type === <span class="syntax-string">"tool_use"</span>) {
+        <span class="syntax-keyword">const</span> result = <span class="syntax-keyword">await</span> <span class="syntax-function">executeTool</span>(block)
+        <span class="syntax-keyword">yield</span> { type: <span class="syntax-string">"tool_result"</span>, content: result }
+        messages.<span class="syntax-function">push</span>(result)  <span class="syntax-comment">// 工具结果喂回消息列表</span>
+      }
+</code></pre>
+</div>
+<table>
+<thead><tr><th>维度</th><th>AsyncGenerator</th><th>回调/Promise</th><th>EventEmitter</th></tr></thead>
+<tbody><tr><td>流式输出</td><td>原生支持 yield</td><td>需要额外流机制</td><td>通过事件模拟</td></tr>
+<tr><td>可中断</td><td><code>return()</code> 方法立即停止</td><td>需要 AbortController</td><td>需要 <code>removeListener</code></td></tr>
+<tr><td>背压控制</td><td>消费者暂停时自动暂停生产</td><td>需要手动实现</td><td>无内置支持</td></tr>
+<tr><td>组合性</td><td><code>yield*</code> 委托子生成器</td><td>回调地狱/Promise 链</td><td>事件嵌套</td></tr>
+</tbody></table>
+<p>背压控制是关键。模型生成 Token 的速度可能远快于终端渲染的速度。AsyncGenerator 天然支持背压——消费者（渲染层）没来得及处理上一条消息时，生产者（模型调用）会自动暂停，不需要手动管理队列。这种机制在高负载场景下防止了内存溢出。</p>
+<p>可中断性同样重要。用户点击 Stop 时，调用生成器的 <code>return()</code> 方法，整个循环干净地退出——没有悬挂的回调、没有泄漏的事件监听器。</p>
+<h3>决策四：为什么文件编辑用字符串替换而非行号</h3>
+<p>Claude Code 的 Edit 工具接收的参数是 <code>old_string</code> 和 <code>new_string</code>，而不是文件路径加行号范围。为什么？</p>
+<table>
+<thead><tr><th>维度</th><th>字符串替换</th><th>行号编辑</th></tr></thead>
+<tbody><tr><td>精确性</td><td>匹配具体内容，不受行号偏移影响</td><td>行号会因为其他编辑而失效</td></tr>
+<tr><td>合并冲突</td><td>每次只改一小段，冲突概率低</td><td>范围编辑容易和并发修改冲突</td></tr>
+<tr><td>可审计</td><td>diff 即编辑意图，一目了然</td><td>看到行号范围还要去对照原文</td></tr>
+<tr><td>局限性</td><td>同一字符串出现多次时需额外处理</td><td>行号总是唯一的</td></tr>
+</tbody></table>
+<p>行号编辑最大的问题是<strong>脆弱</strong>。假设模型决定编辑第 50-55 行，但在此之前另一个工具调用已经在第 30 行插入了 5 行——现在目标内容跑到了第 55-60 行，行号编辑会改错地方。字符串替换用内容匹配，不依赖行号，天然免疫这类偏移问题。</p>
+<p>代价是：如果 <code>old_string</code> 在文件中出现多次，编辑会失败。Claude Code 要求用户提供足够的上下文使 <code>old_string</code> 唯一。这是一个合理的权衡——少量额外的上下文换来的是编辑操作的正确性保证。</p>
+<h3>决策五：为什么压缩分多层策略</h3>
+<p>我们在 §07 详细分析过四层压缩。这里只说为什么不用单一策略。</p>
+<table>
+<thead><tr><th>策略</th><th>触发时机</th><th>压缩力度</th><th>信息损失</th></tr></thead>
+<tbody><tr><td>auto-compact</td><td>Token 用量达阈值</td><td>中等——整轮对话压缩为摘要</td><td>丢失细节，保留决策逻辑</td></tr>
+<tr><td>micro-compact</td><td>每次工具调用后</td><td>轻量——合并相邻同类消息</td><td>几乎无损</td></tr>
+<tr><td>snip</td><td>消息内大段内容</td><td>局部——裁剪过长文件内容</td><td>丢失被裁剪部分</td></tr>
+<tr><td>用户手动 <code>/compact</code></td><td>用户主动触发</td><td>最强——全量压缩为摘要</td><td>损失最大</td></tr>
+</tbody></table>
+<p>单一策略要么压缩太猛（小对话也要压缩），要么压缩太弱（大对话撑爆上下文）。分层策略的好处是"对症下药"：micro-compact 做日常维护，代价极低；auto-compact 在快撑爆时介入；snip 专门处理单个大文件；<code>/compact</code> 留给用户手动救急。</p>
+<h3>决策六：单文件巨石 vs 模块化的取舍</h3>
+<p><code>main.tsx</code> 有约 4600 行。你没看错，四千六百行。一个文件。</p>
+<p>"这不违反了所有软件工程原则吗？"——先别急。</p>
+<table>
+<thead><tr><th>维度</th><th>单文件巨石</th><th>模块化拆分</th></tr></thead>
+<tbody><tr><td>初始化耦合</td><td>所有代码在同一作用域，共享状态无障碍</td><td>跨模块状态传递需要 import/export</td></tr>
+<tr><td>重构成本</td><td>全局搜索替换即可</td><td>需要改接口、更新导入路径</td></tr>
+<tr><td>代码审查</td><td>一个文件，grep 即可全局搜索</td><td>需要跳转多个文件</td></tr>
+<tr><td>编译速度</td><td>Bun 单文件编译反而快</td><td>模块图解析有额外开销</td></tr>
+<tr><td>团队协作</td><td>Git 合并冲突频繁</td><td>冲突分散到不同文件</td></tr>
+<tr><td>认知负担</td><td>需要在巨量代码中定位</td><td>每个模块可独立理解</td></tr>
+</tbody></table>
+<p>Claude Code 的初始化逻辑高度耦合——CLI 参数解析、配置加载、权限初始化、工具注册、UI 渲染之间有大量交叉引用。拆成模块后，模块间的依赖关系图可能比单文件更难理解。团队的判断是：拆分的收益（认知分层）不足以抵消成本（模块间通信的复杂度）。</p>
+<p>这个选择是否可持续？当团队扩大、贡献者增多时，约 4600 行的单文件会成为协作瓶颈。未来大概率会逐步重构。但在当前阶段，单文件带来的开发速度优势是真实的。</p>
+<h3>决策七：Feature Flag 的工程价值</h3>
+<p>Claude Code 使用 Statsig 管理 Feature Flag。每个新功能上线前都裹在一层开关后面。</p>
+<table>
+<thead><tr><th>Feature Flag 用途</th><th>示例</th><th>价值</th></tr></thead>
+<tbody><tr><td>灰度发布</td><td>新压缩算法先对 5% 用户开放</td><td>发现问题的影响范围可控</td></tr>
+<tr><td>A/B 测试</td><td>两种不同的工具选择策略</td><td>数据驱动的决策</td></tr>
+<tr><td>死代码消除</td><td>功能下线后删除 flag 代码</td><td>防止代码腐化</td></tr>
+<tr><td>紧急开关</td><td>某功能出问题时一键关闭</td><td>不需要发版修复</td></tr>
+</tbody></table>
+<p>Feature Flag 不是一个"有没有必要"的问题，而是一个"没有它会怎样"的问题。没有灰度发布，一个 bug 会同时影响所有用户；没有 A/B 测试，优化决策全凭直觉；没有紧急开关，出问题只能走 hotfix 流程，响应时间以小时计。</p>
+<blockquote>
+<strong>核心建议</strong>
+理解设计决策的关键不是记住"选了什么"，而是理解"放弃了什么"。每一个选择都是在特定约束下的最优解。当你自己构建系统时，不要盲目复制 Claude Code 的选择——要复制的是它的决策框架：列出候选方案、评估各维度权重、明确你的约束条件，然后做取舍。
+</blockquote>
+<p>七个决策拆完了。你可能会想："这些我都知道了，但我该怎么用这些知识？"好问题。最后一章，我要帮你把这些零散的认知整合成一套可行动的设计模式——从读懂 Claude Code 到能造你自己的 AI Agent CLI。</p>
+<div class="section-header">
+<div class="section-number">§15</div>
+<h2 class="section-title">从读懂到能写</h2>
+<div class="section-subtitle">From Reading to Building</div>
+</div>
+<p>"源码我都读完了，架构图也画了，但让我从零搭一个 AI Agent CLI，还是不知道从哪下手。"——如果你有这种感觉，说明你读到了正确的地方。读懂源码和能写出来之间有一道坎：前者是理解别人的决策，后者是在自己的约束下做决策。这道坎不能靠"再看一遍"跨过去，只能靠动手。</p>
+<p>这一章我要做三件事：从 Claude Code 里提炼出 5 个可复用的设计模式、给出一个最小 AI Agent 的核心模块骨架、推荐技术栈并规划从玩具到生产的演进路径。</p>
+<h3>模式一：AsyncGenerator 流式循环</h3>
+<p>这是整个系统的心脏。我们拆过很多次了，但这次要从"理解"切换到"使用"。</p>
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">TypeScript</span></div>
+<pre><code class="language-typescript"><span class="syntax-comment">// 消息循环的骨架——所有 AI Agent 的核心</span>
+<span class="syntax-keyword">async</span> function* <span class="syntax-function">agentLoop</span>(
+  messages: Message[],
+  tools: Map&lt;string, ToolDef&gt;
+): AsyncGenerator&lt;AgentEvent&gt; {
+  <span class="syntax-function"><span class="syntax-keyword">while</span></span>(<span class="syntax-keyword">true</span>) {
+    <span class="syntax-keyword">const</span> response = <span class="syntax-keyword">await</span> <span class="syntax-function">callLLM</span>(messages)
+    <span class="syntax-comment">// 流式输出文本块</span>
+    <span class="syntax-function"><span class="syntax-keyword">for</span></span>(<span class="syntax-keyword">const</span> block <span class="syntax-keyword">of</span> response.content) {
+      <span class="syntax-function"><span class="syntax-keyword">if</span></span>(block.type === <span class="syntax-string">"text"</span>) {
+        <span class="syntax-keyword">yield</span> { type: <span class="syntax-string">"stream"</span>, text: block.text }
+      }
+    <span class="syntax-comment">// 收集并执行工具调用</span>
+    <span class="syntax-keyword">const</span> toolCalls = response.content.<span class="syntax-function">filter</span>(b =&gt; b.type === <span class="syntax-string">"tool_use"</span>)
+    <span class="syntax-function"><span class="syntax-keyword">if</span></span>(toolCalls.length === <span class="syntax-number">0</span>) <span class="syntax-keyword">return</span>  <span class="syntax-comment">// 没有工具调用，循环结束</span>
+    <span class="syntax-comment">// 下一节会讲到的并发调度</span>
+    <span class="syntax-keyword">const</span> results = <span class="syntax-keyword">await</span> <span class="syntax-function">executeTools</span>(toolCalls, tools)
+    messages.<span class="syntax-function">push</span>(...results)
+    <span class="syntax-comment">// 工具结果喂回 LLM，继续循环</span>
+    <span class="syntax-keyword">yield</span> { type: <span class="syntax-string">"tool_results"</span>, results }
+  }
+</code></pre>
+</div>
+<p>为什么是 AsyncGenerator 而不是普通 async 函数？三个字：<strong>流、断、压</strong>。流式输出用 yield 逐条推送；可中断用生成器的 <code>return()</code> 方法；背压控制是生成器的天然特性。如果你只用一个设计模式，用这个。</p>
+<h3>模式二：工具并发调度</h3>
+<p>模型一次可能请求调用多个工具。有些能并行跑，有些必须排队。Claude Code 的做法是先分类、再调度：</p>
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">TypeScript</span></div>
+<pre><code class="language-typescript"><span class="syntax-keyword">function</span> <span class="syntax-function">partitionToolCalls</span>(
+  calls: ToolCall[],
+  tools: Map&lt;string, ToolDef&gt;
+): { parallel: ToolCall[]; serial: ToolCall[] } {
+  <span class="syntax-keyword">return</span> calls.<span class="syntax-function">reduce</span>((acc, call) =&gt; {
+    <span class="syntax-keyword">const</span> tool = tools.<span class="syntax-function">get</span>(call.name)
+    <span class="syntax-comment">// isConcurrencySafe 决定了这条产线能不能和其他产线同时开工</span>
+    <span class="syntax-keyword">const</span> safe = tool?.isConcurrencySafe?.(call.input) ?? <span class="syntax-keyword">false</span>
+    <span class="syntax-function"><span class="syntax-keyword">if</span></span>(safe) {
+      acc.parallel.<span class="syntax-function">push</span>(call)
+    } <span class="syntax-keyword">else</span> {
+      acc.serial.<span class="syntax-function">push</span>(call)
+    }
+    <span class="syntax-keyword">return</span> acc
+  }, { parallel: [], serial: [] })
+}
+</code></pre>
+</div>
+<table>
+<thead><tr><th>并发策略</th><th>执行方式</th><th>典型工具</th></tr></thead>
+<tbody><tr><td>parallel（并行）</td><td><code>Promise.all()</code> 同时执行</td><td>Read、Grep、天气查询</td></tr>
+<tr><td>serial（串行）</td><td><code>for...of</code> 顺序执行</td><td>Write、Edit、Bash（写操作）</td></tr>
+</tbody></table>
+<p>这个分类的粒度是单次调用级别的。同一个工具，不同参数可能有不同的并发安全性。比如一个数据库工具，读操作可以并行，写操作必须串行。<code>isConcurrencySafe(input)</code> 接收具体参数来做判断，比整个工具级别的粗粒度标记灵活得多。</p>
+<h3>模式三：多层压缩策略</h3>
+<p>上下文窗口是有限的。对话越长、工具调用越多，Token 消耗越大。Claude Code 的三层压缩策略可以简化为：</p>
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">TypeScript</span></div>
+<pre><code class="language-typescript"><span class="syntax-comment">// 压缩决策的简化逻辑</span>
+<span class="syntax-keyword">function</span> <span class="syntax-function">chooseCompressionStrategy</span>(context: ContextMetrics): Strategy {
+  <span class="syntax-function"><span class="syntax-keyword">if</span></span>(context.tokenUsage &gt; <span class="syntax-number">0.9</span> * context.maxTokens) {
+    <span class="syntax-keyword">return</span> <span class="syntax-string">"auto-compact"</span>  <span class="syntax-comment">// 快撑爆了，紧急压缩</span>
+  }
+  <span class="syntax-function"><span class="syntax-keyword">if</span></span>(context.consecutiveToolCalls &gt; <span class="syntax-number">5</span>) {
+    <span class="syntax-keyword">return</span> <span class="syntax-string">"micro-compact"</span>  <span class="syntax-comment">// 工具调用密集，轻量整理</span>
+  }
+  <span class="syntax-function"><span class="syntax-keyword">if</span></span>(context.largestMessage &gt; <span class="syntax-number">0.15</span> * context.maxTokens) {
+    <span class="syntax-keyword">return</span> <span class="syntax-string">"snip"</span>  <span class="syntax-comment">// 单条消息太大，裁剪</span>
+  }
+  <span class="syntax-keyword">return</span> <span class="syntax-string">"none"</span>
+}
+</code></pre>
+</div>
+<table>
+<thead><tr><th>层级</th><th>触发条件</th><th>动作</th><th>代价</th></tr></thead>
+<tbody><tr><td>auto-compact</td><td>Token 占用 >90%</td><td>整轮对话压缩为摘要</td><td>丢失细节</td></tr>
+<tr><td>micro-compact</td><td>连续工具调用 >5 次</td><td>合并相邻同类消息</td><td>几乎无</td></tr>
+<tr><td>snip</td><td>单条消息 >15% 窗口</td><td>裁剪消息中的大段内容</td><td>局部信息损失</td></tr>
+</tbody></table>
+<p>你的 Agent 不需要一开始就实现三层。从 auto-compact 开始，在遇到实际瓶颈时再加层。过早优化是万恶之源，上下文压缩也不例外。</p>
+<h3>模式四：权限分级</h3>
+<p>工具执行前的门禁系统。Claude Code 用 plan/auto/manual 三档：</p>
+<table>
+<thead><tr><th>档位</th><th>行为</th><th>适用阶段</th></tr></thead>
+<tbody><tr><td>plan</td><td>只规划不执行，列出将要调用的工具</td><td>审计、学习</td></tr>
+<tr><td>auto</td><td>自动批准所有工具调用</td><td>信任环境、CI/CD</td></tr>
+<tr><td>manual（默认）</td><td>每次调用前询问用户</td><td>日常开发</td></tr>
+</tbody></table>
+<p>实现上就是一层中间件：</p>
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">TypeScript</span></div>
+<pre><code class="language-typescript"><span class="syntax-keyword">async</span> <span class="syntax-keyword">function</span> <span class="syntax-function">executeWithPermission</span>(
+  call: ToolCall,
+  level: PermissionLevel
+): Promise&lt;ToolResult&gt; {
+  <span class="syntax-function"><span class="syntax-keyword">if</span></span>(level === <span class="syntax-string">"plan"</span>) {
+    <span class="syntax-keyword">return</span> { planned: <span class="syntax-keyword">true</span>, description: <span class="syntax-string"><code>将调用 ${call.name}</code></span> }
+  }
+  <span class="syntax-function"><span class="syntax-keyword">if</span></span>(level === <span class="syntax-string">"manual"</span>) {
+    <span class="syntax-keyword">const</span> approved = <span class="syntax-keyword">await</span> <span class="syntax-function">askUser</span>(call)
+    <span class="syntax-function"><span class="syntax-keyword">if</span></span>(!approved) <span class="syntax-keyword">return</span> { error: <span class="syntax-string">"用户拒绝"</span> }
+  }
+  <span class="syntax-comment">// auto 直接执行</span>
+  <span class="syntax-keyword">return</span> <span class="syntax-function">executeTool</span>(call)
+}
+</code></pre>
+</div>
+<p>权限系统的核心原则是<strong>最小权限</strong>：默认拒绝，显式允许。auto 模式虽然方便，但在生产环境中应该只在受控条件下启用。</p>
+<h3>模式五：Hook 插件化</h3>
+<p>Hook 是工具执行前后的拦截器。Claude Code 支持 PreToolUse 和 PostToolUse 两类 Hook。</p>
+<table>
+<thead><tr><th>Hook 类型</th><th>触发时机</th><th>用途</th></tr></thead>
+<tbody><tr><td>PreToolUse</td><td>工具执行前</td><td>校验、拦截、修改输入</td></tr>
+<tr><td>PostToolUse</td><td>工具执行后</td><td>日志、审计、触发后续操作</td></tr>
+<tr><td>Stop</td><td>Agent 循环结束</td><td>清理、总结</td></tr>
+<tr><td>UserPromptSubmit</td><td>用户提交消息时</td><td>预处理、注入上下文</td></tr>
+</tbody></table>
+<p>Hook 的实现是一个简单的管道：</p>
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">TypeScript</span></div>
+<pre><code class="language-typescript"><span class="syntax-keyword">async</span> <span class="syntax-keyword">function</span> <span class="syntax-function">runPreHooks</span>(call: ToolCall, hooks: Hook[]): Promise&lt;HookResult&gt; {
+  <span class="syntax-function"><span class="syntax-keyword">for</span></span>(<span class="syntax-keyword">const</span> hook <span class="syntax-keyword">of</span> hooks) {
+    <span class="syntax-keyword">const</span> result = <span class="syntax-keyword">await</span> hook.<span class="syntax-function">execute</span>(call)
+    <span class="syntax-function"><span class="syntax-keyword">if</span></span>(result.exitCode === <span class="syntax-number">2</span>) <span class="syntax-keyword">return</span> { blocked: <span class="syntax-keyword">true</span>, reason: result.stderr }
+    <span class="syntax-function"><span class="syntax-keyword">if</span></span>(result.exitCode === <span class="syntax-number">1</span>) console.<span class="syntax-function">error</span>(result.stderr) <span class="syntax-comment">// 警告但不阻止</span>
+  }
+  <span class="syntax-keyword">return</span> { blocked: <span class="syntax-keyword">false</span> }
+}
+<span class="syntax-comment">// Hook 的退出码决定了行为：</span>
+<span class="syntax-comment">// <span class="syntax-number">0</span> <span class="flowchart-arrow">→</span> <span class="flowchart-box">放行</span></span>
+<span class="syntax-comment">// <span class="syntax-number">1</span> <span class="flowchart-arrow">→</span> <span class="flowchart-box">警告，但继续执行</span></span>
+<span class="syntax-comment">// <span class="syntax-number">2</span> <span class="flowchart-arrow">→</span> <span class="flowchart-box">阻止执行</span></span>
+</code></pre>
+</div>
+<p>这个模式的威力在于它的可组合性。你可以叠加多个 Hook：安全检查 + 命令审计 + 日志记录，每个 Hook 独立开发、独立测试、按需组合。</p>
+<h3>最小 AI Agent 核心模块</h3>
+<p>把上面的模式组合起来，一个最小的 AI Agent CLI 只需要三个模块：</p>
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">TypeScript</span></div>
+<pre><code class="language-typescript"><span class="syntax-comment">// <span class="syntax-number">1</span>. 消息循环</span>
+<span class="syntax-keyword">async</span> function* <span class="syntax-function">agentLoop</span>(messages, tools): AsyncGenerator&lt;Event&gt; { ... }
+<span class="syntax-comment">// <span class="syntax-number">2</span>. 工具系统</span>
+<span class="syntax-keyword">const</span> tools = <span class="syntax-keyword">new</span> Map&lt;string, ToolDef&gt;()
+<span class="syntax-keyword">function</span> <span class="syntax-function">registerTool</span>(def: ToolDef) { tools.<span class="syntax-function">set</span>(def.name, <span class="syntax-function">buildTool</span>(def)) }
+<span class="syntax-comment">// <span class="syntax-number">3</span>. 流式处理</span>
+<span class="syntax-keyword">async</span> <span class="syntax-keyword">function</span> <span class="syntax-function">main</span>() {
+  <span class="syntax-keyword">const</span> messages: Message[] = []
+  <span class="syntax-keyword">const</span> loop = <span class="syntax-function">agentLoop</span>(messages, tools)
+  <span class="syntax-keyword">for</span> <span class="syntax-function"><span class="syntax-keyword">await</span></span>(<span class="syntax-keyword">const</span> event <span class="syntax-keyword">of</span> loop) {
+    <span class="syntax-function">render</span>(event)  <span class="syntax-comment">// 渲染到终端</span>
+  }
+</code></pre>
+</div>
+<p>三个模块、不到 50 行骨架代码，就是一个可工作的 AI Agent。剩下的都是增值功能：压缩、权限、Hook、UI 美化。</p>
+<h3>技术栈推荐</h3>
+<table>
+<thead><tr><th>组件</th><th>推荐选择</th><th>备选</th><th>理由</th></tr></thead>
+<tbody><tr><td>运行时</td><td>Bun</td><td>Node.js + tsx</td><td>冷启动快、原生 TS</td></tr>
+<tr><td>终端 UI</td><td>Ink v4</td><td>blessed</td><td>React 组件模型、虚拟列表</td></tr>
+<tr><td>参数校验</td><td>Zod</td><td>valibot</td><td>生态成熟、类型推导强</td></tr>
+<tr><td>LLM SDK</td><td>Vercel AI SDK</td><td>@anthropic-ai/sdk</td><td>模型无关、流式支持好</td></tr>
+<tr><td>构建工具</td><td>Bun.build</td><td>tsup</td><td>零配置、内置</td></tr>
+<tr><td>测试框架</td><td>Vitest</td><td>Bun:test</td><td>与 Bun 兼容、快</td></tr>
+</tbody></table>
+<p>不要在技术栈选择上花太多时间。Bun + Ink + Zod + Vercel AI SDK 是经过验证的组合，能让你快速出原型。等真正遇到瓶颈时再考虑替换组件。</p>
+<h3>从玩具到生产的演进路径</h3>
+<p><strong>阶段一：命令行玩具（1-2 周）</strong></p>
+<p>实现消息循环 + 1-2 个工具（文件读取 + Bash 执行）。能在终端里和模型对话、让模型执行简单命令。这个阶段的目标是验证核心循环能跑通。</p>
+<p><strong>阶段二：工具生态（2-4 周）</strong></p>
+<p>增加工具数量，实现并发调度，加上 basic 权限控制。让 Agent 能完成多步骤任务（比如"读代码<span class="flowchart-arrow">→</span> <span class="flowchart-box">写测试</span><span class="flowchart-arrow">→</span> <span class="flowchart-box">跑测试</span><span class="flowchart-arrow">→</span> <span class="flowchart-box">修 bug"）。</span></p>
+<p><strong>阶段三：稳定性（4-8 周）</strong></p>
+<p>加入上下文压缩、错误恢复、会话持久化。让 Agent 能处理长对话和大代码库而不崩溃。</p>
+<p><strong>阶段四：可扩展性（持续）</strong></p>
+<p>实现 Hook 系统、MCP 兼容、插件架构。让其他人能为你的 Agent 写扩展。</p>
+<h3>值得关注的开源项目</h3>
+<table>
+<thead><tr><th>项目</th><th>方向</th><th>学习价值</th></tr></thead>
+<tbody><tr><td>Claude Code 本身</td><td>AI 编程助手</td><td>本章分析的几乎所有模式</td></tr>
+<tr><td>Aider</td><td>终端 AI 编程</td><td>多编辑策略、多模型切换</td></tr>
+<tr><td>OpenHands</td><td>自主 AI Agent</td><td>沙箱执行、浏览器操作</td></tr>
+<tr><td>SWE-agent</td><td>自动 bug 修复</td><td>问题分解、验证循环</td></tr>
+<tr><td>Vercel AI SDK</td><td>LLM 应用框架</td><td>流式处理、工具调用的标准抽象</td></tr>
+</tbody></table>
+<p>每个项目都用了不同的方式解决相似的问题。对比它们的方案，你会对设计决策有更深的直觉。</p>
+<blockquote>
+<strong>核心建议</strong>
+从最小的可工作版本开始，而不是从完美的架构开始。50 行骨架代码比 5000 行设计文档更能验证你的想法。先用 AsyncGenerator 搭起消息循环，加一两个工具跑通端到端流程，再逐步加压缩、权限、Hook。每一步都能跑、每一步都能测。AI Agent 的复杂度来自功能的叠加，而不是架构的精巧。
+</blockquote>
+<h3>展望</h3>
+<p>AI Agent CLI 正在从一个新奇玩具变成日常开发工具。Claude Code 展示了一种可能的形态：终端原生的、工具驱动的、流式交互的 AI 编程助手。但它不会是最终形态。</p>
+<p>三个方向值得持续关注：</p>
+<p><strong>多模态输入</strong>——现在的 Agent CLI 主要处理文本。但代码审查需要看截图，UI 开发需要看设计稿，调试需要看错误截图。支持图像输入的终端 Agent 会在这些场景中打开新的可能性。</p>
+<p><strong>多 Agent 协作</strong>——Claude Code 已经有了子 Agent（通过 Task 工具启动），但协作模式还比较初级。未来的 Agent 团队可能像真正的开发团队一样分工：一个 Agent 写代码、一个写测试、一个做审查，各有所长、互相校验。</p>
+<p><strong>从 CLI 到平台</strong>——Claude Code 的插件系统、MCP 协议、Hook 机制都在把一个 CLI 工具变成一个平台。当足够多的工具、Agent、工作流沉淀在平台上，价值会呈网络效应增长。</p>
+<p>你手里的这份源码分析，与其说是对 Claude Code 的解剖，不如说是对 AI Agent 这个品类的蓝图。工厂的每条产线、每个调度决策、每层压缩策略，都是你在构建自己的智能系统时可以参考的模版。现在，该你动手了。</p>
+
+    </div>
+
+    <div class="container">
+        <div class="content-footer">
+            本手册基于 Claude 源码解析 编写。AI 工具迭代迅速，部分内容可能随版本更新而变化，请以官方文档为准。
+        </div>
+    </div>
+</body>
+</html>

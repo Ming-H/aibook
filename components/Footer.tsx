@@ -1,46 +1,107 @@
-import Link from "next/link";
+import Link from 'next/link';
+
+const footerLinks = {
+  services: [
+    { label: 'AI 落地应用 & Agent 开发', href: '/services#ai-application' },
+    { label: 'AI 培训 & 咨询', href: '/services#ai-training' },
+  ],
+  company: [
+    { label: '案例', href: '/cases' },
+    { label: '关于', href: '/about' },
+    { label: '联系', href: '/contact' },
+  ],
+  resources: [
+    { label: 'AI Insights', href: 'https://ming-h.github.io/ai-insights/' },
+    { label: 'GitHub', href: 'https://github.com/Ming-H' },
+  ],
+};
 
 export function Footer() {
   return (
-    <footer className="mt-24">
-      <div className="mx-auto max-w-[720px] px-5 sm:px-8 py-10">
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-[12px] text-[var(--text-muted)]">
-            &copy; 2026 DevFox
-          </p>
-
-          <div className="flex items-center gap-5">
-            <a
-              href="https://Ming-H.github.io/ai-insights/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-[12px] text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition-colors"
-            >
-              AI Insights
-            </a>
-            <a
-              href="https://twitter.com/MingFire520"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-[12px] text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition-colors"
-            >
-              Twitter
-            </a>
-            <a
-              href="https://github.com/Ming-H"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-[12px] text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition-colors"
-            >
-              GitHub
-            </a>
-            <Link
-              href="/rss.xml"
-              className="text-[12px] text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition-colors"
-            >
-              RSS
+    <footer className="border-t border-[var(--border-default)] bg-[var(--background-primary)]">
+      <div className="mx-auto max-w-nav px-5 sm:px-8 py-12 md:py-16">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
+          {/* Brand */}
+          <div className="col-span-2 md:col-span-1">
+            <Link href="/" className="text-[15px] font-semibold tracking-tight text-[var(--text-primary)]">
+              DevFox AI
             </Link>
+            <p className="mt-3 text-sm text-[var(--text-tertiary)] leading-relaxed">
+              用 AI 重新定义业务效率
+            </p>
           </div>
+
+          {/* Services */}
+          <div>
+            <h3 className="text-xs font-semibold text-[var(--text-tertiary)] uppercase tracking-wider mb-3">
+              服务
+            </h3>
+            <ul className="space-y-2">
+              {footerLinks.services.map((link) => (
+                <li key={link.label}>
+                  <Link
+                    href={link.href}
+                    className="text-sm text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] transition-colors"
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Company */}
+          <div>
+            <h3 className="text-xs font-semibold text-[var(--text-tertiary)] uppercase tracking-wider mb-3">
+              导航
+            </h3>
+            <ul className="space-y-2">
+              {footerLinks.company.map((link) => (
+                <li key={link.label}>
+                  <Link
+                    href={link.href}
+                    className="text-sm text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] transition-colors"
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Resources */}
+          <div>
+            <h3 className="text-xs font-semibold text-[var(--text-tertiary)] uppercase tracking-wider mb-3">
+              资源
+            </h3>
+            <ul className="space-y-2">
+              {footerLinks.resources.map((link) => (
+                <li key={link.label}>
+                  <a
+                    href={link.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] transition-colors inline-flex items-center gap-1"
+                  >
+                    {link.label}
+                    <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+                    </svg>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+
+        {/* Bottom bar */}
+        <div className="pt-8 border-t border-[var(--border-subtle)] flex flex-col sm:flex-row items-center justify-between gap-4">
+          <p className="text-xs text-[var(--text-muted)]">
+            &copy; {new Date().getFullYear()} DevFox AI. All rights reserved.
+          </p>
+          <p className="text-xs text-[var(--text-muted)]">
+            Built with Next.js &middot; Deployed on Vercel
+          </p>
         </div>
       </div>
     </footer>

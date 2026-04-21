@@ -1,0 +1,2227 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vibe Coding 实战教程</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=Noto+Sans+SC:wght@300;400;500;600&family=Inter:wght@300;400;500;600&display=swap');
+
+        :root {
+            /* Technology Blue theme palette (default) */
+            --primary: #5dade2;
+            --primary-dark: #3498db;
+            --accent-teal: #48c9b0;
+            --accent-blue: #5dade2;
+            --accent-amber: #f5b041;
+            --accent-pink: #ec7063;
+
+            --text: #2c3e50;
+            --text-light: #7f8c8d;
+            --text-muted: #95a5a6;
+
+            --bg: #fafafa;
+            --bg-white: #ffffff;
+            --border: #e0e0e0;
+            --code-bg: #f8f9fa;
+            --callout-bg: #f3e5f5;
+            --callout-border: #85c1e9;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans SC', 'Inter', -apple-system, sans-serif;
+            font-size: 11pt;
+            line-height: 1.7;
+            color: var(--text);
+            background: var(--bg);
+        }
+
+        /* Print Settings - Golden Ratio Margins (top:right:bottom:left = 16:24:20:18) */
+        @page {
+            size: A4;
+            margin: 16mm 24mm 20mm 18mm;
+        }
+
+        @media print {
+            body {
+                background: white;
+            }
+            .page-break {
+                page-break-before: always;
+                break-before: page;
+            }
+            .no-print {
+                display: none;
+            }
+
+            /* Ensure background colors print */
+            * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+
+            /* Avoid breaking inside block elements */
+            pre, blockquote, .info-box, .warning-box, .success-box, .tip-box, .highlight-box, table {
+                page-break-inside: avoid;
+                break-inside: avoid;
+            }
+
+            /* Keep section headers with their first paragraph */
+            .section-header, .part-header {
+                page-break-after: avoid;
+                break-after: avoid;
+            }
+
+            /* Ensure at least 2 lines of content after a header (orphan control) */
+            .section-header + p,
+            .section-header + h3 {
+                page-break-after: avoid;
+                break-after: avoid;
+            }
+
+            /* Keep code blocks together with their preceding paragraph */
+            p + .code-block,
+            p + pre {
+                page-break-before: avoid;
+                break-before: avoid;
+            }
+
+            /* Avoid page break right before a blockquote */
+            p + blockquote {
+                page-break-before: avoid;
+                break-before: avoid;
+            }
+
+            /* Avoid page break between h3 and its first paragraph */
+            h3 + p,
+            h4 + p {
+                page-break-before: avoid;
+                break-before: avoid;
+            }
+
+            /* Print-friendly code blocks */
+            .code-block {
+                border: 1px solid #ccc !important;
+            }
+            .code-block-header {
+                background: #e8e8e8 !important;
+                border-bottom: 1px solid #ccc !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            .code-block pre {
+                background: #f5f5f5 !important;
+            }
+            .code-block pre code {
+                color: #333 !important;
+            }
+            .code-block-lang {
+                color: #555 !important;
+            }
+            pre:not(.code-block pre) {
+                background: #f5f5f5 !important;
+                border: 1px solid #ccc !important;
+            }
+            pre:not(.code-block pre) code {
+                color: #333 !important;
+            }
+
+            /* Wrap long lines in code blocks for PDF */
+            .code-block {
+                overflow: visible !important;
+            }
+            pre {
+                overflow: visible !important;
+                white-space: pre-wrap !important;
+                word-break: break-all !important;
+                overflow-wrap: break-word !important;
+            }
+            pre code {
+                white-space: pre-wrap !important;
+                word-break: break-all !important;
+                overflow-wrap: break-word !important;
+            }
+        }
+
+        /* Container */
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Cover Page */
+        .cover-page {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 60px 40px;
+            background: linear-gradient(135deg, #fff 0%, #fafafa 100%);
+            position: relative;
+        }
+
+        .cover-page::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 8px;
+            background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+        }
+
+        .series-name {
+            font-family: 'Noto Sans SC', sans-serif;
+            font-size: 14pt;
+            font-weight: 600;
+            color: var(--primary);
+            letter-spacing: 0;
+            word-spacing: 0.5em;
+            margin-bottom: 40px;
+            text-transform: uppercase;
+        }
+
+        .cover-title {
+            font-family: 'Noto Sans SC', sans-serif;
+            font-size: 32pt;
+            font-weight: 700;
+            line-height: 1.4;
+            color: var(--text);
+            margin-bottom: 20px;
+            max-width: 600px;
+            letter-spacing: -0.02em;
+        }
+
+        .cover-subtitle {
+            font-family: 'Noto Sans SC', sans-serif;
+            font-size: 16pt;
+            font-weight: 400;
+            color: var(--text-light);
+            margin-bottom: 60px;
+            max-width: 500px;
+            line-height: 1.5;
+        }
+
+        .cover-meta {
+            margin-top: 60px;
+            padding: 30px;
+            background: var(--bg-white);
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .cover-keywords {
+            font-size: 10pt;
+            color: var(--text-light);
+            margin-bottom: 8px;
+        }
+
+        .cover-audience {
+            font-size: 10pt;
+            color: var(--text-light);
+            margin-bottom: 8px;
+        }
+
+        .cover-version {
+            font-size: 9pt;
+            color: var(--text-light);
+            font-family: 'Inter', monospace;
+        }
+
+        .cover-author {
+            margin-top: 40px;
+            font-size: 12pt;
+            color: var(--text);
+        }
+
+        .cover-footer {
+            position: absolute;
+            bottom: 30px;
+            font-size: 8pt;
+            color: var(--text-light);
+            max-width: 400px;
+            line-height: 1.5;
+        }
+
+        /* TOC Page */
+        .toc-page {
+            padding: 60px 0;
+            min-height: 100vh;
+        }
+
+        .toc-title {
+            font-family: 'Noto Sans SC', sans-serif;
+            font-size: 24pt;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 10px;
+            color: var(--text);
+            letter-spacing: -0.01em;
+        }
+
+        .toc-subtitle {
+            font-family: 'Inter', sans-serif;
+            font-size: 10pt;
+            font-weight: 500;
+            text-align: center;
+            letter-spacing: 4px;
+            color: var(--text-light);
+            margin-bottom: 60px;
+            text-transform: uppercase;
+        }
+
+        .toc-part {
+            margin-bottom: 30px;
+        }
+
+        .toc-part-title {
+            font-family: 'Noto Sans SC', sans-serif;
+            font-size: 12pt;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+
+        .toc-item {
+            display: flex;
+            align-items: baseline;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .toc-item-number {
+            font-family: 'Inter', monospace;
+            font-size: 10pt;
+            color: var(--primary);
+            margin-right: 15px;
+            min-width: 60px;
+        }
+
+        .toc-item-title {
+            font-size: 11pt;
+            color: var(--text);
+        }
+
+        .toc-item-page {
+            margin-left: auto;
+            font-size: 10pt;
+            color: var(--text-light);
+        }
+
+        /* Content Page */
+        .content-page {
+            padding: 40px 0;
+        }
+
+        /* ============================================================
+           PART TITLE PAGE — O'Reilly / Manning style
+           Standalone divider page, content starts on next page.
+           ============================================================ */
+        .part-header {
+            text-align: left;
+            margin: 0;
+            padding: 60px 0 40px 0;      /* compact padding, no min-height */
+            /* removed page-break-after to prevent blank pages */
+        }
+
+        .part-header.page-break {
+            page-break-before: always;
+        }
+
+        .part-number {
+            font-family: 'Inter', sans-serif;
+            font-size: 11pt;
+            font-weight: 500;
+            color: var(--text-light);
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 16px;
+        }
+
+        .part-rule {
+            width: 48px;
+            height: 3px;
+            background: var(--primary);
+            margin: 20px 0;
+            border: none;
+        }
+
+        .part-title {
+            font-family: 'Noto Sans SC', sans-serif;
+            font-size: 26pt;
+            font-weight: 700;
+            color: var(--text);
+            letter-spacing: -0.02em;
+            line-height: 1.3;
+        }
+
+        /* ============================================================
+           SECTION (CHAPTER) HEADERS — clean, professional
+           ============================================================ */
+        .section-header {
+            margin: 0 0 20px 0;
+            padding-top: 8px;
+            page-break-after: avoid;
+        }
+
+        .section-number {
+            font-family: 'Inter', sans-serif;
+            font-size: 11pt;
+            font-weight: 500;
+            color: var(--primary);
+            letter-spacing: 1px;
+            margin-bottom: 6px;
+        }
+
+        .section-title {
+            font-family: 'Noto Sans SC', sans-serif;
+            font-size: 20pt;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 4px;
+            line-height: 1.3;
+            letter-spacing: -0.01em;
+        }
+
+        .section-subtitle {
+            font-family: 'Inter', sans-serif;
+            font-size: 10.5pt;
+            font-weight: 400;
+            color: var(--text-light);
+            letter-spacing: 0.3px;
+        }
+
+        /* Content Elements */
+        h3 {
+            font-family: 'Noto Sans SC', sans-serif;
+            font-size: 16pt;
+            font-weight: 600;
+            color: var(--text);
+            margin: 40px 0 20px 0;
+            page-break-after: avoid;
+            letter-spacing: -0.01em;
+        }
+
+        h4 {
+            font-family: 'Noto Sans SC', sans-serif;
+            font-size: 13pt;
+            font-weight: 500;
+            color: var(--text);
+            margin: 30px 0 15px 0;
+            page-break-after: avoid;
+        }
+
+        p {
+            margin-bottom: 1em;
+            text-align: justify;
+            orphans: 4;
+            widows: 4;
+        }
+
+        a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        /* Lists */
+        ul, ol {
+            margin: 1.2em 0;
+            padding-left: 2em;
+        }
+
+        li {
+            margin-bottom: 0.6em;
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 2em 0;
+            font-size: 10pt;
+            page-break-inside: avoid;
+            border-radius: 6px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        th, td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            font-family: 'Noto Sans SC', sans-serif;
+            font-weight: 600;
+            background: #f8f9fa;
+            color: var(--text);
+            border-bottom: 2px solid var(--primary);
+            font-size: 0.95em;
+        }
+
+        td {
+            vertical-align: top;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:nth-child(even) {
+            background: rgba(0,0,0,0.015);
+        }
+
+        tr:hover {
+            background: rgba(52, 152, 219, 0.04);
+        }
+
+        /* Code Blocks */
+        code {
+            font-family: 'JetBrains Mono', 'Fira Code', 'Monaco', 'Consolas', 'Courier New', monospace;
+            font-size: 0.88em;
+            background: rgba(0,0,0,0.06);
+            padding: 2px 7px;
+            border-radius: 4px;
+            color: #d63384;
+        }
+
+        /* Code Block Wrapper — O'Reilly style: clean, functional */
+        .code-block {
+            margin: 1.5em 0;
+            border-radius: 4px;
+            overflow: hidden;
+            border: 1px solid #dee2e6;
+            page-break-inside: avoid;
+        }
+
+        .code-block-header {
+            background: #f1f3f5;
+            padding: 4px 12px;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .code-block-lang {
+            font-family: 'Inter', 'Noto Sans SC', sans-serif;
+            font-size: 0.7em;
+            color: #868e96;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            font-weight: 500;
+        }
+
+        .code-block pre {
+            margin: 0;
+            border: none;
+            border-radius: 0;
+        }
+
+        pre {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 12px 16px;
+            margin: 1.5em 0;
+            overflow-x: auto;
+            page-break-inside: avoid;
+            line-height: 1.5;
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+            font-size: 0.85em;
+            line-height: 1.5;
+            color: #495057;
+        }
+
+        /* Syntax highlighting - Light theme (print-friendly) */
+        .syntax-keyword { color: #d6336c; font-weight: 600; }
+        .syntax-string { color: #2b8a3e; }
+        .syntax-number { color: #e8590c; }
+        .syntax-comment { color: #868e96; font-style: italic; }
+        .syntax-function { color: #1971c2; }
+        .syntax-class { color: #9c36b5; }
+        .syntax-operator { color: #0c8599; }
+        .syntax-variable { color: #c92a2a; }
+        .syntax-property { color: #e8590c; }
+
+        /* Blockquotes (核心建议 etc.) */
+        blockquote {
+            margin: 2em 0;
+            padding: 20px 24px;
+            background: linear-gradient(135deg, rgba(52, 152, 219, 0.04), rgba(52, 152, 219, 0.08));
+            border-left: 4px solid var(--primary);
+            border-radius: 0 8px 8px 0;
+            page-break-inside: avoid;
+            font-size: 0.96em;
+        }
+
+        blockquote strong {
+            color: var(--primary-dark);
+            font-weight: 700;
+        }
+
+        blockquote p {
+            margin-bottom: 0.6em;
+        }
+
+        blockquote p:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Horizontal Rule */
+        hr {
+            border: none;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--border), transparent);
+            margin: 3em 0;
+        }
+
+        /* Emphasis */
+        strong {
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        em {
+            font-style: italic;
+            color: var(--text-light);
+        }
+
+        /* Footer */
+        .content-footer {
+            margin-top: 60px;
+            padding-top: 30px;
+            border-top: 1px solid var(--border);
+            text-align: center;
+            font-size: 9pt;
+            color: var(--text-light);
+        }
+
+        /* Flowchart / Diagram */
+        .flowchart {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin: 2em 0;
+            flex-wrap: wrap;
+        }
+
+        .flowchart-arrow {
+            color: var(--text-light);
+            font-size: 1.3em;
+            font-weight: 400;
+        }
+
+        .flowchart-box {
+            background: var(--bg-white);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 10px 16px;
+            font-family: 'Noto Sans SC', sans-serif;
+            font-weight: 500;
+            font-size: 0.9em;
+            color: var(--text);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+        }
+
+        /* File Tree */
+        .file-tree {
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin: 2em 0;
+            font-family: 'Fira Code', 'Monaco', 'Consolas', monospace;
+            font-size: 0.85em;
+        }
+
+        .file-tree-line {
+            padding: 4px 0;
+            color: var(--text);
+        }
+
+        .file-tree-dir {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .file-tree-file {
+            color: var(--text-light);
+        }
+
+        /* Info Box */
+        .info-box {
+            margin: 2em 0;
+            padding: 18px 20px;
+            background: #f0fdfa;
+            border-left: 3px solid var(--accent-teal);
+            border-radius: 0 4px 4px 0;
+            page-break-inside: avoid;
+        }
+
+        /* Success Box */
+        .success-box {
+            margin: 2em 0;
+            padding: 18px 20px;
+            background: #f0fdf4;
+            border-left: 3px solid #22c55e;
+            border-radius: 0 4px 4px 0;
+            page-break-inside: avoid;
+        }
+
+        /* Warning Box */
+        .warning-box {
+            margin: 2em 0;
+            padding: 18px 20px;
+            background: #fffbeb;
+            border-left: 3px solid #eab308;
+            border-radius: 0 4px 4px 0;
+            page-break-inside: avoid;
+        }
+
+        /* Danger Box */
+        .danger-box {
+            margin: 2em 0;
+            padding: 18px 20px;
+            background: #fef2f2;
+            border-left: 3px solid #ef4444;
+            border-radius: 0 4px 4px 0;
+            page-break-inside: avoid;
+        }
+
+        /* Tip Box */
+        .tip-box {
+            margin: 2em 0;
+            padding: 18px 20px;
+            background: #fef3c7;
+            border-left: 3px solid var(--accent-amber);
+            border-radius: 0 4px 4px 0;
+            page-break-inside: avoid;
+        }
+
+        /* Diagram Box */
+        .diagram-box {
+            margin: 2em 0;
+            padding: 20px;
+            background: #fafafa;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            page-break-inside: avoid;
+        }
+
+        /* Process Steps */
+        .process-steps {
+            counter-reset: step;
+            margin: 2em 0;
+        }
+
+        .process-step {
+            position: relative;
+            padding-left: 45px;
+            margin: 1.2em 0;
+        }
+
+        .process-step::before {
+            counter-increment: step;
+            content: counter(step);
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 28px;
+            height: 28px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.85em;
+        }
+
+        /* Highlight Box */
+        .highlight-box {
+            background: #fafafa;
+            border-left: 3px solid var(--primary);
+            padding: 18px 20px;
+            margin: 2em 0;
+            border-radius: 0 4px 4px 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- Cover Page -->
+    <div class="cover-page">
+        <div class="series-name">技术文档</div>
+        <h1 class="cover-title">Vibe Coding 实战教程</h1>
+        <div class="cover-subtitle">从"听说过"到"能交付"的完整指南</div>
+        <div class="cover-meta">
+            <div class="cover-keywords"><strong>关键词：</strong>Vibe Coding · AI 编程 · Cursor · Claude Code · Prompt 工程</div>
+            <div class="cover-audience"><strong>适合读者：</strong>想系统掌握 AI 辅助编程的开发者、从传统编码转向 Vibe Coding 的工程师、想提升 AI 编程效率和交付质量的程序员</div>
+            <div class="cover-version"><strong>版本：</strong>v260411</div>
+        </div>
+        <div class="cover-author">极客狐DevFox</div>
+        <div class="cover-footer">本手册基于 Vibe Coding 实战教程 编写。AI 工具迭代迅速，部分内容可能随版本更新而变化，请以官方文档为准。</div>
+    </div>
+
+    <!-- TOC Page -->
+    <div class="toc-page page-break">
+        <div class="container">
+            <h1 class="toc-title">目录</h1>
+            <div class="toc-subtitle">CONTENTS</div>
+            <div class="toc-part">
+<div class="toc-part-title">Part 1: 概念</div>
+<div class="toc-item">
+<div class="toc-item-number">§01</div>
+<div class="toc-item-title">从写代码到说代码：Vibe Coding 是什么</div>
+<div class="toc-item-page">1</div>
+</div>
+<div class="toc-item">
+<div class="toc-item-number">§02</div>
+<div class="toc-item-title">不只是自动补全：Vibe Coding 的真正边界</div>
+<div class="toc-item-page">2</div>
+</div>
+<div class="toc-item">
+<div class="toc-item-number">§03</div>
+<div class="toc-item-title">上路之前：你需要什么基础和心态</div>
+<div class="toc-item-page">3</div>
+</div>
+</div>
+<div class="toc-part">
+<div class="toc-part-title">Part 2: 核心机制</div>
+<div class="toc-item">
+<div class="toc-item-number">§04</div>
+<div class="toc-item-title">Prompt 即方向盘：怎么说 AI 才听得懂</div>
+<div class="toc-item-page">4</div>
+</div>
+<div class="toc-item">
+<div class="toc-item-number">§05</div>
+<div class="toc-item-title">引擎盖下：AI 编程工具的工作原理</div>
+<div class="toc-item-page">5</div>
+</div>
+<div class="toc-item">
+<div class="toc-item-number">§06</div>
+<div class="toc-item-title">别盲信导航：代码审查与质量把控</div>
+<div class="toc-item-page">6</div>
+</div>
+<div class="toc-item">
+<div class="toc-item-number">§07</div>
+<div class="toc-item-title">走偏了就调头：迭代循环与重构策略</div>
+<div class="toc-item-page">7</div>
+</div>
+</div>
+<div class="toc-part">
+<div class="toc-part-title">Part 3: 动手搭建</div>
+<div class="toc-item">
+<div class="toc-item-number">§08</div>
+<div class="toc-item-title">选车加油：搭建 Vibe Coding 工作环境</div>
+<div class="toc-item-page">8</div>
+</div>
+<div class="toc-item">
+<div class="toc-item-number">§09</div>
+<div class="toc-item-title">第一次上路：用自然语言写一个 CLI 工具</div>
+<div class="toc-item-page">9</div>
+</div>
+<div class="toc-item">
+<div class="toc-item-number">§10</div>
+<div class="toc-item-title">导航出错时：调试和排错实战</div>
+<div class="toc-item-page">10</div>
+</div>
+<div class="toc-item">
+<div class="toc-item-number">§11</div>
+<div class="toc-item-title">从车库到马路：测试、部署与上线</div>
+<div class="toc-item-page">11</div>
+</div>
+</div>
+<div class="toc-part">
+<div class="toc-part-title">Part 4: 实战场景</div>
+<div class="toc-item">
+<div class="toc-item-number">§12</div>
+<div class="toc-item-title">实战一：从零搭建一个 Web 应用</div>
+<div class="toc-item-page">12</div>
+</div>
+<div class="toc-item">
+<div class="toc-item-number">§13</div>
+<div class="toc-item-title">实战二：自动化工作流脚本</div>
+<div class="toc-item-page">13</div>
+</div>
+<div class="toc-item">
+<div class="toc-item-number">§14</div>
+<div class="toc-item-title">实战三：给现有项目加新功能</div>
+<div class="toc-item-page">14</div>
+</div>
+</div>
+<div class="toc-part">
+<div class="toc-part-title">Part 5: 深度思考</div>
+<div class="toc-item">
+<div class="toc-item-number">§15</div>
+<div class="toc-item-title">工具横评：六款主流工具对比选型</div>
+<div class="toc-item-page">15</div>
+</div>
+<div class="toc-item">
+<div class="toc-item-number">§16</div>
+<div class="toc-item-title">Vibe Coding 之后：职业、教育与软件工程的未来</div>
+<div class="toc-item-page">16</div>
+</div>
+</div>
+
+        </div>
+    </div>
+
+    <!-- Content Pages -->
+    <div class="container content-page">
+        <div class="part-header page-break">
+<div class="part-number">PART 1</div>
+<div class="part-rule"></div>
+<div class="part-title">概念</div>
+</div>
+<div class="section-header">
+<div class="section-number">§01</div>
+<h2 class="section-title">从写代码到说代码：Vibe Coding 是什么</h2>
+<div class="section-subtitle">From Writing Code to Speaking Code: What Is Vibe Coding</div>
+</div>
+<p>2025 年 2 月，Andrej Karpathy 发了一条推文：</p>
+<blockquote>
+There's a new kind of coding I call "vibe coding", where you fully give in to the vibes, embrace exponentials, and forget that the code even exists.
+</blockquote>
+<p>这条推文炸了。一个月内，"Vibe Coding"成了科技圈最热的词。到了年底，Collins 词典把它评为 2025 年度词汇。</p>
+<p>你的第一反应可能是：又一个 buzzword？AI 编程助手我早就在用了，Copilot 补全代码都补了两年了，有什么新鲜的？</p>
+<p>还真有。</p>
+<h3>不是 Copilot 换了个名字</h3>
+<p>Vibe Coding 和传统的 AI 代码补全，区别不在工具，在心态。</p>
+<p>Copilot 时代：你写代码，AI 帮你补全下一行。你是司机，AI 是副驾驶，帮你踩踩油门。</p>
+<p>Vibe Coding 时代：你用自然语言描述想要什么，AI 写完整段代码。你是乘客，AI 是导航，你只需要说"我要去哪"。</p>
+<p>打个比方。你用过 GPS 导航吧？你不需要记住每条路怎么走，只需要告诉导航目的地。但——你不能闭着眼开。导航说右转，你也得看一眼是不是右转进了河里。</p>
+<p>这就是 Vibe Coding 的核心张力：<strong>信任 AI，但别盲信。</strong></p>
+<table>
+<thead><tr><th>维度</th><th>传统 AI 补全</th><th>Vibe Coding</th></tr></thead>
+<tbody><tr><td>你做什么</td><td>写代码主体，AI 补全细节</td><td>描述需求，AI 生成代码</td></tr>
+<tr><td>AI 的角色</td><td>副驾驶</td><td>导航系统</td></tr>
+<tr><td>交互方式</td><td>Tab 接受建议</td><td>自然语言对话</td></tr>
+<tr><td>代码归属</td><td>你写的，AI 辅助</td><td>AI 写的，你审查</td></tr>
+<tr><td>心态</td><td>我在写代码</td><td>我在和 AI 协作</td></tr>
+<tr><td>典型工具</td><td>GitHub Copilot</td><td>Cursor、Claude Code、Windsurf</td></tr>
+</tbody></table>
+<h3>三个真实场景</h3>
+<p>光说概念没感觉，看三个场景：</p>
+<p><strong>场景一：产品经理要做原型。</strong> 不用找开发排期了，打开 Cursor，说"做一个登录页面，支持邮箱和手机号"，10 分钟出原型。能跑。不能上生产，但够用来做用户测试。</p>
+<p><strong>场景二：后端开发者写脚本。</strong> 每次部署要手动改配置文件、压缩资源、上传服务器。跟 Claude Code 说"帮我写个部署脚本，自动完成这些步骤"，5 分钟拿到一个能用的 shell 脚本。</p>
+<p><strong>场景三：独立开发者做副业。</strong> 有个想法但不想从零写代码。用 Bolt.new 描述需求，30 分钟出一个 MVP（Minimum Viable Product，最小可行产品）。不完美，但足以验证想法值不值得继续投入。</p>
+<p>这三个场景的共同点：<strong>人关注"做什么"，AI 处理"怎么做"。</strong></p>
+<h3>GPS 隐喻：贯穿全书的理解框架</h3>
+<p>我选了一个隐喻来帮你理解 Vibe Coding：<strong>带着 GPS 开车。</strong></p>
+<table>
+<thead><tr><th>开车场景</th><th>Vibe Coding 概念</th></tr></thead>
+<tbody><tr><td>目的地</td><td>项目需求 / 你想要的产品</td></tr>
+<tr><td>GPS 导航</td><td>AI 编程助手</td></tr>
+<tr><td>驾驶技术</td><td>你的编程基础</td></tr>
+<tr><td>导航规划的路线</td><td>AI 生成的代码方案</td></tr>
+<tr><td>走错路重新规划</td><td>迭代、调试、修改 Prompt</td></tr>
+<tr><td>路况判断</td><td>代码审查、安全检查</td></tr>
+<tr><td>盲目跟导航开进河里</td><td>不看代码直接用 AI 输出</td></tr>
+</tbody></table>
+<p>这个隐喻会贯穿全书。当你读到后面讨论工具选型、质量把控、迭代策略的时候，想想"如果是开车，这时候我该做什么"。</p>
+<blockquote>
+<strong>核心建议</strong>
+<br>
+Vibe Coding 不是"不会写代码的人也能写代码了"。它是"会写代码的人可以写得更快、做得更多了"。GPS 不能替你考驾照，但有了驾照之后，GPS 让你敢去没去过的地方。
+</blockquote>
+<p>下一节拆开讲：Vibe Coding 和你已经在用的 AI 工具到底差在哪。</p>
+<div class="section-header">
+<div class="section-number">§02</div>
+<h2 class="section-title">不只是自动补全：Vibe Coding 的真正边界</h2>
+<div class="section-subtitle">Beyond Autocomplete: The Real Boundaries of Vibe Coding</div>
+</div>
+<p>你可能觉得：我用 Copilot 补全代码补了两年，这不就是 Vibe Coding 吗？</p>
+<p>不是。差别比你想的大。</p>
+<h3>从"一行建议"到"一段实现"</h3>
+<p>Copilot 的工作模式：你打了一行 <code>def fetch_user(</code>，它猜你想写什么，给出补全建议。你按 Tab，接受。它帮你省了几次敲键盘。</p>
+<p>Vibe Coding 的工作模式：你说"写一个函数，从数据库获取用户信息，支持分页和模糊搜索，返回 JSON 格式"，AI 给你完整实现。包含错误处理、参数校验、返回格式。你可能需要调整，但起点完全不同。</p>
+<p>这不是量的差异，是质的跳跃。</p>
+<table>
+<thead><tr><th>维度</th><th>Copilot 模式</th><th>Vibe Coding 模式</th></tr></thead>
+<tbody><tr><td>输入</td><td>代码上下文</td><td>自然语言需求</td></tr>
+<tr><td>输出</td><td>下一行/几行建议</td><td>完整函数/模块</td></tr>
+<tr><td>交互频率</td><td>每几秒一次</td><td>每几分钟一次</td></tr>
+<tr><td>人的角色</td><td>写代码 + 审核 AI 补全</td><td>描述需求 + 审核 AI 生成</td></tr>
+<tr><td>上下文窗口</td><td>当前文件</td><td>整个项目</td></tr>
+<tr><td>思维方式</td><td>"我要写什么代码"</td><td>"我要实现什么功能"</td></tr>
+</tbody></table>
+<h3>四个层级：你在哪一层</h3>
+<p>AI 辅助编程不是一刀切。它有四个层级，层层递进：</p>
+<h3>补全与对话</h3>
+<p><strong>Level 1：行内补全。</strong> 就是 Copilot 的经典模式。你写一半，它补另一半。省打字时间。</p>
+<p><strong>Level 2：对话式辅助。</strong> 你在编辑器里打开一个对话窗口，问"这个报错怎么修"，AI 看你的代码上下文给建议。不用离开编辑器去搜 Stack Overflow。</p>
+<h3>Agent 与全自动</h3>
+<p><strong>Level 3：Agent 模式。</strong> 你给一个任务描述，AI 自己规划步骤、读写文件、运行命令、查看结果。你只需要在关键节点确认。Claude Code、Cursor Agent 都在做这个。</p>
+<p><strong>Level 4：全自动。</strong> 你说"做一个 XX"，AI 从设计到部署全搞定。目前还没完全到这一步，但 Bolt.new、Replit Agent 已经在逼近。</p>
+<p>你现在大概率在 Level 1 或 2。本教程的目标是帮你稳稳站在 Level 3，并知道 Level 4 的边界在哪。</p>
+<p>!<a href="images/four-levels-ai-programming.png">四个层级的 AI 编程</a></p>
+<h3>它能做什么，不能做什么</h3>
+<p>先泼冷水。Vibe Coding 不是万能的。</p>
+<p><strong>擅长的：</strong></p>
+<ul>
+<li>快速原型和 MVP</li>
+<li>重复性的 CRUD（增删改查，Create/Read/Update/Delete）逻辑</li>
+<li>脚本和自动化任务</li>
+<li>已有代码的重构和优化</li>
+<li>学习新技术时的实验项目</li>
+</ul>
+<p><strong>不擅长的：</strong></p>
+<ul>
+<li>高并发系统的核心架构设计</li>
+<li>需要深度领域知识的业务逻辑</li>
+<li>对安全性有极端要求的模块</li>
+<li>需要精细性能调优的代码</li>
+<li>你自己都说不清楚的需求</li>
+</ul>
+<p>最后一条最关键。GPS 再好，你说不清楚目的地，它也没法导航。Vibe Coding 的天花板不是 AI 的能力，是你描述需求的能力。</p>
+<blockquote>
+<strong>核心建议</strong>
+<br>
+如果你只是想 Tab 补全快点，Copilot 够了。如果你想让 AI 帮你实现完整功能，你需要学会 Vibe Coding 的核心技能：把想法说清楚、审查 AI 的输出、在出错时高效迭代。这三样就是本教程要教你的。
+</blockquote>
+<p>下一节，我们聊聊上路之前你需要准备什么。</p>
+<div class="section-header">
+<div class="section-number">§03</div>
+<h2 class="section-title">上路之前：你需要什么基础和心态</h2>
+<div class="section-subtitle">Before You Hit the Road: Prerequisites and Mindset</div>
+</div>
+<p>"我不会写代码，能用 Vibe Coding 吗？"</p>
+<p>能。但你的体验会和会写代码的人完全不同。</p>
+<p>这就像问"我不会开车，能用导航吗？"——当然能，但你得先学会开车。导航不能替你踩刹车。</p>
+<h3>你需要的技术底子</h3>
+<p>说实话，不需要很多，但需要有一些。</p>
+<table>
+<thead><tr><th>你需要会的</th><th>为什么需要</th><th>最低要求</th></tr></thead>
+<tbody><tr><td>看懂代码</td><td>AI 写的代码你要能判断对不对</td><td>能读懂 Python/JS 的基本逻辑</td></tr>
+<tr><td>用命令行</td><td>Vibe Coding 工具大量在终端操作</td><td>会 cd、ls、python node 这些基本命令</td></tr>
+<tr><td>理解项目结构</td><td>AI 会在你的项目里改文件</td><td>知道什么是目录、配置文件、入口文件</td></tr>
+<tr><td>基础调试能力</td><td>AI 写的代码不会一次就对</td><td>能看报错信息，大概知道问题在哪</td></tr>
+<tr><td>Git 基础</td><td>你需要频繁提交和回滚</td><td>会 add、commit、push、reset</td></tr>
+</tbody></table>
+<p>如果你的编程经验在 1 年以上，这些应该都没问题。如果完全没有编程经验，建议先花一两周学个 Python 入门，再来看这本教程。</p>
+<h3>心态调整：三要三不要</h3>
+<p>Vibe Coding 需要的心态和传统编程很不一样。调不好心态，工具再好也用不出效果。</p>
+<h3>三要</h3>
+<p><strong>要：信任 AI 的第一版输出。</strong></p>
+<p>不要一上来就逐行审查。先让它跑起来，看效果。有问题再改。GPS 给你路线，你先跟着走，发现不对再调整。</p>
+<p><strong>要：快速迭代，不要完美主义。</strong></p>
+<p>Vibe Coding 的核心优势是快。你提需求，AI 生成，你看效果，改需求，AI 重新生成。每个循环 1-5 分钟。别在一个版本上纠结太久。</p>
+<p><strong>要：关注架构，放手细节。</strong></p>
+<p>你来决定项目结构、技术选型、模块划分。让 AI 来写具体实现。你是规划路线的人，AI 是开车的。</p>
+<h3>三不要</h3>
+<p><strong>不要：不看代码就用。</strong></p>
+<p>AI 生成的代码可能有 bug、安全漏洞、性能问题。你可以不写，但你必须能看懂。</p>
+<p><strong>不要：一次提太大的需求。</strong></p>
+<p>"帮我做一个电商网站"——太大了。"帮我做一个商品列表页面，从数据库读取数据，支持分页"——这差不多。把大需求拆成小任务，一个个来。</p>
+<p><strong>不要：对 AI 说"随便"、"都行"。</strong></p>
+<p>AI 需要明确的指令。"用 React 还是 Vue？""Python 还是 Node？"——你必须有主见。GPS 问你去哪，你说"随便"，它没法导航。</p>
+<h3>工具清单</h3>
+<p>接下来的章节会详细教你怎么用。这里先列个清单，你有印象就行：</p>
+<table>
+<thead><tr><th>工具</th><th>类型</th><th>用途</th><th>价格</th></tr></thead>
+<tbody><tr><td>Cursor</td><td>AI IDE</td><td>日常开发主力</td><td>$20/月</td></tr>
+<tr><td>Claude Code</td><td>终端 Agent</td><td>复杂项目、深度重构</td><td>按量付费</td></tr>
+<tr><td>Windsurf</td><td>AI IDE</td><td>轻量级替代 Cursor</td><td>$15/月</td></tr>
+<tr><td>GitHub Copilot</td><td>编辑器插件</td><td>行内补全</td><td>$10/月</td></tr>
+<tr><td>Bolt.new</td><td>Web 平台</td><td>快速原型</td><td>$20/月</td></tr>
+<tr><td>Replit</td><td>Web 平台</td><td>在线编码+部署</td><td>$25/月</td></tr>
+</tbody></table>
+<p>不需要全装。本教程的示例主要用 Cursor 和 Claude Code，选一个主力工具跟着做就行。</p>
+<blockquote>
+<strong>核心建议</strong>
+<br>
+心态比工具重要。会用 Cursor 的人很多，但能高效使用 Vibe Coding 的人很少。差别在于：你是把 AI 当打字机用，还是把它当协作搭档用。打字机你按一个键出一个字；搭档你交代一个任务，它给你一个方案，你们再一起打磨。
+</blockquote>
+<p>接下来的章节，我们从 GPS 的核心机制开始拆——Prompt 工程和 AI 工具的工作原理。</p>
+<div class="part-header page-break">
+<div class="part-number">PART 2</div>
+<div class="part-rule"></div>
+<div class="part-title">核心机制</div>
+</div>
+<div class="section-header">
+<div class="section-number">§04</div>
+<h2 class="section-title">Prompt 即方向盘：怎么说 AI 才听得懂</h2>
+<div class="section-subtitle">Prompt as the Steering Wheel: How to Talk So AI Understands</div>
+</div>
+<p>"帮我写个网站。"</p>
+<p>AI 真的会给你写个网站。但大概率不是你想要的那个。</p>
+<p>Vibe Coding 里最核心的技能不是编程，是表达。你能不能把脑子里的想法说清楚，直接决定了 AI 输出的质量。</p>
+<p>这不是玄学。有套路。</p>
+<h3>一个好 Prompt 的结构</h3>
+<p>经过大量实践，我发现一个好 Prompt 包含四个要素：</p>
+<h3>四要素拆解</h3>
+<p><strong>1. 角色（Role）</strong> — 你希望 AI 扮演什么角色</p>
+<p>"你是一个有 10 年经验的 Python 后端开发者" 比 "帮我写个 Python 函数" 效果好很多。</p>
+<p><strong>2. 上下文（Context）</strong> — 现在的状况是什么</p>
+<p>"这是一个 Flask 项目，使用 SQLAlchemy ORM（Object-Relational Mapping，用对象操作数据库的中间层），数据库是 PostgreSQL" 比 "帮我写个数据库查询" 更精准。</p>
+<p><strong>3. 任务（Task）</strong> — 具体要做什么</p>
+<p>"写一个用户注册接口，需要邮箱验证，密码用 bcrypt（一种密码加密算法）加密，返回 JWT（JSON Web Token，一种身份验证令牌）Token" 比 "写个注册功能" 更容易得到好结果。</p>
+<p><strong>4. 约束（Constraints）</strong> — 有什么限制条件</p>
+<p>"不要用第三方库"、"代码要兼容 Python 3.8"、"注释用中文"——这些限制帮助 AI 缩小搜索空间。</p>
+<h3>合体示例</h3>
+<p>合在一起：</p>
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">TEXT</span></div>
+<pre><code class="language-text">你是一个有 <span class="syntax-number">10</span> 年经验的 Python 后端开发者。
+这是一个 Flask 项目，使用 SQLAlchemy ORM，数据库是 PostgreSQL。
+写一个用户注册接口，需要邮箱验证，密码用 bcrypt 加密，返回 JWT token。
+不要使用 Flask-RESTful 扩展，代码需要兼容 Python <span class="syntax-number">3.10</span>+。
+</code></pre>
+</div>
+<h3>五个常见错误</h3>
+<p>实际用下来，80% 的差结果来自这五个错误：</p>
+<table>
+<thead><tr><th>错误</th><th>示例</th><th>问题</th><th>怎么改</th></tr></thead>
+<tbody><tr><td>太模糊</td><td>"做个好看的前端"</td><td>AI 猜你要什么</td><td>指定：配色方案、布局方式、参考网站</td></tr>
+</tbody></table>
+<p>| 太大 | "做个电商系统" | AI 一次吃不下 | 拆成：商品列表<span class="flowchart-arrow">→</span> <span class="flowchart-box">购物车</span><span class="flowchart-arrow">→</span> <span class="flowchart-box">订单</span><span class="flowchart-arrow">→</span> <span class="flowchart-box">支付 |</span></p>
+<table>
+<thead><tr><th>没上下文</th><th>"这个报错怎么修"</th><th>AI 不知道你的环境</th><th>附上：框架版本、文件路径、完整报错</th></tr></thead>
+<tbody><tr><td>一次要太多</td><td>"顺便把测试也写了"</td><td>多任务质量都下降</td><td>一次一个任务，完成后追加下一个</td></tr>
+</tbody></table>
+<h3>渐进式 Prompt：从模糊到精确</h3>
+<p>你可能不会一次写出完美的 Prompt。没关系。Vibe Coding 本身就是迭代的过程。</p>
+<h3>从粗到细</h3>
+<p><strong>第一步：粗描述。</strong></p>
+<p>"帮我写一个文件上传功能。"</p>
+<p><strong>第二步：加细节。</strong></p>
+<p>"帮我写一个文件上传功能，支持图片和 PDF，最大 10MB，上传到本地 storage 目录。"</p>
+<h3>加约束和异常</h3>
+<p><strong>第三步：加约束。</strong></p>
+<p>"帮我写一个文件上传功能，支持图片和 PDF，最大 10MB，上传到本地 storage 目录。用 FastAPI 实现，文件名用 UUID 重命名，返回文件的访问 URL。"</p>
+<p><strong>第四步：加异常处理。</strong></p>
+<p>在上面的基础上加："需要处理文件过大、格式不支持、存储空间不足的情况，返回合适的 HTTP 状态码。"</p>
+<p>每一步 AI 的输出质量都在提升。你不需要一次到位，但你需要在看到结果后知道往哪个方向补。</p>
+<h3>一个实战对比</h3>
+<p>同样的需求，两种写法：</p>
+<p><strong>差版本：</strong></p>
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">TEXT</span></div>
+<pre><code class="language-text">写个 TODO 应用
+</code></pre>
+</div>
+<p><strong>好版本：</strong></p>
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">Python</span></div>
+<pre><code class="language-python">你是一个前端开发者，擅长 React + TypeScript。
+写一个 TODO 应用，功能如下：
+<span class="syntax-number">1</span>. 添加待办事项（标题 + 优先级）
+<span class="syntax-number">2</span>. 标记完成
+<span class="syntax-number">3</span>. 按优先级排序
+<span class="syntax-number">4</span>. 本地存储，刷新不丢数据
+技术要求：用 React hooks，不用 <span class="syntax-keyword">class</span> <span class="syntax-class">组件</span>。
+样式用 Tailwind CSS，配色偏蓝色系。
+不需要后端，数据存 localStorage。
+</code></pre>
+</div>
+<blockquote>
+<strong>核心建议</strong>
+<br>
+Prompt 工程不是"提示词模板"，是"把需求想清楚"的能力。写好 Prompt 的过程，本质上是在整理你自己的思路。如果你说不清楚要什么，说明你还没想清楚。想清楚了，说给 AI 听自然就清楚。
+</blockquote>
+<p>下一节，我们打开引擎盖，看看 AI 编程工具到底是怎么工作的。</p>
+<div class="section-header">
+<div class="section-number">§05</div>
+<h2 class="section-title">引擎盖下：AI 编程工具的工作原理</h2>
+<div class="section-subtitle">Under the Hood: How AI Coding Tools Work</div>
+</div>
+<p>你不需要理解 Transformer 架构才能用 Vibe Coding。就像你不需要理解发动机原理才能开车。</p>
+<p>但你需要知道一些关键概念。因为理解了这些，你就知道什么时候该信任 AI，什么时候该自己上手。</p>
+<h3>三个关键组件</h3>
+<p>一个 AI 编程工具的内部，有三个关键部分在协作：</p>
+<h3>发动机：LLM</h3>
+<p><strong>1. 大语言模型（LLM）— 发动机。</strong></p>
+<p>这是核心。Claude、GPT-4、Gemini 都是 LLM。它们通过阅读海量代码学会了"给定上下文，预测接下来应该写什么代码"。</p>
+<p>关键特性：它不是在"搜索"代码，是在"生成"代码。每次输出都是根据你的 Prompt 和上下文即时生成的。这意味着同一个 Prompt 可能得到不同结果。</p>
+<h3>传感器：上下文</h3>
+<p><strong>2. 上下文系统 — 传感器。</strong></p>
+<p>AI 怎么知道你的项目长什么样？靠上下文系统。不同的工具收集上下文的方式不同：</p>
+<table>
+<thead><tr><th>工具</th><th>上下文来源</th></tr></thead>
+<tbody><tr><td>Copilot</td><td>当前打开的文件 + 光标附近的代码</td></tr>
+<tr><td>Cursor</td><td>当前文件 + 你手动引用的文件 + 项目索引</td></tr>
+<tr><td>Claude Code</td><td>自动搜索相关文件 + 读取 CLAUDE.md（一个 Markdown 配置文件，记录项目规范和 AI 协作偏好）配置</td></tr>
+<tr><td>Bolt.new</td><td>你描述的项目结构 + 已生成的代码</td></tr>
+</tbody></table>
+<p>上下文越多，AI 的输出越准确。但上下文也有上限（叫"上下文窗口"），塞太多反而会分散注意力。</p>
+<h3>手和脚：工具调用</h3>
+<p><strong>3. 工具调用系统 — 手和脚。</strong></p>
+<p>光能生成代码不够，AI 还得能把代码写进文件、运行命令、查看结果。这就是工具调用。</p>
+<p>Cursor 的 Agent 模式可以：读取文件、创建文件、运行终端命令、搜索代码。</p>
+<p>Claude Code 可以：读写文件、运行 bash 命令、搜索代码库、调用外部工具（通过 MCP（Model Context Protocol，一种让 AI 调用外部工具的开放协议））。</p>
+<p>这些能力让 AI 从"只能建议"变成了"能执行"。</p>
+<p>!<a href="images/ai-coding-components.png">AI 编程工具三大组件</a></p>
+<h3>为什么 AI 会犯错</h3>
+<p>AI 编程工具犯错的根本原因有三个：</p>
+<h3>上下文不够</h3>
+<p><strong>1. 上下文不够。</strong></p>
+<p>它没看到你项目里的某个关键文件，所以不知道你已经在 utils.py 里写了一个类似的函数，又造了一个轮子。</p>
+<h3>知识截止</h3>
+<p><strong>2. 知识截止。</strong></p>
+<p>训练数据有时间限制。如果你用的是 2024 年训练的模型，它可能不知道某个库在 2025 年做了重大 API 变更。</p>
+<h3>统计偏差</h3>
+<p><strong>3. 统计特性。</strong></p>
+<p>LLM 本质上是在预测"下一个 Token 最可能是什么"。有时候"最可能"不等于"正确"。特别是处理边界情况和特殊逻辑的时候。</p>
+<p>理解了这三个原因，你就知道怎么应对了：</p>
+<ul>
+<li>上下文不够 <span class="flowchart-arrow">→</span> <span class="flowchart-box">主动提供相关文件和信息</span></li>
+<li>知识过时 <span class="flowchart-arrow">→</span> <span class="flowchart-box">告诉 AI 你用的版本号</span></li>
+<li>统计偏差 <span class="flowchart-arrow">→</span> <span class="flowchart-box">对关键逻辑手动验证</span></li>
+</ul>
+<h3>对话上下文管理</h3>
+<p>和 AI 的对话会越来越长。AI 在对话中看到的每一条消息都会影响它的输出。这意味着：</p>
+<p><strong>前几轮对话的质量，决定了后面的质量。</strong></p>
+<p>如果你一开始给了清晰的项目结构和需求描述，后面的每轮对话 AI 都能保持一致的上下文。如果你一开始就模糊，后面会越来越偏。</p>
+<blockquote>
+<strong>核心建议</strong>
+<br>
+把 AI 当成一个能力很强但对你项目一无所知的新同事。你不会让新同事直接改代码，你会先给他介绍项目结构、技术栈、代码规范。对 AI 也一样。项目介绍越清楚，协作越高效。
+</blockquote>
+<p>下一节讲最重要的主题：怎么审查 AI 生成的代码，确保质量。</p>
+<div class="section-header">
+<div class="section-number">§06</div>
+<h2 class="section-title">别盲信导航：代码审查与质量把控</h2>
+<div class="section-subtitle">Don't Blindly Trust the GPS: Code Review and Quality Control</div>
+</div>
+<p>2025 年的一项研究数据：AI 生成的代码中，约 45% 包含安全漏洞。</p>
+<p>这个数字可能让你紧张。应该紧张。但紧张不等于不用，而是要建立一套审查流程。</p>
+<p>回想 GPS 隐喻：导航说右转，你扫一眼路况再转。不是为了不相信导航，是为了安全。</p>
+<h3>AI 生成代码的五大类问题</h3>
+<table>
+<thead><tr><th>问题类型</th><th>典型表现</th><th>风险等级</th><th>检查方法</th></tr></thead>
+<tbody><tr><td>安全漏洞</td><td>SQL 注入、XSS（跨站脚本攻击，一种 Web 安全漏洞）、硬编码密钥</td><td>高</td><td>安全扫描 + 人工审查</td></tr>
+<tr><td>逻辑错误</td><td>边界条件未处理、空指针</td><td>高</td><td>写测试 + 手动走一遍逻辑</td></tr>
+<tr><td>性能问题</td><td>N+1（一种数据库查询性能问题，循环中逐条查询而非批量查询）查询、内存泄漏</td><td>中</td><td>跑基准测试 + 看 profiling（性能分析，找出代码的耗时瓶颈）</td></tr>
+<tr><td>代码风格</td><td>命名不一致、缺少错误处理</td><td>低</td><td>Lint 工具 + 代码审查</td></tr>
+<tr><td>幻觉代码</td><td>调用不存在的 API、伪造函数</td><td>高</td><td>实际运行 + 查文档验证</td></tr>
+</tbody></table>
+<p>最后一类"幻觉代码"特别值得注意。AI 有时候会非常自信地调用一个根本不存在的函数或库。代码看起来完全合理，但你一跑就报错。</p>
+<h3>三遍审查法</h3>
+<p>我用的审查流程，简单但有效：</p>
+<h3>先跑起来</h3>
+<p><strong>第一遍：跑起来看效果。</strong></p>
+<p>不要先读代码。先运行，看结果是不是你想要的。如果运行结果就不对，读代码也没意义——直接让 AI 重写。</p>
+<h3>扫关键路径</h3>
+<p><strong>第二遍：扫关键路径。</strong></p>
+<p>不用逐行读。只看三个地方：</p>
+<ol>
+<li>输入处理 — 参数验证、类型检查做了没有</li>
+<li>核心逻辑 — 主流程的思路对不对</li>
+<li>输出处理 — 返回值、错误处理、边界情况</li>
+</ol>
+<h3>查安全依赖</h3>
+<p><strong>第三遍：查安全和依赖。</strong></p>
+<ol>
+<li>有没有硬编码的密钥、Token、密码</li>
+<li>有没有 SQL 拼接、eval（一个危险的 Python 函数，能执行任意字符串代码）、未转义的用户输入</li>
+<li>引入的新依赖是否必要、是否可信</li>
+</ol>
+<p>三遍做完，大概 5-10 分钟。比你从零写快得多，但足以挡住大部分问题。</p>
+<p>!<a href="images/three-pass-review.png">三遍审查法</a></p>
+<h3>让 AI 帮你审查 AI</h3>
+<p>一个有用的技巧：让 AI 审查自己（或其他 AI）生成的代码。</p>
+<p>在 Cursor 或 Claude Code 里：</p>
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">TEXT</span></div>
+<pre><code class="language-text">请审查以下代码，重点关注：
+<span class="syntax-number">1</span>. 安全漏洞
+<span class="syntax-number">2</span>. 逻辑错误
+<span class="syntax-number">3</span>. 性能问题
+<span class="syntax-number">4</span>. 是否有更好的实现方式
+[粘贴代码]
+</code></pre>
+</div>
+<p>AI 审查 AI 不是完美的，但它能帮你发现很多你一眼看不到的问题。两个不完美的审查者加在一起，比一个强。</p>
+<h3>自动化质量门禁</h3>
+<p>除了人工审查，用工具设几道自动门禁：</p>
+<table>
+<thead><tr><th>门禁</th><th>工具</th><th>作用</th></tr></thead>
+<tbody><tr><td>Lint</td><td>ESLint / Ruff</td><td>代码风格问题</td></tr>
+<tr><td>类型检查</td><td>TypeScript / mypy</td><td>类型错误</td></tr>
+<tr><td>单元测试</td><td>pytest / Jest</td><td>逻辑正确性</td></tr>
+<tr><td>安全扫描</td><td>Snyk / Bandit</td><td>已知漏洞</td></tr>
+<tr><td>Git Hook</td><td>pre-commit</td><td>提交前自动检查</td></tr>
+</tbody></table>
+<p>在项目一开始就让 AI 帮你配好这些工具。之后每次 AI 生成代码，门禁自动帮你挡住一部分问题。</p>
+<blockquote>
+<strong>核心建议</strong>
+<br>
+审查 AI 代码不是不信任 AI，是对用户负责。AI 不在乎代码跑在生产环境还是本地测试环境。你在乎。所以审查是你的责任，不是可选项。花 5 分钟审查，省 5 小时排故障。
+</blockquote>
+<p>下一节讲迭代——当 AI 的输出不完美时，怎么高效地让它改。</p>
+<div class="section-header">
+<div class="section-number">§07</div>
+<h2 class="section-title">走偏了就调头：迭代循环与重构策略</h2>
+<div class="section-subtitle">When GPS Leads You Astray: Iteration Loops and Refactoring</div>
+</div>
+<p>你不会第一次跟 AI 说需求就得到完美的代码。这不正常吗？太正常了。</p>
+<p>你跟 GPS 说"去机场"，它给你规划了一条路线。你开了一会儿发现前方修路，怎么办？你不会扔掉 GPS 徒步走，你会让它重新规划路线。</p>
+<p>Vibe Coding 的迭代也是这个道理。</p>
+<h3>三种迭代模式</h3>
+<p>根据问题的性质，有三种不同的迭代策略：</p>
+<h3>微调</h3>
+<p><strong>模式一：微调。</strong> 方向对，细节要改。</p>
+<p>AI 生成的代码 80% 没问题，但有几个小地方需要调整。比如变量命名、错误提示文案、某个参数的默认值。</p>
+<p>策略：直接告诉 AI 改哪里。"把第 15 行的超时时间从 5 秒改成 10 秒"、"错误信息改成中文"。</p>
+<h3>转向</h3>
+<p><strong>模式二：转向。</strong> 方向不对，重新来。</p>
+<p>AI 理解错了你的需求，或者选了一个你不认同的实现方式。代码能跑，但架构不是你想要的。</p>
+<p>策略：别在错误的方案上修补。回到起点，重新描述需求，加上这次你学到的东西。"不要用类的方式写，改成函数式的"、"不需要 ORM，直接写 SQL"。</p>
+<h3>拆解</h3>
+<p><strong>模式三：拆解。</strong> 需求太大，AI 吃不下。</p>
+<p>一次提的需求太多，AI 生成的代码虽然能跑但很混乱。</p>
+<p>策略：把一个大任务拆成几个小任务，一步步来。先让 AI 写核心逻辑，确认没问题后再加错误处理，再加测试，再加文档。</p>
+<p>!<a href="images/iteration-modes.png">三种迭代模式</a></p>
+<h3>迭代的节奏控制</h3>
+<p>什么时候该微调，什么时候该推倒重来？有个简单的判断标准：</p>
+<table>
+<thead><tr><th>状况</th><th>策略</th><th>为什么</th></tr></thead>
+<tbody><tr><td>改了两轮还没对</td><td>转向</td><td>方向可能就错了，继续修补是浪费时间</td></tr>
+<tr><td>代码越改越乱</td><td>拆解</td><td>任务可能太大，拆小了更容易控制</td></tr>
+<tr><td>只差最后一公里</td><td>微调</td><td>都走到这了，别轻易放弃</td></tr>
+<tr><td>AI 反复犯同一个错</td><td>换工具/换模型</td><td>当前模型可能不适合这个任务</td></tr>
+</tbody></table>
+<p>一个重要的经验：<strong>不要在一个错误的方向上迭代超过三轮。</strong> 三轮还没改好，说明问题不在细节，在方向。重新来。</p>
+<h3>Git 是你的安全网</h3>
+<p>每次 AI 生成一段你能接受的代码，立即提交。这样如果后面的修改搞砸了，你可以轻松回退。</p>
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">Bash</span></div>
+<pre><code class="language-bash"><span class="syntax-comment"># AI 帮你完成了用户注册功能，测试通过</span>
+<span class="syntax-keyword">git</span> add <span class="syntax-property">-A</span> &amp;&amp; <span class="syntax-keyword">git</span> commit <span class="syntax-property">-m</span> <span class="syntax-string">"feat: add user registration"</span>
+<span class="syntax-comment"># AI 继续做登录功能，但搞乱了注册功能</span>
+<span class="syntax-keyword">git</span> diff  <span class="syntax-comment"># 看看改了什么</span>
+<span class="syntax-keyword">git</span> checkout <span class="syntax-property">--</span> routes/auth.py  <span class="syntax-comment"># 只回退被搞乱的文件</span>
+</code></pre>
+</div>
+<p>这个工作流有一个名字：<strong>小步快跑，频繁提交。</strong> 每完成一个小功能就提交，永远有一个可以回退的安全点。</p>
+<h3>重构：什么时候该让人来</h3>
+<p>AI 擅长写新代码，不太擅长理解复杂的历史代码。当你的项目越来越大，你会发现 AI 开始"乱改"——改了一个地方，坏了另一个地方。</p>
+<p>这时候需要人来主导重构：</p>
+<ol>
+<li>你来规划重构方案（哪些模块要动、怎么解耦）</li>
+<li>你来决定重构的顺序（先改接口还是先改实现）</li>
+<li>让 AI 按你的方案逐个模块重构</li>
+<li>每重构一个模块就跑测试</li>
+</ol>
+<blockquote>
+<strong>核心建议</strong>
+<br>
+迭代是 Vibe Coding 的常态，不是异常。不要追求一次到位。第一次生成"能用"，第二次迭代"好用"，第三次打磨"漂亮"。三步走比一步到位快得多。GPS 给你规划路线也不是一次就最优的——它会根据路况实时调整。
+</blockquote>
+<p>接下来的 Part 3，我们正式动手：搭建环境、写第一个项目、调试、部署，全部实战。</p>
+<div class="part-header page-break">
+<div class="part-number">PART 3</div>
+<div class="part-rule"></div>
+<div class="part-title">动手搭建</div>
+</div>
+<div class="section-header">
+<div class="section-number">§08</div>
+<h2 class="section-title">选车加油：搭建 Vibe Coding 工作环境</h2>
+<div class="section-subtitle">Choose Your Ride and Fuel Up: Setting Up Your Vibe Coding Workspace</div>
+</div>
+<p>工欲善其事，必先配好工具。</p>
+<p>这一章我带你从零搭建一个 Vibe Coding 工作环境。以 Cursor 为主力工具，Claude Code 为辅助。如果你偏好其他工具，流程大同小异。</p>
+<h3>第一步：安装 Cursor</h3>
+<p>Cursor 是目前最受欢迎的 AI IDE，基于 VS Code 改造。你如果用过 VS Code，上手零成本。</p>
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">Bash</span></div>
+<pre><code class="language-bash"><span class="syntax-comment"># macOS 用 Homebrew 安装</span>
+<span class="syntax-keyword">brew</span> install <span class="syntax-property">--cask</span> cursor
+<span class="syntax-comment"># 或者去官网下载：https://cursor.sh</span>
+</code></pre>
+</div>
+<p>安装完成后，Cursor 会引导你导入 VS Code 的扩展和设置。如果你之前用 VS Code，建议全部导入。</p>
+<h3>第二步：配置 AI 模型</h3>
+<p>Cursor 内置了多个模型可选。推荐配置：</p>
+<table>
+<thead><tr><th>模型</th><th>用途</th><th>特点</th></tr></thead>
+<tbody><tr><td>Claude Sonnet</td><td>日常编码</td><td>速度快，质量稳定</td></tr>
+<tr><td>Claude Opus</td><td>复杂逻辑</td><td>最强推理，但较慢</td></tr>
+<tr><td>GPT-4o</td><td>备选</td><td>适合某些特定场景</td></tr>
+</tbody></table>
+<p>在 Settings <span class="flowchart-arrow">→</span> <span class="flowchart-box">Models 里开启你需要的模型。日常用 Sonnet 就够了，遇到复杂任务临时切 Opus。</span></p>
+<h3>第三步：安装 Claude Code</h3>
+<p>Claude Code 是终端里的 AI Agent。它比 Cursor 更适合处理复杂的多文件操作和项目级重构。</p>
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">Bash</span></div>
+<pre><code class="language-bash"><span class="syntax-comment"># 安装 Claude Code</span>
+<span class="syntax-keyword">npm</span> install <span class="syntax-property">-g</span> @anthropic-ai/claude-code
+<span class="syntax-comment"># 进入你的项目目录，启动</span>
+<span class="syntax-keyword">cd</span> your-project
+claude
+</code></pre>
+</div>
+<p>Claude Code 启动后会读取项目文件，你就可以用自然语言给它下指令了。</p>
+<h3>第四步：项目初始化模板</h3>
+<p>每开始一个新项目，建议先创建一个 <code>CLAUDE.md</code> 文件。这是 Claude Code 的项目说明文件，告诉 AI 你的项目结构、技术栈、代码规范。</p>
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">Markdown</span></div>
+<pre><code class="language-markdown"><span class="syntax-comment"># CLAUDE.md</span>
+<span class="syntax-comment">## 项目概述</span>
+一个 Python 命令行工具，用于批量处理图片。
+
+<span class="syntax-comment">## 技术栈</span>
+- Python <span class="syntax-number">3.12</span>+
+- Click（命令行框架）
+- Pillow（图片处理）
+- pytest（测试）
+
+<span class="syntax-comment">## 代码规范</span>
+- 使用 type hints（Python 的类型注解，帮助 IDE 和工具理解变量类型）
+- 函数必须有 docstring
+- 变量名用 snake_case
+- 注释用中文
+
+<span class="syntax-comment">## 项目结构</span>
+src/
+  cli.py      <span class="syntax-comment"># 命令行入口</span>
+  processor.py <span class="syntax-comment"># 图片处理逻辑</span>
+  utils.py    <span class="syntax-comment"># 工具函数</span>
+tests/         <span class="syntax-comment"># 测试目录</span>
+</code></pre>
+</div>
+<p>这个文件会让 AI 的输出质量提升一个档次。因为它不用猜你的规范，你已经写清楚了。</p>
+<h3>第五步：Git 初始化</h3>
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">Bash</span></div>
+<pre><code class="language-bash"><span class="syntax-comment"># 每个项目都从 Git 开始</span>
+<span class="syntax-keyword">mkdir</span> my-project &amp;&amp; <span class="syntax-keyword">cd</span> my-project
+<span class="syntax-keyword">git</span> init
+<span class="syntax-comment"># 创建 .gitignore</span>
+<span class="syntax-keyword">echo</span> <span class="syntax-string">"__pycache__/\n*.pyc\n.<span class="syntax-keyword">env</span>\nnode_modules/\n.DS_Store"</span> &gt; .gitignore
+<span class="syntax-keyword">git</span> add <span class="syntax-property">-A</span> &amp;&amp; <span class="syntax-keyword">git</span> commit <span class="syntax-property">-m</span> <span class="syntax-string">"init: project scaffold"</span>
+</code></pre>
+</div>
+<p>Git 不是可选项。在 Vibe Coding 的流程里，Git 是你的安全网。AI 每完成一步，你提交一次。搞砸了随时回退。</p>
+<h3>环境就绪检查清单</h3>
+<p>动笔写代码之前，确认以下都准备好了：</p>
+<ul>
+<li>[ ] Cursor 安装完成，能打开项目文件夹</li>
+<li>[ ] AI 模型已配置，对话窗口能正常使用</li>
+<li>[ ] Claude Code 已安装，在项目目录里能启动</li>
+<li>[ ] CLAUDE.md 已创建，写好了技术栈和代码规范</li>
+<li>[ ] Git 已初始化，第一次提交已完成</li>
+</ul>
+<blockquote>
+<strong>核心建议</strong>
+<br>
+环境配置只需要做一次，但 CLAUDE.md 每个项目都要写。花 10 分钟写好项目说明，省后面无数次的"AI 猜错了我的意图"。这不只是给 AI 看的——写 CLAUDE.md 的过程也是在帮你理清项目思路。
+</blockquote>
+<p>环境搭好了。下一节，我们用 Vibe Coding 写第一个项目。</p>
+<div class="section-header">
+<div class="section-number">§09</div>
+<h2 class="section-title">第一次上路：用自然语言写一个 CLI 工具</h2>
+<div class="section-subtitle">Your First Drive: Building a CLI Tool with Natural Language</div>
+</div>
+<p>到了最激动人心的部分：用 Vibe Coding 从零写一个能用的工具。</p>
+<p>我们要做一个文件整理器。功能很简单：扫描指定目录，按照文件类型（图片、文档、视频、音频、其他）自动分类到不同子文件夹。</p>
+<p>没有 AI，这个工具大概需要 1-2 小时。用 Vibe Coding，10-15 分钟。</p>
+<h3>第一步：描述需求</h3>
+<p>在 Cursor 里打开一个新的对话窗口（Cmd+L），输入：</p>
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">TEXT</span></div>
+<pre><code class="language-text">你是一个 Python 开发者。
+帮我写一个命令行工具，功能是整理指定目录下的文件。
+要求：
+<span class="syntax-number">1</span>. 扫描用户指定的目录
+<span class="syntax-number">2</span>. 按文件扩展名分类到子文件夹：images（jpg/png/gif/webp）、documents（pdf/docx/txt/xlsx）、videos（mp4/mov/avi）、audio（mp3/wav/flac）、others（其余所有）
+<span class="syntax-number">3</span>. 用移动操作（不是复制）
+<span class="syntax-number">4</span>. 显示处理了多少个文件
+<span class="syntax-number">5</span>. 支持 --dry-run 模式（只显示会做什么，不实际移动）
+用 Click 框架，Python <span class="syntax-number">3.12</span>+。
+</code></pre>
+</div>
+<p>AI 会生成一个完整的 Python 文件。我们来看看它大概会给你什么。</p>
+<h3>第二步：审查和运行</h3>
+<p>AI 生成的第一版代码，先别读。直接跑。</p>
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">Bash</span></div>
+<pre><code class="language-bash"><span class="syntax-comment"># 先看看帮助信息</span>
+python organizer.py <span class="syntax-property">--help</span>
+<span class="syntax-comment"># 用 dry-run 模式测试一下（不会真的移动文件）</span>
+python organizer.py ~/Downloads <span class="syntax-property">--dry-run</span>
+</code></pre>
+</div>
+<p>如果 dry-run 的输出符合预期——文件被正确分类了——那核心逻辑没问题。接下来正式运行：</p>
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">Bash</span></div>
+<pre><code class="language-bash">python organizer.py ~/Downloads
+</code></pre>
+</div>
+<h3>第三步：发现问题时迭代</h3>
+<p>大概率第一版不会完美。常见的问题：</p>
+<p><strong>问题 1：没有处理子目录。</strong> 你可能只想整理当前目录的文件，不想递归处理子目录。或者你想递归处理。</p>
+<p>解决方案：告诉 AI 你的需求。</p>
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">TEXT</span></div>
+<pre><code class="language-text">文件整理工具需要支持递归扫描子目录。
+加一个 --recursive 参数，默认不递归。
+</code></pre>
+</div>
+<p><strong>问题 2：目标文件夹已经存在同名文件。</strong> 直接移动会覆盖。</p>
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">TEXT</span></div>
+<pre><code class="language-text">移动文件时，如果目标文件夹已有同名文件，自动重命名。
+比如 photo.jpg <span class="flowchart-arrow">→</span> <span class="flowchart-box">photo_1.jpg </span><span class="flowchart-arrow">→</span> <span class="flowchart-box">photo_2.jpg。</span>
+</code></pre>
+</div>
+<p><strong>问题 3：没有进度显示。</strong> 文件多的时候，黑屏等半天不知道在干嘛。</p>
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">TEXT</span></div>
+<pre><code class="language-text">加一个进度条，显示当前处理进度。
+用 rich 库的进度条功能。
+</code></pre>
+</div>
+<p>每改完一个就提交一次：</p>
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">Bash</span></div>
+<pre><code class="language-bash"><span class="syntax-keyword">git</span> add <span class="syntax-property">-A</span> &amp;&amp; <span class="syntax-keyword">git</span> commit <span class="syntax-property">-m</span> <span class="syntax-string">"feat: add recursive scan support"</span>
+<span class="syntax-keyword">git</span> add <span class="syntax-property">-A</span> &amp;&amp; <span class="syntax-keyword">git</span> commit <span class="syntax-property">-m</span> <span class="syntax-string">"fix: handle duplicate filenames"</span>
+<span class="syntax-keyword">git</span> add <span class="syntax-property">-A</span> &amp;&amp; <span class="syntax-keyword">git</span> commit <span class="syntax-property">-m</span> <span class="syntax-string">"feat: add progress bar"</span>
+</code></pre>
+</div>
+<h3>完整的最终版本</h3>
+<p>经过几轮迭代，你大概会得到这样一个核心结构：</p>
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">Python</span></div>
+<pre><code class="language-python"><span class="syntax-function">@click</span>.command()
+<span class="syntax-function">@click</span>.argument(<span class="syntax-string">"directory"</span>, type=click.Path(exists=<span class="syntax-keyword">True</span>))
+<span class="syntax-function">@click</span>.option(<span class="syntax-string">"--dry-run"</span>, is_flag=<span class="syntax-keyword">True</span>, help=<span class="syntax-string">"只显示操作，不实际执行"</span>)
+<span class="syntax-function">@click</span>.option(<span class="syntax-string">"--recursive"</span>, is_flag=<span class="syntax-keyword">True</span>, help=<span class="syntax-string">"递归处理子目录"</span>)
+<span class="syntax-keyword">def</span> <span class="syntax-function">organize</span>(directory: str, dry_run: bool, recursive: bool):
+    <span class="syntax-string">"""整理指定目录下的文件，按类型分类到子文件夹。"""</span>
+    <span class="syntax-comment"># 用 Path 而不是字符串拼接，避免跨平台路径问题</span>
+    target = Path(directory)
+    <span class="syntax-comment"># glob 的 ** 表示递归，rglob 会自动递归子目录</span>
+    pattern = <span class="syntax-string">"<em>*/</em>"</span> <span class="syntax-keyword">if</span> recursive <span class="syntax-keyword">else</span> <span class="syntax-string">"*"</span>
+    files = [f <span class="syntax-keyword">for</span> f <span class="syntax-keyword">in</span> target.glob(pattern) <span class="syntax-keyword">if</span> f.is_file()]
+    <span class="syntax-comment"># 如果文件太少就不需要进度条了</span>
+    <span class="syntax-keyword">if</span> len(files) &gt; <span class="syntax-number">20</span>:
+        progress = Progress()
+        <span class="syntax-keyword">with</span> progress:
+            task = progress.add_task(<span class="syntax-string">"整理中..."</span>, total=len(files))
+            <span class="syntax-keyword">for</span> f <span class="syntax-keyword">in</span> files:
+                move_file(f, target, dry_run)
+                progress.advance(task)
+    <span class="syntax-keyword">else</span>:
+        <span class="syntax-keyword">for</span> f <span class="syntax-keyword">in</span> files:
+            move_file(f, target, dry_run)
+</code></pre>
+</div>
+<p>这不是伪代码，是真正能跑的代码。从描述需求到得到这个版本，如果你跟着做，应该不超过 20 分钟。</p>
+<blockquote>
+<strong>核心建议</strong>
+<br>
+第一个项目的关键是"跑起来"，不是"写完美"。10 分钟出第一版 <span class="flowchart-arrow">→</span> <span class="flowchart-box">测试 </span><span class="flowchart-arrow">→</span> <span class="flowchart-box">发现问题 </span><span class="flowchart-arrow">→</span> <span class="flowchart-box">5 分钟改好 </span><span class="flowchart-arrow">→</span> <span class="flowchart-box">再测试 </span><span class="flowchart-arrow">→</span> <span class="flowchart-box">再改。三轮迭代，比你在编辑器里想 2 小时然后一次写完快得多。</span>
+</blockquote>
+<p>下一节，我们讲最让人头疼的环节：当 AI 的代码跑不通时怎么调试。</p>
+<div class="section-header">
+<div class="section-number">§10</div>
+<h2 class="section-title">导航出错时：调试和排错实战</h2>
+<div class="section-subtitle">When Navigation Fails: Debugging and Troubleshooting in Practice</div>
+</div>
+<p>AI 写的代码能一次跑通吗？有时候能。大多数时候不能。</p>
+<p>别紧张，这不是 AI 的问题。你自己写的代码第一次就能跑通吗？</p>
+<p>调试是编程的一部分。只不过 Vibe Coding 的调试方式不太一样。</p>
+<h3>传统调试 vs Vibe Coding 调试</h3>
+<table>
+<thead><tr><th>维度</th><th>传统调试</th><th>Vibe Coding 调试</th></tr></thead>
+<tbody><tr><td>看报错</td><td>你自己看</td><td>把报错贴给 AI</td></tr>
+<tr><td>定位问题</td><td>print / debugger</td><td>问 AI "这个报错是什么意思"</td></tr>
+<tr><td>修复方式</td><td>你自己改代码</td><td>告诉 AI 报错信息，让它改</td></tr>
+<tr><td>验证</td><td>你自己跑测试</td><td>AI 跑测试，你看结果</td></tr>
+<tr><td>耗时</td><td>10-60 分钟</td><td>1-10 分钟</td></tr>
+</tbody></table>
+<p>效率差异巨大。但前提是你得会"问"。</p>
+<h3>把报错信息喂给 AI 的正确姿势</h3>
+<p>差的做法：只截一小段报错。</p>
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">TEXT</span></div>
+<pre><code class="language-text">报错了：TypeError: cannot unpack non-iterable NoneType object
+</code></pre>
+</div>
+<p>AI 会猜。猜大概率是猜错的。</p>
+<p>好的做法：报错信息 + 上下文 + 你在做什么。</p>
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">TEXT</span></div>
+<pre><code class="language-text">运行 python organizer.py ~/Downloads 时报错。
+完整报错：
+TypeError: cannot unpack non-iterable NoneType object
+  File <span class="syntax-string">"organizer.py"</span>, line <span class="syntax-number">42</span>, in categorize_file
+    category, ext = FILE_TYPES[ext]
+我在上一个版本基础上加了自定义分类功能。
+请分析原因并修复。
+</code></pre>
+</div>
+<h3>四步调试法</h3>
+<p>遇到 AI 的代码报错，按这个顺序处理：</p>
+<h3>贴报错</h3>
+<p><strong>第一步：把完整报错贴给 AI。</strong> 包括 traceback、文件名、行号。不要截断。</p>
+<h3>给上下文</h3>
+<p><strong>第二步：告诉 AI 你之前做了什么。</strong> "我刚加了递归扫描功能"或者"我把 Click 升级到了 8.2"。上下文很重要。</p>
+<h3>要解释</h3>
+<p><strong>第三步：让 AI 解释原因，不只是修代码。</strong> "先告诉我为什么错了，再给我修复方案。" 这一步帮你理解问题，而不只是换个能跑的代码。</p>
+<h3>加防护</h3>
+<p><strong>第四步：让 AI 加防御性代码。</strong> "修复这个问题，并在类似的地方加上防护。" 防止同一个坑踩两次。</p>
+<h3>常见报错模式</h3>
+<p>AI 生成代码中有几类特别常见的错误：</p>
+<table>
+<thead><tr><th>报错类型</th><th>根因</th><th>预防措施</th></tr></thead>
+<tbody><tr><td>ImportError / ModuleNotFoundError</td><td>AI 用了你没装的库</td><td>在 Prompt 里列出已安装的包</td></tr>
+<tr><td>AttributeError</td><td>AI 调用了不存在的方法（幻觉）</td><td>让 AI 确认 API 是否存在</td></tr>
+<tr><td>TypeError</td><td>类型假设错误</td><td>要求 AI 加 type hints</td></tr>
+<tr><td>FileNotFoundError</td><td>路径硬编码了绝对路径</td><td>要求 AI 用相对路径 + 配置</td></tr>
+<tr><td>IndentationError</td><td>AI 生成的代码缩进混乱</td><td>用 Lint 工具自动格式化</td></tr>
+</tbody></table>
+<h3>复杂 Bug 的策略</h3>
+<p>有些 bug 不是一眼能看出来的。这时候可以用"分治法"：</p>
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">TEXT</span></div>
+<pre><code class="language-text">这段代码的输出不符合预期。
+请帮我逐步调试：
+<span class="syntax-number">1</span>. 先在每个关键步骤后加 print，输出中间结果
+<span class="syntax-number">2</span>. 我会运行并把输出贴给你
+<span class="syntax-number">3</span>. 你根据中间结果判断问题在哪
+</code></pre>
+</div>
+<p>这比直接让 AI 猜"为什么不对"有效得多。因为你给了 AI 实际的数据，而不是让它凭空推理。</p>
+<blockquote>
+<strong>核心建议</strong>
+<br>
+调试 Vibe Coding 项目时，你的角色从"修代码的人"变成了"描述问题的人"。你不需要知道怎么修，但你必须能准确描述"哪里不对"。这就像跟修理厂描述车的问题——你不需要会修发动机，但你要能说清"加速时有异响"。
+</blockquote>
+<p>下一节，从本地测试到部署上线。</p>
+<div class="section-header">
+<div class="section-number">§11</div>
+<h2 class="section-title">从车库到马路：测试、部署与上线</h2>
+<div class="section-subtitle">From the Garage to the Road: Testing, Deployment, and Going Live</div>
+</div>
+<p>你的代码在本地跑通了。恭喜。但那只是停在车库里。</p>
+<p>要让代码真正有用，你需要测试保证它靠谱，部署让它能被访问。</p>
+<h3>让 AI 写测试</h3>
+<p>测试是 Vibe Coding 最被低估的用途。让 AI 写功能代码容易出错，但让 AI 写测试非常靠谱——因为测试的逻辑通常比业务逻辑简单、明确。</p>
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">TEXT</span></div>
+<pre><code class="language-text">为文件整理器 organizer.py 写单元测试。
+覆盖以下场景：
+<span class="syntax-number">1</span>. 正常分类各种文件类型
+<span class="syntax-number">2</span>. 重复文件名自动重命名
+<span class="syntax-number">3</span>. dry-run 模式不实际移动文件
+<span class="syntax-number">4</span>. 空目录不报错
+<span class="syntax-number">5</span>. 不存在的目录抛出明确异常
+用 pytest，测试文件放在 tests/ 目录。
+</code></pre>
+</div>
+<p>AI 生成的测试大概率一次就能跑通。因为测试的需求描述通常比业务需求更精确。</p>
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">Bash</span></div>
+<pre><code class="language-bash"><span class="syntax-comment"># 运行测试</span>
+pytest tests/ <span class="syntax-property">-v</span>
+<span class="syntax-comment"># 看覆盖率</span>
+pytest tests/ <span class="syntax-property">--cov</span>=src <span class="syntax-property">--cov-report</span>=term-missing
+</code></pre>
+</div>
+<h3>CI/CD：让测试自动跑</h3>
+<p>如果你把代码放在 GitHub 上，可以让 AI 帮你配一个 CI 流水线：</p>
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">TEXT</span></div>
+<pre><code class="language-text">帮我创建一个 GitHub Actions 工作流：
+<span class="syntax-number">1</span>. 每次 push 和 PR 都自动跑 pytest
+<span class="syntax-number">2</span>. Python <span class="syntax-number">3.12</span> 环境
+<span class="syntax-number">3</span>. 先安装依赖再跑测试
+<span class="syntax-number">4</span>. 测试失败时阻止合并
+</code></pre>
+</div>
+<p>AI 会给你一个 <code>.github/workflows/test.yml</code> 文件。放到项目里就行。以后每次你提交代码，测试自动跑。AI 生成的代码有问题？CI 会帮你挡住。</p>
+<h3>部署的选择</h3>
+<p>部署方式取决于你的项目类型：</p>
+<table>
+<thead><tr><th>项目类型</th><th>推荐部署方式</th><th>适合场景</th></tr></thead>
+<tbody><tr><td>CLI 工具</td><td>PyPI / Homebrew</td><td>给其他开发者用</td></tr>
+<tr><td>Web API</td><td>Railway / Fly.io</td><td>需要在线访问的服务</td></tr>
+<tr><td>静态网站</td><td>Vercel / Netlify</td><td>前端项目</td></tr>
+<tr><td>全栈应用</td><td>Render / Railway</td><td>前后端一体的项目</td></tr>
+<tr><td>Docker</td><td>任何云平台</td><td>需要环境一致性的项目</td></tr>
+</tbody></table>
+<p>当然，部署也可以让 AI 帮你。比如：</p>
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">TEXT</span></div>
+<pre><code class="language-text">帮我创建一个 Dockerfile：
+<span class="syntax-number">1</span>. 基于 python:<span class="syntax-number">3.12</span>-slim
+<span class="syntax-number">2</span>. 安装依赖
+<span class="syntax-number">3</span>. 设置入口点为 organizer.py
+<span class="syntax-number">4</span>. 暴露健康检查端口
+</code></pre>
+</div>
+<h3>发布前的检查清单</h3>
+<p>代码能跑 ≠ 可以发布。上线前过一遍这个清单：</p>
+<ul>
+<li>[ ] 所有测试通过（pytest / Jest）</li>
+<li>[ ] 没有 print 调试语句残留</li>
+<li>[ ] 没有 hardcoded 密钥或 Token</li>
+<li>[ ] .env 文件在 .gitignore 里</li>
+<li>[ ] README 写了安装和使用方法</li>
+<li>[ ] 依赖版本在 requirements.txt / package.json 里锁定</li>
+<li>[ ] 加了 LICENSE 文件</li>
+</ul>
+<blockquote>
+<strong>核心建议</strong>
+<br>
+测试是 Vibe Coding 里投入产出比最高的事情。让 AI 写功能代码你可能要改三遍，但让 AI 写测试几乎一次到位。先让 AI 写测试，再让 AI 写功能代码通过测试——这个"测试驱动"的 Vibe Coding 流程，比"先写代码后补测试"靠谱得多。
+</blockquote>
+<p>接下来的 Part 4，进入实战环节。三个端到端项目，覆盖 Web 应用、自动化脚本和项目扩展。</p>
+<div class="part-header page-break">
+<div class="part-number">PART 4</div>
+<div class="part-rule"></div>
+<div class="part-title">实战场景</div>
+</div>
+<div class="section-header">
+<div class="section-number">§12</div>
+<h2 class="section-title">实战一：从零搭建一个 Web 应用</h2>
+<div class="section-subtitle">Project 1: Building a Web App from Scratch</div>
+</div>
+<p>前面三章都是小工具。这次我们来做一个真正的 Web 应用：一个书签管理器。</p>
+<p>功能：保存网页链接、打标签、搜索、按分类浏览。</p>
+<p>为什么选这个项目？因为它覆盖了 Web 开发的核心环节——前端、后端、数据库、部署——但复杂度可控，适合 Vibe Coding 的节奏。</p>
+<h3>第一步：选技术栈</h3>
+<p>用 Prompt 告诉 AI 你想要什么：</p>
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">TEXT</span></div>
+<pre><code class="language-text">我要做一个书签管理 Web 应用。
+技术栈：
+- 后端：FastAPI（Python <span class="syntax-number">3.12</span>）
+- 数据库：SQLite + SQLAlchemy
+- 前端：用 Jinja2 模板 + Tailwind CSS（不需要前端框架）
+- 认证：简单的密码保护，不需要用户注册
+功能：
+<span class="syntax-number">1</span>. 添加书签（URL + 标题 + 描述 + 标签）
+<span class="syntax-number">2</span>. 编辑和删除书签
+<span class="syntax-number">3</span>. 按标签筛选
+<span class="syntax-number">4</span>. 全文搜索（标题和描述）
+<span class="syntax-number">5</span>. 导出为 JSON
+请先给我项目结构和数据库模型设计。
+</code></pre>
+</div>
+<p>AI 会给你一个清晰的项目结构。审查一下，觉得合理就让它继续。</p>
+<h3>第二步：数据库模型</h3>
+<p>AI 给你的模型大概长这样：</p>
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">Python</span></div>
+<pre><code class="language-python"><span class="syntax-keyword">class</span> <span class="syntax-class">Bookmark</span>(Base):
+    __tablename__ = <span class="syntax-string">"bookmarks"</span>
+    id = Column(Integer, primary_key=<span class="syntax-keyword">True</span>)
+    url = Column(String(<span class="syntax-number">2048</span>), nullable=<span class="syntax-keyword">False</span>, index=<span class="syntax-keyword">True</span>)
+    <span class="syntax-comment"># 用 title 而不是 name，因为书签天然有标题属性</span>
+    title = Column(String(<span class="syntax-number">500</span>), nullable=<span class="syntax-keyword">False</span>)
+    description = Column(Text, default=<span class="syntax-string">""</span>)
+    <span class="syntax-comment"># tags 用逗号分隔的字符串，简单但够用</span>
+    tags = Column(String(<span class="syntax-number">500</span>), default=<span class="syntax-string">""</span>)
+    created_at = Column(DateTime, default=<span class="syntax-keyword">lambda</span>: datetime.now(timezone.utc))
+    updated_at = Column(DateTime, default=<span class="syntax-keyword">lambda</span>: datetime.now(timezone.utc), onupdate=<span class="syntax-keyword">lambda</span>: datetime.now(timezone.utc))
+</code></pre>
+</div>
+<p>你看一眼：字段够不够、类型对不对、索引合理不合理。有问题就改，没问题就下一步。</p>
+<h3>第三步：后端 API</h3>
+<p>继续跟 AI 说：</p>
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">TEXT</span></div>
+<pre><code class="language-text">基于上面的模型，帮我写后端 API：
+POST /bookmarks — 添加书签
+GET /bookmarks — 列表（支持 tag 和 q 参数筛选）
+GET /bookmarks/{id} — 详情
+PUT /bookmarks/{id} — 编辑
+DELETE /bookmarks/{id} — 删除
+GET /export — 导出 JSON
+先只写 API 路由和逻辑，前端后面做。
+</code></pre>
+</div>
+<h3>第四步：前端页面</h3>
+<p>后端搞定后，让 AI 生成前端：</p>
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">TEXT</span></div>
+<pre><code class="language-text">帮我写前端页面，用 Jinja2 模板 + Tailwind CSS：
+<span class="syntax-number">1</span>. 首页：书签列表 + 搜索栏 + 标签筛选
+<span class="syntax-number">2</span>. 添加/编辑页：表单（URL、标题、描述、标签输入）
+<span class="syntax-number">3</span>. 配色用蓝色系，布局简洁
+标签输入支持：输入时自动补全已有标签。
+</code></pre>
+</div>
+<h3>第五步：测试和部署</h3>
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">TEXT</span></div>
+<pre><code class="language-text">帮我写测试覆盖：
+<span class="syntax-number">1</span>. 添加、编辑、删除书签
+<span class="syntax-number">2</span>. 搜索功能
+<span class="syntax-number">3</span>. 标签筛选
+<span class="syntax-number">4</span>. 导出功能
+用 pytest + httpx（FastAPI 的 TestClient）。
+</code></pre>
+</div>
+<p>部署：</p>
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">TEXT</span></div>
+<pre><code class="language-text">帮我创建：
+<span class="syntax-number">1</span>. Dockerfile（基于 python:<span class="syntax-number">3.12</span>-slim）
+<span class="syntax-number">2</span>. docker-compose.yml（应用 + 数据卷）
+<span class="syntax-number">3</span>. 一个简单的部署脚本
+</code></pre>
+</div>
+<h3>项目复盘</h3>
+<p>这个项目从头到尾，你跟 AI 的交互大约 8-10 轮。每轮 2-5 分钟。总时间大概 30-60 分钟。如果纯手写，这个项目至少要一整天。</p>
+<table>
+<thead><tr><th>环节</th><th>Vibe Coding</th><th>纯手写</th></tr></thead>
+<tbody><tr><td>项目结构设计</td><td>2 分钟</td><td>15 分钟</td></tr>
+<tr><td>数据库模型</td><td>5 分钟</td><td>30 分钟</td></tr>
+<tr><td>后端 API</td><td>15 分钟</td><td>2-3 小时</td></tr>
+<tr><td>前端页面</td><td>15 分钟</td><td>3-4 小时</td></tr>
+<tr><td>测试</td><td>10 分钟</td><td>1-2 小时</td></tr>
+<tr><td>部署配置</td><td>5 分钟</td><td>30 分钟</td></tr>
+<tr><td><strong>总计</strong></td><td><strong>~50 分钟</strong></td><td><strong>~8 小时</strong></td></tr>
+</tbody></table>
+<p>效率提升约 8-10 倍。而且代码质量不比你手写的差——前提是你每一步都审查了。</p>
+<blockquote>
+<strong>核心建议</strong>
+<br>
+做 Web 应用时，把后端和前端分开做。先让 AI 写完后端 API，用 curl 或浏览器测试 API 能跑，再让它写前端。不要一次把前后端都扔给 AI，它容易顾此失彼。
+</blockquote>
+<p>下一节，换个场景——自动化脚本。</p>
+<div class="section-header">
+<div class="section-number">§13</div>
+<h2 class="section-title">实战二：自动化工作流脚本</h2>
+<div class="section-subtitle">Project 2: Automating Your Workflow</div>
+</div>
+<p>日常开发里有很多重复性操作：每次部署要跑一堆命令、每次发版要改好几个文件、每周要汇总数据做报告。</p>
+<p>这些事情不难，但烦。Vibe Coding 最擅长解决的就是这类"重复性但不是核心业务"的工作。</p>
+<h3>场景：自动周报生成器</h3>
+<p>假设你是一个开发者，每周五需要写一份周报，内容包括：</p>
+<ul>
+<li>本周完成了哪些 commit</li>
+<li>哪些 PR 合并了</li>
+<li>代码统计（新增/删除/修改行数）</li>
+<li>下周计划（需要手动填写）</li>
+</ul>
+<h3>第一步：描述需求</h3>
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">TEXT</span></div>
+<pre><code class="language-text">帮我写一个 Python 脚本，自动生成本周工作周报。
+输入：Git 仓库路径
+输出：Markdown 格式的周报
+需要：
+<span class="syntax-number">1</span>. 用 git log 获取本周（周一到今天）的 commit 记录
+<span class="syntax-number">2</span>. 用 git log --stat 统计代码变更行数
+<span class="syntax-number">3</span>. 用 git shortlog 按日期分组 commit
+<span class="syntax-number">4</span>. 生成 Markdown 格式的周报模板，包含以上信息
+<span class="syntax-number">5</span>. 预留<span class="syntax-string">"下周计划"</span>部分供手动填写
+用 subprocess 调用 git 命令，不需要 GitPython 库。
+</code></pre>
+</div>
+<h3>第二步：AI 生成的核心代码</h3>
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">Python</span></div>
+<pre><code class="language-python"><span class="syntax-keyword">def</span> <span class="syntax-function">get_week_commits</span>(repo_path: str) -&gt; list[dict]:
+    <span class="syntax-string">"""获取本周的 commit 记录。"""</span>
+    <span class="syntax-comment"># 用 --since 限定时间范围，比在 Python 里过滤高效</span>
+    monday = get_last_monday()
+    result = subprocess.run(
+        [<span class="syntax-string">"git"</span>, <span class="syntax-string">"log"</span>, <span class="syntax-string">"--since"</span>, monday, <span class="syntax-string">"--pretty=format:%H|%s|%ai"</span>],
+        cwd=repo_path,
+        capture_output=<span class="syntax-keyword">True</span>,
+        text=<span class="syntax-keyword">True</span>,
+    )
+    commits = []
+    <span class="syntax-keyword">for</span> line <span class="syntax-keyword">in</span> result.stdout.strip().split(<span class="syntax-string">"\n"</span>):
+        <span class="syntax-keyword">if</span> <span class="syntax-keyword">not</span> line:
+            <span class="syntax-keyword">continue</span>
+        hash_val, subject, date = line.split(<span class="syntax-string">"|"</span>, <span class="syntax-number">2</span>)
+        commits.append({<span class="syntax-string">"hash"</span>: hash_val[:<span class="syntax-number">8</span>], <span class="syntax-string">"subject"</span>: subject, <span class="syntax-string">"date"</span>: date})
+    <span class="syntax-keyword">return</span> commits
+</code></pre>
+</div>
+<h3>第三步：迭代增强</h3>
+<p>第一版可能只有基础的 commit 列表。你可以逐步加功能：</p>
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">TEXT</span></div>
+<pre><code class="language-text">在周报里加上代码统计：
+<span class="syntax-number">1</span>. 本周新增行数 / 删除行数 / 修改行数
+<span class="syntax-number">2</span>. 改动最多的文件 Top <span class="syntax-number">5</span>
+<span class="syntax-number">3</span>. 按目录统计改动（比如 src/ vs tests/）
+</code></pre>
+</div>
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">TEXT</span></div>
+<pre><code class="language-text">加一个 --team 参数，支持汇总多个项目的工作：
+<span class="syntax-number">1</span>. 扫描指定目录下的所有 Git 仓库
+<span class="syntax-number">2</span>. 汇总每个仓库的 commit
+<span class="syntax-number">3</span>. 按项目分组展示
+</code></pre>
+</div>
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">TEXT</span></div>
+<pre><code class="language-text">加一个功能：自动检测 git remote 是 GitHub 的话，
+获取本周合并的 PR 列表（用 gh 命令）。
+</code></pre>
+</div>
+<h3>第四步：美化输出</h3>
+<p>让 AI 生成一个更好看的周报模板：</p>
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">Markdown</span></div>
+<pre><code class="language-markdown"><span class="syntax-comment"># 周报 - <span class="syntax-number">2026</span>-<span class="syntax-number">04</span>-<span class="syntax-number">06</span> ~ <span class="syntax-number">2026</span>-<span class="syntax-number">04</span>-<span class="syntax-number">11</span></span>
+
+<span class="syntax-comment">## 本周工作</span>
+
+<span class="syntax-comment">### 项目 A</span>
+- feat: 添加用户注册功能 (<span class="syntax-number">3</span> commits, +<span class="syntax-number">245</span> -<span class="syntax-number">32</span> lines)
+- fix: 修复登录超时问题 (<span class="syntax-number">1</span> commit, +<span class="syntax-number">12</span> -<span class="syntax-number">8</span> lines)
+
+<span class="syntax-comment">### 代码统计</span>
+ PLACEHOLDER0 
+
+<span class="syntax-comment">### 合并的 PR</span>
+- <span class="syntax-comment">#<span class="syntax-number">42</span> 用户注册模块</span>
+- <span class="syntax-comment">#<span class="syntax-number">43</span> 登录 Bug 修复</span>
+
+<span class="syntax-comment">## 下周计划</span>
+- [ ] （请手动填写）
+</code></pre>
+</div>
+<h3>其他自动化场景</h3>
+<p>这个周报生成器只是一个例子。以下是其他适合 Vibe Coding 的自动化场景：</p>
+<table>
+<thead><tr><th>场景</th><th>Prompt 关键描述</th><th>预计时间</th></tr></thead>
+<tbody><tr><td>数据库备份脚本</td><td>"写一个脚本，每天凌晨自动备份 MySQL 数据库，保留最近 7 天"</td><td>5 分钟</td></tr>
+<tr><td>日志分析工具</td><td>"分析 Nginx access.log，统计 Top 20 访问 URL 和状态码分布"</td><td>10 分钟</td></tr>
+<tr><td>部署脚本</td><td>"写一个一键部署脚本：拉代码、安装依赖、跑迁移、重启服务"</td><td>10 分钟</td></tr>
+<tr><td>图片批量处理</td><td>"批量压缩指定目录下的图片，保持尺寸不变，质量降到 80%"</td><td>5 分钟</td></tr>
+<tr><td>API Mock 服务器</td><td>"用 FastAPI 做一个 Mock 服务器，根据 JSON 配置返回假数据"</td><td>15 分钟</td></tr>
+</tbody></table>
+<blockquote>
+<strong>核心建议</strong>
+<br>
+自动化脚本是 Vibe Coding 最佳切入点。原因很简单：需求明确、边界清晰、不需要复杂架构。如果你刚开始学 Vibe Coding，别上来就做大项目。先从自动化脚本开始，熟悉流程后再挑战更复杂的场景。
+</blockquote>
+<p>下一节，第三种场景：给现有项目加功能。</p>
+<div class="section-header">
+<div class="section-number">§14</div>
+<h2 class="section-title">实战三：给现有项目加新功能</h2>
+<div class="section-subtitle">Project 3: Adding Features to an Existing Project</div>
+</div>
+<p>前面的项目都是从零开始。但实际工作中，更常见的场景是：你有一个已有的项目，需要加新功能。</p>
+<p>这对 Vibe Coding 是更大的挑战。因为 AI 需要理解已有的代码结构和逻辑。</p>
+<h3>场景：给一个 Flask 博客加评论功能</h3>
+<p>假设你有一个用 Flask 写的博客系统，现在要加评论功能。</p>
+<h3>第一步：让 AI 理解项目</h3>
+<p>不要上来就说"加评论功能"。先让 AI 熟悉项目。</p>
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">TEXT</span></div>
+<pre><code class="language-text">请先阅读以下文件，理解项目结构：
+- app.py（主入口）
+- models.py（数据库模型）
+- routes/（路由目录）
+- templates/（模板目录）
+阅读完成后，告诉我：
+<span class="syntax-number">1</span>. 这个项目的技术栈和结构
+<span class="syntax-number">2</span>. 现有的数据库模型
+<span class="syntax-number">3</span>. 路由的组织方式
+</code></pre>
+</div>
+<p>AI 会读你的代码然后给你一个总结。你看它的理解是否正确。如果有偏差，补充信息。</p>
+<h3>第二步：设计新功能</h3>
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">TEXT</span></div>
+<pre><code class="language-text">在理解项目的基础上，帮我设计评论功能：
+<span class="syntax-number">1</span>. 评论关联到文章（Post 模型）
+<span class="syntax-number">2</span>. 支持匿名评论（名字 + 内容，不需要登录）
+<span class="syntax-number">3</span>. 评论按时间倒序显示
+<span class="syntax-number">4</span>. 简单的防垃圾：同一 IP 每分钟最多评论一次
+请先给出数据库模型设计，不要写代码。
+</code></pre>
+</div>
+<p>先要设计，再写代码。这是 Vibe Coding 处理已有项目的重要原则。</p>
+<h3>第三步：逐模块实现</h3>
+<p>设计确认后，按模块让 AI 写代码：</p>
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">TEXT</span></div>
+<pre><code class="language-text">先写 Comment 模型和数据库迁移。
+</code></pre>
+</div>
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">Python</span></div>
+<pre><code class="language-python"><span class="syntax-keyword">class</span> <span class="syntax-class">Comment</span>(Base):
+    __tablename__ = <span class="syntax-string">"comments"</span>
+    id = Column(Integer, primary_key=<span class="syntax-keyword">True</span>)
+    <span class="syntax-comment"># 关联到 Post，用外键保证引用完整性</span>
+    post_id = Column(Integer, ForeignKey(<span class="syntax-string">"posts.id"</span>), nullable=<span class="syntax-keyword">False</span>, index=<span class="syntax-keyword">True</span>)
+    author_name = Column(String(<span class="syntax-number">100</span>), nullable=<span class="syntax-keyword">False</span>)
+    content = Column(Text, nullable=<span class="syntax-keyword">False</span>)
+    <span class="syntax-comment"># 存 IP 用于防垃圾评论，不展示给用户</span>
+    ip_address = Column(String(<span class="syntax-number">45</span>), nullable=<span class="syntax-keyword">False</span>)
+    created_at = Column(DateTime, default=<span class="syntax-keyword">lambda</span>: datetime.now(timezone.utc))
+    <span class="syntax-comment"># 建立和 Post 的关系，方便 post.comments 直接访问</span>
+    post = relationship(<span class="syntax-string">"Post"</span>, backref=<span class="syntax-string">"comments"</span>)
+</code></pre>
+</div>
+<p>然后逐步加路由、前端、测试。每一步都确认后再继续。</p>
+<h3>已有项目的注意事项</h3>
+<p>给现有项目加功能比从零开始更考验你的把控能力：</p>
+<table>
+<thead><tr><th>风险</th><th>表现</th><th>对策</th></tr></thead>
+<tbody><tr><td>AI 不理解现有架构</td><td>生成的代码风格和项目不一致</td><td>先让 AI 读代码，确认它理解了再写</td></tr>
+<tr><td>改错了现有功能</td><td>加评论时把文章展示搞坏了</td><td>每次改动后跑全部测试</td></tr>
+<tr><td>代码冲突</td><td>AI 改了别人正在改的文件</td><td>用 Git 分支，不在 main 上直接改</td></tr>
+<tr><td>上下文溢出</td><td>项目太大，AI 看不完</td><td>只给 AI 看相关的文件，别喂整个项目</td></tr>
+</tbody></table>
+<h3>关键原则：增量式推进</h3>
+
+<div class="code-block">
+<div class="code-block-header"><span class="code-block-lang">TEXT</span></div>
+<pre><code class="language-text">正确的顺序：
+<span class="syntax-number">1</span>. 让 AI 读懂项目 <span class="flowchart-arrow">→</span> <span class="flowchart-box">确认理解正确</span>
+<span class="syntax-number">2</span>. 让 AI 设计方案 <span class="flowchart-arrow">→</span> <span class="flowchart-box">你审查方案</span>
+<span class="syntax-number">3</span>. 让 AI 写模型 <span class="flowchart-arrow">→</span> <span class="flowchart-box">你审查模型</span>
+<span class="syntax-number">4</span>. 让 AI 写路由 <span class="flowchart-arrow">→</span> <span class="flowchart-box">你审查路由</span>
+<span class="syntax-number">5</span>. 让 AI 写前端 <span class="flowchart-arrow">→</span> <span class="flowchart-box">你审查前端</span>
+<span class="syntax-number">6</span>. 让 AI 写测试 <span class="flowchart-arrow">→</span> <span class="flowchart-box">你跑测试</span>
+每一步确认后才开始下一步。
+</code></pre>
+</div>
+<p>不要一口气让 AI 全做完。已有项目的改动牵一发而动全身，增量式推进才能保证每一步不出问题。</p>
+<blockquote>
+<strong>核心建议</strong>
+<br>
+在已有项目里用 Vibe Coding，关键是控制 AI 的"视野"。不要把整个项目都喂给它，只给它看和当前任务相关的文件。就像你让导航带你去一个地方，不需要把整张地图都展开——你只需要看到当前位置到目的地之间的路线。
+</blockquote>
+<p>Part 5，我们拔高视角：对比工具、讨论趋势，帮你形成自己的判断。</p>
+<div class="part-header page-break">
+<div class="part-number">PART 5</div>
+<div class="part-rule"></div>
+<div class="part-title">深度思考</div>
+</div>
+<div class="section-header">
+<div class="section-number">§15</div>
+<h2 class="section-title">工具横评：六款主流工具对比选型</h2>
+<div class="section-subtitle">Tool Showdown: Comparing Six Mainstream AI Coding Tools</div>
+</div>
+<p>我用过六款主流的 AI 编程工具，每个都花了不少时间深入使用。这一章把我的判断全摊开给你看。</p>
+<p>先说结论：没有最好的工具，只有最适合你的工具组合。</p>
+<h3>六款工具速览</h3>
+<table>
+<thead><tr><th>工具</th><th>类型</th><th>定位</th><th>价格</th></tr></thead>
+<tbody><tr><td>Cursor</td><td>AI IDE</td><td>日常开发的主力编辑器</td><td>$20/月</td></tr>
+<tr><td>Claude Code</td><td>终端 Agent</td><td>深度代码操作和项目重构</td><td>按量计费</td></tr>
+<tr><td>Windsurf (Codeium)</td><td>AI IDE</td><td>Cursor 的平价替代</td><td>$15/月</td></tr>
+<tr><td>GitHub Copilot</td><td>编辑器插件</td><td>行内补全，轻量级辅助</td><td>$10/月</td></tr>
+<tr><td>Bolt.new</td><td>Web 平台</td><td>快速原型，零配置</td><td>$20/月</td></tr>
+<tr><td>Replit</td><td>Web 平台</td><td>在线编码 + 一键部署</td><td>$25/月</td></tr>
+</tbody></table>
+<h3>分维度对比</h3>
+<p><strong>代码生成质量：</strong></p>
+<table>
+<thead><tr><th>工具</th><th>单文件质量</th><th>多文件一致性</th><th>复杂逻辑</th><th>评分</th></tr></thead>
+<tbody><tr><td>Cursor</td><td>优秀</td><td>良好</td><td>良好</td><td>8.5/10</td></tr>
+<tr><td>Claude Code</td><td>优秀</td><td>优秀</td><td>优秀</td><td>9/10</td></tr>
+<tr><td>Windsurf</td><td>良好</td><td>良好</td><td>中等</td><td>7.5/10</td></tr>
+<tr><td>Copilot</td><td>良好</td><td>一般</td><td>一般</td><td>7/10</td></tr>
+<tr><td>Bolt.new</td><td>良好</td><td>一般</td><td>较弱</td><td>6.5/10</td></tr>
+<tr><td>Replit</td><td>中等</td><td>中等</td><td>较弱</td><td>6/10</td></tr>
+</tbody></table>
+<p><strong>上下文理解能力：</strong></p>
+<table>
+<thead><tr><th>工具</th><th>上下文来源</th><th>项目级理解</th><th>自定义指令</th></tr></thead>
+<tbody><tr><td>Cursor</td><td>手动 @文件 + 项目索引</td><td>中等</td><td>.cursorrules（Cursor 和 Windsurf 的项目配置文件，类似 CLAUDE.md）</td></tr>
+<tr><td>Claude Code</td><td>自动搜索 + CLAUDE.md</td><td>强</td><td>CLAUDE.md</td></tr>
+<tr><td>Windsurf</td><td>自动分析</td><td>中等</td><td>.windsurfrules（Cursor 和 Windsurf 的项目配置文件，类似 CLAUDE.md）</td></tr>
+<tr><td>Copilot</td><td>当前文件 + workspace</td><td>弱</td><td>.github/copilot</td></tr>
+<tr><td>Bolt.new</td><td>对话历史</td><td>弱</td><td>无</td></tr>
+<tr><td>Replit</td><td>对话历史 + 文件树</td><td>中等</td><td>无</td></tr>
+</tbody></table>
+<p><strong>工作流适配：</strong></p>
+<table>
+<thead><tr><th>场景</th><th>最佳选择</th><th>次优选择</th></tr></thead>
+<tbody><tr><td>日常功能开发</td><td>Cursor</td><td>Windsurf</td></tr>
+<tr><td>复杂项目重构</td><td>Claude Code</td><td>Cursor</td></tr>
+<tr><td>行内补全</td><td>Copilot</td><td>Cursor</td></tr>
+<tr><td>快速原型验证</td><td>Bolt.new</td><td>Replit</td></tr>
+<tr><td>在线协作</td><td>Replit</td><td>Bolt.new</td></tr>
+<tr><td>学习新技术</td><td>Cursor</td><td>Claude Code</td></tr>
+<tr><td>零代码基础</td><td>Bolt.new</td><td>Replit</td></tr>
+</tbody></table>
+<h3>我的推荐组合</h3>
+<p>根据不同的开发者画像，推荐不同的工具组合：</p>
+<h3>独立开发者</h3>
+<p><strong>如果你是独立开发者 / 副业 maker：</strong></p>
+<p>主力：Cursor + Claude Code</p>
+<p>理由：Cursor 做日常开发，Claude Code 处理复杂任务。互补性强。</p>
+<h3>团队开发者</h3>
+<p><strong>如果你是团队开发者：</strong></p>
+<p>主力：Cursor + Copilot</p>
+<p>理由：Copilot 做行内补全（团队可能已经付费），Cursor 做 Agent 模式。</p>
+<h3>产品经理</h3>
+<p><strong>如果你是产品经理 / 设计师：</strong></p>
+<p>主力：Bolt.new + Replit</p>
+<p>理由：零配置、可视化强、不需要本地环境。</p>
+<h3>省钱方案</h3>
+<p><strong>如果你想省钱：</strong></p>
+<p>主力：Windsurf + Claude Free Tier</p>
+<p>理由：Windsurf 免费版就够日常用，Claude 免费版偶尔辅助。</p>
+<h3>什么时候该换工具</h3>
+<p>工具迭代很快。今天的最佳选择可能半年后就不是了。几个信号告诉你该重新评估了：</p>
+<ol>
+<li>你的 AI 工具频繁生成错误代码，且迭代多轮修不好</li>
+<li>你花在等 AI 响应上的时间比写代码还多</li>
+<li>团队里其他人用的工具明显比你高效</li>
+<li>有新工具发布了并且有可靠的评测数据</li>
+</ol>
+<blockquote>
+<strong>核心建议</strong>
+<br>
+别纠结"哪个最好"。挑一个主力工具（Cursor 或 Claude Code），深度用两周。用顺了再加第二个工具处理主力不擅长的场景。工具组合 > 单一工具。就像 GPS 导航：日常用 Google Maps，去野外用 Gaia GPS。不是一个地图打天下。
+</blockquote>
+<p>最后一章，聊聊 Vibe Coding 对我们的职业和行业意味着什么。</p>
+<div class="section-header">
+<div class="section-number">§16</div>
+<h2 class="section-title">Vibe Coding 之后：职业、教育与软件工程的未来</h2>
+<div class="section-subtitle">After Vibe Coding: Careers, Education, and the Future of Software Engineering</div>
+</div>
+<p>最后一章，不写代码了。聊聊大的。</p>
+<h3>一个不舒服的事实</h3>
+<p>Vibe Coding 不会取代程序员。但会写 Vibe Coding 的程序员，会取代不会写的程序员。</p>
+<p>这句话不是危言耸听。你回想一下 GPS 出现后出租车行业发生了什么：司机没被 GPS 取代，但不会用导航的司机被会用导航的司机取代了。GPS 改变的是竞争门槛，不是岗位本身。</p>
+<p>Vibe Coding 在做同样的事。</p>
+<h3>编程能力的新定义</h3>
+<p>2024 年之前，"会编程"的意思是：能手写代码实现功能。</p>
+<p>2026 年之后，"会编程"的意思变成了：</p>
+<table>
+<thead><tr><th>维度</th><th>传统定义</th><th>新定义</th></tr></thead>
+<tbody><tr><td>核心能力</td><td>写代码</td><td>描述需求 + 审查代码</td></tr>
+<tr><td>效率标准</td><td>一天写多少行</td><td>一天交付多少功能</td></tr>
+<tr><td>价值来源</td><td>实现细节</td><td>架构决策和业务理解</td></tr>
+<tr><td>学习重点</td><td>语言语法和 API</td><td>系统思维和沟通表达</td></tr>
+<tr><td>竞争优势</td><td>代码写得快</td><td>需求想得清楚</td></tr>
+</tbody></table>
+<p>这不是说编程技术不重要了。而是说，"写代码"从核心能力变成了基础能力。就像开车：会踩油门和刹车是基础，但导航和路线规划才是决定你能不能准时到的关键。</p>
+<h3>不会被 AI 取代的能力</h3>
+<p>有些能力是 AI 短期内无法替代的：</p>
+<table>
+<thead><tr><th>能力</th><th>为什么 AI 做不了</th></tr></thead>
+<tbody><tr><td>理解模糊的业务需求</td><td>需要和人沟通、理解上下文、做判断</td></tr>
+<tr><td>系统架构设计</td><td>需要权衡利弊、考虑长期演进</td></tr>
+<tr><td>代码审查和决策</td><td>需要对质量标准和风险有判断力</td></tr>
+<tr><td>调试复杂问题</td><td>需要"诊断思维"，不是模式匹配</td></tr>
+<tr><td>团队协作</td><td>需要沟通、妥协、领导力</td></tr>
+<tr><td>创造性解决问题</td><td>需要跨领域联想和创新思维</td></tr>
+</tbody></table>
+<h3>新手起步</h3>
+<p><strong>学生 / 刚入行（0-2 年）：</strong></p>
+<p>一定先学编程基础。Python、Git、数据库、HTTP——这些是基本功。没有驾驶技术，GPS 再好也白搭。</p>
+<p>然后用 Vibe Coding 加速学习。遇到不懂的概念，让 AI 给你解释、写示例代码。学习效率能提升 3-5 倍。</p>
+<p>但别跳过"手写代码"的阶段。你必须经历"一行一行写、一个 bug 一个 bug 调"的过程，才能真正理解代码是怎么工作的。</p>
+<h3>中级进阶</h3>
+<p><strong>中级开发者（2-5 年）：</strong></p>
+<p>这是 Vibe Coding 最大的受益群体。你已经知道什么是好代码，只是写起来费时间。AI 帮你省时间，你帮 AI 把关质量。</p>
+<p>重点学：Prompt 工程、代码审查技巧、AI 工具的高级用法。把你的经验通过 CLAUDE.md 和自定义规则传递给 AI，让它按你的标准写代码。</p>
+<h3>资深提效</h3>
+<p><strong>资深开发者（5 年以上）：</strong></p>
+<p>你最大的挑战不是写代码，是做决策。技术选型、架构设计、团队协作——这些 AI 帮不了太多。</p>
+<p>但 Vibe Coding 可以帮你快速验证想法。以前你想试一个架构方案要花一天搭 prototype，现在 30 分钟就能看到效果。</p>
+<h3>软件工程的未来走向</h3>
+<p>我的判断，三年内会看到这些变化：</p>
+<h3>短期预测</h3>
+<p><strong>短期（1 年内）：</strong></p>
+<ul>
+<li>Vibe Coding 成为开发者的标准技能，就像今天没人不会用搜索引擎</li>
+<li>企业开始招聘"AI 辅助开发效率"作为加分项</li>
+<li>代码审查从"检查实现"变成"检查 AI 输出的合理性"</li>
+</ul>
+<h3>中期趋势</h3>
+<p><strong>中期（1-3 年）：</strong></p>
+<ul>
+<li>初级开发者的角色从"写代码"变成"AI 输出审核员"</li>
+<li>项目交付速度提升 3-5 倍，但软件质量的标准不会降</li>
+<li>出现"AI 原生"的开发方法论和最佳实践</li>
+</ul>
+<h3>长期展望</h3>
+<p><strong>长期（3 年以上）：</strong></p>
+<ul>
+<li>自然语言编程成为主流，手写代码变成"高级技能"</li>
+<li>软件工程师的价值核心从"实现"转向"设计和决策"</li>
+<li>编程教育的重点从语法转向系统思维</li>
+</ul>
+<h3>最后的建议</h3>
+<p>回到 GPS 隐喻。</p>
+<p>GPS 改变了出行方式，但它没有改变出行需要人这件事。你仍然需要决定去哪、判断路况、处理突发情况。</p>
+<p>Vibe Coding 改变了编程方式，但它没有改变编程需要人这件事。你仍然需要理解需求、设计架构、把控质量。</p>
+<p>唯一的问题是：你是愿意当那个会用 GPS 的司机，还是坚持凭记忆认路的人。</p>
+<blockquote>
+<strong>核心建议</strong>
+<br>
+不要等"AI 编程成熟了"再开始学。现在就是最好的时候。工具已经够用，社区资源已经丰富，唯一缺的是你的实践。跟着这本教程做三个项目，你就会超越 90% 还在观望的人。GPS 不是等完全精准了才用的——它从第一天起就比凭记忆认路强。
+</blockquote>
+<p>旅程到此结束。但你的 Vibe Coding 之旅才刚刚开始。</p>
+
+    </div>
+
+    <div class="container">
+        <div class="content-footer">
+            本手册基于 Vibe Coding 实战教程 编写。AI 工具迭代迅速，部分内容可能随版本更新而变化，请以官方文档为准。
+        </div>
+    </div>
+</body>
+</html>
