@@ -40,23 +40,7 @@ const cases = [
     techStack: ['LangGraph', 'LangChain', 'OpenAI', 'FastAPI', 'pytest'],
     architecture: 'Router → Greeter/Product/Finance/Appointment + 16 Tools',
   },
-  {
-    id: 'agent-xray',
-    name: 'Agent X-Ray',
-    tagline: 'Multi-Agent 运行时可视化调试工具',
-    category: 'DevTools',
-    description:
-      '框架无关的 Multi-Agent 运行时可视化调试工具。基于 React Flow 实现智能体执行流程的实时可视化，支持深度调试和状态追踪。纯 Web 实现，零部署成本，支持 LangGraph、CrewAI 等多种框架。',
-    highlights: [
-      { label: '框架无关设计', detail: 'SDK 适配多种 Agent 框架（LangGraph/CrewAI/OTel）' },
-      { label: '深度运行时调试', detail: '支持断点、变量检查、调用栈追踪' },
-      { label: '纯 Web 零部署', detail: '无需安装，打开浏览器即可使用' },
-      { label: '静态分析 Scanner', detail: '自动检测项目中的 Agent 架构和组件' },
-    ],
-    techStack: ['Next.js 14', 'React Flow', 'Zustand', 'TypeScript', 'Python SDK'],
-    architecture: 'SDK → Scanner → Import → Topology + Timeline + Inspector',
-  },
-  {
+{
     id: 'content-forge',
     name: 'ContentForge AI',
     tagline: 'AI 内容自动化生产线',
@@ -71,22 +55,6 @@ const cases = [
     ],
     techStack: ['Python', '多 LLM', 'GitHub Actions', 'Hugo', 'Markdown'],
     architecture: 'Trigger → Research → Draft → Review → Publish → Monitor',
-  },
-  {
-    id: 'mediacrawler',
-    name: 'MediaCrawler',
-    tagline: '多平台内容智能爬虫',
-    category: 'Infrastructure',
-    description:
-      '支持抖音、小红书、微博、B站、快手、贴吧、知乎等多个平台的内容爬取工具。基于 CDP (Chrome DevTools Protocol) 实现无侵入式数据采集，支持搜索、详情、创作者等多种爬取模式。',
-    highlights: [
-      { label: '7 大平台支持', detail: '抖音/小红书/微博/B站/快手/贴吧/知乎' },
-      { label: 'CDP 无侵入采集', detail: '基于浏览器协议，绕过反爬限制' },
-      { label: '多种爬取模式', detail: '搜索/详情/创作者模式灵活切换' },
-      { label: 'Cookie 持久化', detail: '登录状态持久保存，减少重复登录' },
-    ],
-    techStack: ['Python', 'Playwright', 'CDP', 'AsyncIO'],
-    architecture: 'Config → CDP Browser → Platform Adapter → Data Pipeline',
   },
 ];
 

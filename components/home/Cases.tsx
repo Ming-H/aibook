@@ -22,16 +22,7 @@ const cases = [
     techStack: ['LangGraph', 'LangChain', 'OpenAI', 'FastAPI'],
     category: 'Multi-Agent',
   },
-  {
-    id: 'agent-xray',
-    name: 'Agent X-Ray',
-    tagline: 'Multi-Agent 运行时可视化调试工具',
-    description: '框架无关的 Multi-Agent 运行时可视化工具。基于 React Flow 实现Agent执行流程的实时可视化，支持深度调试和状态追踪。纯Web实现，零部署成本。',
-    highlights: ['框架无关设计', '深度运行时调试', '纯Web零部署', '实时可视化追踪'],
-    techStack: ['Next.js 14', 'React Flow', 'Zustand', 'TypeScript'],
-    category: 'DevTools',
-  },
-  {
+{
     id: 'content-forge',
     name: 'ContentForge AI',
     tagline: 'AI 内容自动化生产线',
