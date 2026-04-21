@@ -92,3 +92,11 @@ Thumbs.db
 /generated/prisma
 .env.production
 .env.r2
+
+# Design tools
+.agents/
+.claude/
+.goose/
+.trae/
+.windsurf/
+skills-lock.json
