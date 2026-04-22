@@ -127,24 +127,7 @@ export function Hero() {
                   ))}
                 </div>
 
-                <div className="mt-5 grid grid-cols-2 gap-3">
-                  <div className="rounded-[20px] border border-[var(--border-default)] bg-[var(--background-secondary)] px-4 py-3">
-                    <p className="font-mono text-[0.68rem] uppercase tracking-[0.2em] text-[var(--text-muted)]">
-                      Focus
-                    </p>
-                    <p className="mt-1.5 text-sm font-medium tracking-[-0.01em]">
-                      Agent 编排 · 知识检索 · 业务集成
-                    </p>
-                  </div>
-                  <div className="rounded-[20px] border border-[var(--border-default)] bg-[var(--background-secondary)] px-4 py-3">
-                    <p className="font-mono text-[0.68rem] uppercase tracking-[0.2em] text-[var(--text-muted)]">
-                      Output
-                    </p>
-                    <p className="mt-1.5 text-sm font-medium tracking-[-0.01em]">
-                      需求到上线，交付可运行成果
-                    </p>
-                  </div>
-                </div>
+
               </div>
 
               <div className="rounded-[24px] border border-[var(--border-default)] bg-[linear-gradient(180deg,rgba(82,167,255,0.18),transparent_50%),var(--background-primary)] p-5">
