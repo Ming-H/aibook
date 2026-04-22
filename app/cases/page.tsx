@@ -60,11 +60,11 @@ export default function CasesPage() {
           <div className="mx-auto max-w-section">
             <div className="max-w-3xl">
               <span className="eyebrow animate-fade-in-down">Selected work</span>
-              <h1 className=”section-heading mt-5 animate-text-reveal”>
+              <h1 className="section-heading mt-5 animate-text-reveal">
                 每个项目背后都有真实的业务场景和可验证的落地过程
               </h1>
               <p
-                className=”section-copy mt-4 max-w-2xl animate-fade-in-up”
+                className="section-copy mt-4 max-w-2xl animate-fade-in-up"
                 style={{ animationDelay: '0.15s', opacity: 0 }}
               >
                 场景、架构、结果——用可验证的交付物说明每个项目的落地能力
