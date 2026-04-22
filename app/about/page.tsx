@@ -44,19 +44,17 @@ export default function AboutPage() {
       <ScrollAnimator>
         <section className="px-5 pb-10 pt-14 sm:px-8 md:pb-14 md:pt-16">
           <div className="mx-auto max-w-section">
-            <div className="grid gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-end">
+            <div className="grid gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-start">
               <div className="max-w-3xl">
                 <span className="eyebrow animate-fade-in-down">About the builder</span>
                 <h1 className="section-heading mt-5 animate-text-reveal">
-                  我做的不只是 AI 项目，
-                  <br />
-                  也是它们真正落地的方式
+                  把 AI 项目从想法推进到真正可运行的落地成果
                 </h1>
                 <p
-                  className="section-copy mt-5 max-w-2xl animate-fade-in-up"
+                  className="section-copy mt-4 max-w-2xl animate-fade-in-up"
                   style={{ animationDelay: '0.15s', opacity: 0 }}
                 >
-                  专注于将 AI Agent、自动化工作流和智能应用变成可运行、可上线的项目成果——不是 Demo，是真正能用的系统
+                  从 Agent 系统到自动化工作流，从智能应用到部署上线——不做 Demo，只交付可运行的项目成果
                 </p>
               </div>
 

@@ -67,12 +67,10 @@ export default function ServicesPage() {
             <div className="max-w-3xl">
               <span className="eyebrow animate-fade-in-down">Services</span>
               <h1 className="section-heading mt-5 animate-text-reveal">
-                我提供的不是概念展示，
-                <br />
-                而是 AI 项目的真实落地能力
+                我提供的不是概念展示，而是 AI 项目的真实落地能力
               </h1>
               <p
-                className="section-copy mt-5 max-w-2xl animate-fade-in-up"
+                className="section-copy mt-4 max-w-2xl animate-fade-in-up"
                 style={{ animationDelay: '0.15s', opacity: 0 }}
               >
                 从 Agent 架构设计到自动化工作流开发，从部署上线到团队赋能，每一步都指向可交付、可上线的项目成果
