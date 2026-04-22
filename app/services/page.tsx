@@ -67,7 +67,7 @@ export default function ServicesPage() {
             <div className="max-w-3xl">
               <span className="eyebrow animate-fade-in-down">Services</span>
               <h1 className="section-heading mt-5 animate-text-reveal">
-                我提供的不是概念展示，而是 AI 项目的真实落地能力
+                我们提供的不是概念展示，而是 AI 项目的真实落地能力
               </h1>
               <p
                 className="section-copy mt-4 max-w-2xl animate-fade-in-up"
