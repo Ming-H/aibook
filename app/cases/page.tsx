@@ -12,7 +12,7 @@ const cases = [
     id: 'growth-pilot',
     category: 'Growth infrastructure',
     name: 'GrowthPilot Agent',
-    tagline: '面向货运平台的增长决策 Agent 系统',
+    tagline: '面向 APP 用户增长的增长决策 Agent 系统',
     description: '通过多 Agent 协作、因果推断和模型分层，把增长动作从经验驱动升级为具备决策逻辑的自动化系统',
     details: [
       '6 个专业 Agent 协同工作',
@@ -26,7 +26,7 @@ const cases = [
     id: 'smart-sales',
     category: 'Sales orchestration',
     name: 'Smart Sales Agent',
-    tagline: '面向汽车销售场景的多 Agent 对话系统',
+    tagline: '面向销售场景的多 Agent 对话系统',
     description: '通过 Scope 路由 DAG、Checkpoint 持久化和工具系统，把多轮销售流程组织成可持续演进的智能对话体验',
     details: [
       '5 Agent + 16 工具协同',

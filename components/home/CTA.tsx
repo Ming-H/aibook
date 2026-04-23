@@ -1,36 +1,41 @@
-'use client';
-
 import Link from 'next/link';
 
 export function CTA() {
   return (
-    <section className="px-5 py-14 sm:px-8 md:py-20">
-      <div className="mx-auto max-w-section">
-        <div className="surface-panel overflow-hidden rounded-[28px] p-8 md:p-10">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(82,167,255,0.18),transparent_24%),radial-gradient(circle_at_bottom_left,rgba(184,242,119,0.12),transparent_28%)]" />
+    <section className="bg-white px-6 py-24">
+      <div className="mx-auto max-w-[1200px] text-center">
+        <h2
+          className="mx-auto max-w-[600px] font-bold leading-[1.00]"
+          style={{
+            fontSize: 'clamp(32px, 4.5vw, 54px)',
+            letterSpacing: '-1.875px',
+            color: 'rgba(0, 0, 0, 0.95)',
+            fontFeatureSettings: '"lnum" 1, "locl" 1',
+          }}
+        >
+          推进你的 AI 项目
+        </h2>
 
-          <div className="relative z-10 grid gap-10 lg:grid-cols-[1fr_auto] lg:items-end">
-            <div className="max-w-3xl">
-              <span className="eyebrow">Start the project</span>
-              <h2 className="section-heading mt-5">
-                如果你想推进 AI Agent
-                <br />
-                或 AI 应用落地，现在就可以开始
-              </h2>
-              <p className="section-copy mt-4 max-w-2xl">
-                无论你是企业团队还是个人创业者，AI Agent 和智能应用的落地都可以从一次对话开始
-              </p>
-            </div>
+        <p
+          className="mx-auto mt-4 max-w-[480px]"
+          style={{
+            fontSize: '20px',
+            lineHeight: 1.40,
+            letterSpacing: '-0.125px',
+            fontWeight: 600,
+            color: '#615d59',
+          }}
+        >
+          从一次对话开始，把想法变成可运行的产品
+        </p>
 
-            <div className="relative z-10 flex flex-col gap-4 sm:flex-row lg:flex-col">
-              <Link href="/contact" className="btn-primary rounded-full px-8 py-3.5 text-sm font-semibold">
-                联系我聊项目
-              </Link>
-              <Link href="/about" className="btn-secondary rounded-full px-8 py-3.5 text-sm font-semibold">
-                先了解我的背景
-              </Link>
-            </div>
-          </div>
+        <div className="mt-8 flex items-center justify-center gap-4">
+          <Link href="/contact" className="btn-primary">
+            联系合作
+          </Link>
+          <Link href="/about" className="btn-secondary">
+            了解背景
+          </Link>
         </div>
       </div>
     </section>

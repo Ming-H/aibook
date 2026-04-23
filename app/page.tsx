@@ -1,10 +1,6 @@
 import { Hero } from '@/components/home/Hero';
-import { Stats } from '@/components/home/Stats';
-import { Services } from '@/components/home/Services';
-import { Cases } from '@/components/home/Cases';
-import { Process } from '@/components/home/Process';
+import { ProductShowcase } from '@/components/home/ProductShowcase';
 import { CTA } from '@/components/home/CTA';
-import { ScrollAnimator } from '@/components/ScrollAnimator';
 
 export const dynamic = 'force-static';
 
@@ -22,14 +18,9 @@ export const metadata = {
 export default function HomePage() {
   return (
     <div className="page-shell">
-      <ScrollAnimator>
-        <Hero />
-        <Stats />
-        <Services />
-        <Cases />
-        <Process />
-        <CTA />
-      </ScrollAnimator>
+      <Hero />
+      <ProductShowcase />
+      <CTA />
     </div>
   );
 }
